@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
-@TeleOp(name = "Position Test")
+@TeleOp(group = "Tests", name = "Position Test")
 public class PositionTest extends OpMode {
     BHI260IMU imu;
 
@@ -19,15 +19,22 @@ public class PositionTest extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
 
-    double wheel_circ, ticksPerRev, track_width, k;
-    double fwd, str, theta;
+    double wheel_circ, ticksPerRev, track_width, k, forward_offset;
+    double fwd, str;
 
-    double x, y;
+    double x, y, theta;
+
+    double prev_ticks_left = 0, prev_ticks_right = 0, prev_ticks_back = 0;
+
+    double dx, dy, dtheta;
+
+    double dx_center, dx_perpendicular;
 
     @Override
     public void init() {
         wheel_circ = 157.08; // mm
-        track_width = 292.1; // mm
+        track_width = 285; // mm
+        forward_offset = 140; // mm
         k = 165.1; // mm
         ticksPerRev = 8192;
 
@@ -57,13 +64,9 @@ public class PositionTest extends OpMode {
 
         TelemetryPacket packet = new TelemetryPacket();
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        packet.put("x", 3.7);
-        double[] xs = {x-5, x-5, x+5, x+5};
-        double[] ys = {y-5, y+5, y+5, y-5};
+        double[] xs = {x/100 -5, x/100 -5, x/100+5, x/100+5};
+        double[] ys = {y/100 -5, y/100 +5, y/100+5, y/100-5};
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
-//        packet.fieldOverlay()
-//                .setFill("blue")
-//                .fillRect(-20, -20, 40, 40);
 
         double move = gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
@@ -74,34 +77,58 @@ public class PositionTest extends OpMode {
         backLeft.setPower(move - turn - strafe);
         backRight.setPower(move + turn + strafe);
 
-        double ticks_left = frontLeft.getCurrentPosition();
-        double ticks_right = frontRight.getCurrentPosition();
-        double ticks_back = backRight.getCurrentPosition();
+        double delta_ticks_left = frontLeft.getCurrentPosition() - prev_ticks_left;
+        double delta_ticks_right = frontRight.getCurrentPosition() - prev_ticks_right;
+        double delta_ticks_back = backRight.getCurrentPosition() - prev_ticks_back;
 
-        double dist_left = ticks_left / ticksPerRev * wheel_circ;
-        double dist_right = ticks_right / ticksPerRev * wheel_circ;
-        double dist_back = ticks_back / ticksPerRev * wheel_circ;
+//        double dist_left = ticks_left / ticksPerRev * wheel_circ;
+//        double dist_right = ticks_right / ticksPerRev * wheel_circ;
+//        double dist_back = ticks_back / ticksPerRev * wheel_circ;
 
-        theta = (dist_right-dist_left)/(2*(track_width/2));
-        fwd = ((dist_left + dist_right) / 2)/25.4;
-        str = (dist_back - k * theta)/25.4;
+        dtheta = (delta_ticks_left - delta_ticks_right) / track_width;
+        dx_center = (delta_ticks_left + delta_ticks_right) / 2;
+        dx_perpendicular = delta_ticks_back - (forward_offset * dtheta);
 
-        double r = Math.sqrt(Math.pow(fwd, 2) + Math.pow(str, 2));
-        double theta0 = Math.atan2(fwd, str);
-        x = r * Math.cos(theta0 - theta);
-        y = r * Math.sin(theta0 - theta);
+        dx = dx_center * Math.cos(theta) - dx_perpendicular * Math.sin(theta);
+        dy = dx_center * Math.sin(theta) + dx_perpendicular * Math.cos(theta);
 
-        telemetry.addData("ticks left", ticks_left);
-        telemetry.addData("ticks right", ticks_right);
-        telemetry.addData("ticks back", ticks_back);
-        telemetry.addData("fwd", fwd);
-        telemetry.addData("str", str);
-        telemetry.addData("theta", theta);
-        telemetry.addData("theta0", theta0);
-        telemetry.addData("x", x);
-        telemetry.addData("y", y);
+//        double dx += dx_center * Math.cos(theta) - dx_perpendicular * Math.sin(theta);
+//        dougle dy += dx_center * Math.sin(theta) + dx_perpendicular * Math.cos(theta);
+//        double dtheta += (delta_ticks_left - delta_ticks_right) / track_width;
+        x += dx;
+        y += dy;
+        theta += dtheta;
+
+
+//        theta = (dist_right-dist_left)/(2*(track_width/2));
+//        fwd = ((dist_left + dist_right) / 2)/25.4;
+//        str = (dist_back - k * theta)/25.4;
+//
+//        double r = Math.sqrt(Math.pow(fwd, 2) + Math.pow(str, 2));
+//        double theta0 = Math.atan2(fwd, str);
+//        x = r * Math.cos(theta0 - theta);
+//        y = r * Math.sin(theta0 - theta);
+
+        telemetry.addData("ticks back", prev_ticks_back);
+        telemetry.addData("ticks right", prev_ticks_right);
+        telemetry.addData("ticks left", prev_ticks_left);
+//        telemetry.addData("fwd", fwd);
+//        telemetry.addData("str", str);
+        telemetry.addData("theta", theta/ ticksPerRev * wheel_circ);
+//        telemetry.addData("theta0", theta0);
+        telemetry.addData("x", x/ ticksPerRev * wheel_circ);
+        telemetry.addData("y", y/ ticksPerRev * wheel_circ);
+        telemetry.addData("dx", dx);
+        telemetry.addData("dy", dy);
+        telemetry.addData("dtheta", dtheta);
+        telemetry.addData("perpendicular", dx_perpendicular);
+        telemetry.addData("center", dx_center);
         telemetry.update();
         dashboard.sendTelemetryPacket(packet);
+
+        prev_ticks_back = backRight.getCurrentPosition();
+        prev_ticks_left = frontLeft.getCurrentPosition();
+        prev_ticks_right = frontRight.getCurrentPosition();
+
     }
 }
-
