@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 @TeleOp(group = "Tests", name = "Position Test")
+@Config
 public class PositionTest extends OpMode {
     BHI260IMU imu;
 
@@ -19,7 +21,9 @@ public class PositionTest extends OpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
 
-    double wheel_circ, ticksPerRev, track_width, k, forward_offset;
+//    double leftOffset, rightOffset, backOffset;
+
+    public static double wheel_circ, ticksPerRev, track_width, forward_offset;
     double fwd, str;
 
     double x, y, theta;
@@ -30,12 +34,14 @@ public class PositionTest extends OpMode {
 
     double dx_center, dx_perpendicular;
 
+    double side_length = 2;
+
     @Override
     public void init() {
+
         wheel_circ = 157.08; // mm
-        track_width = 285; // mm
-        forward_offset = 140; // mm
-        k = 165.1; // mm
+        track_width = 285; // mm distance between drive wheels
+        forward_offset = 140; // mm distance from center of robot to perp wheel
         ticksPerRev = 8192;
 
         BHI260IMU.Parameters parameters = new IMU.Parameters(
@@ -53,6 +59,10 @@ public class PositionTest extends OpMode {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
+//        leftOffset = frontLeft.getCurrentPosition();
+//        rightOffset = frontRight.getCurrentPosition();
+//        backOffset = backRight.getCurrentPosition();
+
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
@@ -64,8 +74,20 @@ public class PositionTest extends OpMode {
 
         TelemetryPacket packet = new TelemetryPacket();
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        double[] xs = {x/100 -5, x/100 -5, x/100+5, x/100+5};
-        double[] ys = {y/100 -5, y/100 +5, y/100+5, y/100-5};
+        double[] xs = {(side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
+                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
+                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
+                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x};
+
+//        ((x - 5) * Math.cos(theta) - (y - 5) * Math.sin(theta)) + 5
+//        ((y - 5) * Math.sin(theta) - (x - 5) * Math.cos(theta)) + 5
+
+
+        double[] ys = {(side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
+                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
+                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
+                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y};
+
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
 
         double move = gamepad1.left_stick_y;
@@ -77,52 +99,36 @@ public class PositionTest extends OpMode {
         backLeft.setPower(move - turn - strafe);
         backRight.setPower(move + turn + strafe);
 
-        double delta_ticks_left = frontLeft.getCurrentPosition() - prev_ticks_left;
-        double delta_ticks_right = frontRight.getCurrentPosition() - prev_ticks_right;
-        double delta_ticks_back = backRight.getCurrentPosition() - prev_ticks_back;
+        double delta_ticks_left = (frontLeft.getCurrentPosition() - prev_ticks_left) / ticksPerRev * wheel_circ;
+        double delta_ticks_right = (frontRight.getCurrentPosition() - prev_ticks_right) / ticksPerRev * wheel_circ;
+        double delta_ticks_back = (backRight.getCurrentPosition() - prev_ticks_back) / ticksPerRev * wheel_circ;
 
-//        double dist_left = ticks_left / ticksPerRev * wheel_circ;
-//        double dist_right = ticks_right / ticksPerRev * wheel_circ;
-//        double dist_back = ticks_back / ticksPerRev * wheel_circ;
-
-        dtheta = (delta_ticks_left - delta_ticks_right) / track_width;
+        dtheta = ((delta_ticks_left - delta_ticks_right) / track_width) * 2;
         dx_center = (delta_ticks_left + delta_ticks_right) / 2;
         dx_perpendicular = delta_ticks_back - (forward_offset * dtheta);
 
         dx = dx_center * Math.cos(theta) - dx_perpendicular * Math.sin(theta);
         dy = dx_center * Math.sin(theta) + dx_perpendicular * Math.cos(theta);
 
-//        double dx += dx_center * Math.cos(theta) - dx_perpendicular * Math.sin(theta);
-//        dougle dy += dx_center * Math.sin(theta) + dx_perpendicular * Math.cos(theta);
-//        double dtheta += (delta_ticks_left - delta_ticks_right) / track_width;
         x += dx;
         y += dy;
         theta += dtheta;
 
 
-//        theta = (dist_right-dist_left)/(2*(track_width/2));
-//        fwd = ((dist_left + dist_right) / 2)/25.4;
-//        str = (dist_back - k * theta)/25.4;
-//
-//        double r = Math.sqrt(Math.pow(fwd, 2) + Math.pow(str, 2));
-//        double theta0 = Math.atan2(fwd, str);
-//        x = r * Math.cos(theta0 - theta);
-//        y = r * Math.sin(theta0 - theta);
-
         telemetry.addData("ticks back", prev_ticks_back);
         telemetry.addData("ticks right", prev_ticks_right);
         telemetry.addData("ticks left", prev_ticks_left);
-//        telemetry.addData("fwd", fwd);
-//        telemetry.addData("str", str);
-        telemetry.addData("theta", theta/ ticksPerRev * wheel_circ);
-//        telemetry.addData("theta0", theta0);
-        telemetry.addData("x", x/ ticksPerRev * wheel_circ);
-        telemetry.addData("y", y/ ticksPerRev * wheel_circ);
+        telemetry.addData("theta", theta);
+        telemetry.addData("x", x);
+        telemetry.addData("y", y);
         telemetry.addData("dx", dx);
         telemetry.addData("dy", dy);
         telemetry.addData("dtheta", dtheta);
         telemetry.addData("perpendicular", dx_perpendicular);
         telemetry.addData("center", dx_center);
+        telemetry.addData("d_back", delta_ticks_back);
+        telemetry.addData("d_left", delta_ticks_left);
+        telemetry.addData("d_right", delta_ticks_right);
         telemetry.update();
         dashboard.sendTelemetryPacket(packet);
 
