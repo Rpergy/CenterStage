@@ -34,14 +34,16 @@ public class PositionTest extends OpMode {
 
     double dx_center, dx_perpendicular;
 
-    double side_length = 2;
+    double side_length = 5;
+
+    double scale = 0.0737;
 
     @Override
     public void init() {
 
         wheel_circ = 157.08; // mm
-        track_width = 285; // mm distance between drive wheels
-        forward_offset = 140; // mm distance from center of robot to perp wheel
+        track_width = 280; // mm distance between drive wheels
+        forward_offset = 145; // mm distance from center of robot to perp wheel
         ticksPerRev = 8192;
 
         BHI260IMU.Parameters parameters = new IMU.Parameters(
@@ -74,19 +76,19 @@ public class PositionTest extends OpMode {
 
         TelemetryPacket packet = new TelemetryPacket();
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        double[] xs = {(side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
-                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
-                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x,
-                (side_length * Math.cos(theta) - side_length * Math.sin(theta)) + x};
+        double[] xs = {(side_length * Math.cos(theta) - side_length * Math.sin(theta)) + 5,
+                (-side_length * Math.cos(theta) - side_length * Math.sin(theta)) + 5,
+                (side_length * Math.sin(theta) - side_length * Math.cos(theta)) + 5,
+                (side_length * Math.cos(theta) + side_length * Math.sin(theta)) + 5};
 
-//        ((x - 5) * Math.cos(theta) - (y - 5) * Math.sin(theta)) + 5
-//        ((y - 5) * Math.sin(theta) - (x - 5) * Math.cos(theta)) + 5
+//        double[] xs = {scale * x + side_length, scale * x + side_length, scale * x + -side_length, scale * x + -side_length};
 
+//        double[] ys = {scale * y + side_length, scale * y + -side_length, scale * y + -side_length, scale * y + side_length};
 
-        double[] ys = {(side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
-                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
-                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y,
-                (side_length * Math.sin(theta) + side_length * Math.cos(theta)) + y};
+        double[] ys = {(side_length * Math.sin(theta) + side_length * Math.cos(theta)) + 5,
+                (-side_length * Math.sin(theta) + side_length * Math.cos(theta)) + 5,
+                (-side_length * Math.cos(theta) - side_length * Math.sin(theta)) + 5,
+                (side_length * Math.sin(theta) - side_length * Math.cos(theta)) + 5};
 
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
 
