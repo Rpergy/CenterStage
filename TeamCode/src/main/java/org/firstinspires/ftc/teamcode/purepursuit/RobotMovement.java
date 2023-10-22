@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.purepursuit;
 
-import static org.firstinspires.ftc.teamcode.purepursuit.Functions.AngleWrap;
+import static org.firstinspires.ftc.teamcode.purepursuit.utility.Functions.AngleWrap;
+import static org.firstinspires.ftc.teamcode.purepursuit.utility.Functions.lineCircleIntersection;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -8,11 +9,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.purepursuit.utility.CurvePoint;
+import org.firstinspires.ftc.teamcode.purepursuit.utility.Point;
+import org.firstinspires.ftc.teamcode.purepursuit.utility.Pose;
+
+import java.util.ArrayList;
+
 public class RobotMovement {
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public static double wheel_circ, ticksPerRev, track_width, forward_offset;
-    Pose worldPos;
+    Pose worldPose;
     double prev_ticks_left = 0, prev_ticks_right = 0, prev_ticks_back = 0;
     double dx, dy, dtheta;
     double dx_center, dx_perpendicular;
@@ -38,21 +45,21 @@ public class RobotMovement {
 
         scale = wheel_circ / ticksPerRev;
 
-        worldPos = startPos;
+        worldPose = startPos;
     }
 
     public void updatePosition() {
         TelemetryPacket packet = new TelemetryPacket();
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        double[] xs = {(side_length * Math.cos(worldPos.heading) - side_length * Math.sin(worldPos.heading)) + worldPos.x,
-                (-side_length * Math.cos(worldPos.heading) - side_length * Math.sin(worldPos.heading)) + worldPos.x,
-                (-side_length * Math.cos(worldPos.heading) + side_length * Math.sin(worldPos.heading)) + worldPos.x,
-                (side_length * Math.cos(worldPos.heading) + side_length * Math.sin(worldPos.heading)) + worldPos.x};
+        double[] xs = {(side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (-side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (-side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x};
 
-        double[] ys = {(side_length * Math.sin(worldPos.heading) + side_length * Math.cos(worldPos.heading)) + worldPos.y,
-                (-side_length * Math.sin(worldPos.heading) + side_length * Math.cos(worldPos.heading)) + worldPos.y,
-                (-side_length * Math.sin(worldPos.heading) - side_length * Math.cos(worldPos.heading)) + worldPos.y,
-                (side_length * Math.sin(worldPos.heading) - side_length * Math.cos(worldPos.heading)) + worldPos.y};
+        double[] ys = {(side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (-side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (-side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y};
 
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
 
@@ -64,12 +71,12 @@ public class RobotMovement {
         dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * scale;
         dx_perpendicular = (delta_ticks_back - (forward_offset * ((delta_ticks_left - delta_ticks_right) / track_width))) * scale * lateral_offset;
 
-        dx = dx_center * Math.cos(worldPos.heading) - dx_perpendicular * Math.sin(worldPos.heading);
-        dy = dx_center * Math.sin(worldPos.heading) + dx_perpendicular * Math.cos(worldPos.heading);
+        dx = dx_center * Math.cos(worldPose.heading) - dx_perpendicular * Math.sin(worldPose.heading);
+        dy = dx_center * Math.sin(worldPose.heading) + dx_perpendicular * Math.cos(worldPose.heading);
 
-        worldPos.x += dx;
-        worldPos.y += dy;
-        worldPos.heading += -1 * dtheta;
+        worldPose.x += dx;
+        worldPose.y += dy;
+        worldPose.heading += -1 * dtheta;
 
         dashboard.sendTelemetryPacket(packet);
 
@@ -85,11 +92,11 @@ public class RobotMovement {
      * @param turnSpeed Robot turn speed
      */
     public void goToPosition(Pose targetPos, double movementSpeed, double turnSpeed) {
-        double distanceToTarget = Math.hypot(targetPos.x - worldPos.x, targetPos.y - worldPos.y);
+        double distanceToTarget = Math.hypot(targetPos.x - worldPose.x, targetPos.y - worldPose.y);
 
-        double absoluteAngleToTarget = Math.atan2(targetPos.y - worldPos.y, targetPos.x - worldPos.x);
+        double absoluteAngleToTarget = Math.atan2(targetPos.y - worldPose.y, targetPos.x - worldPose.x);
 
-        double relativeAngleToTarget = AngleWrap(absoluteAngleToTarget - worldPos.heading - Math.toRadians(90));
+        double relativeAngleToTarget = AngleWrap(absoluteAngleToTarget - worldPose.heading - Math.toRadians(90));
 
         double relativeXToTarget = Math.cos(relativeAngleToTarget) * distanceToTarget;
         double relativeYToTarget = Math.sin(relativeAngleToTarget) * distanceToTarget;
@@ -106,5 +113,39 @@ public class RobotMovement {
         frontRight.setPower(movementXPower + turnPower - movementYPower);
         backLeft.setPower(movementXPower - turnPower - movementYPower);
         backRight.setPower(movementXPower + turnPower + movementYPower);
+    }
+
+    /**
+     * Finds the current point that the robot should be following
+     * @param pathPoints List including all points for the lines in the trajectory
+     * @param pos Position of the robot
+     * @param followRadius Specifies how far away the algorithm looks for points to follow
+     * @return CurvePoint specifying the point that the robot should move towards
+     */
+    public CurvePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point pos, double followRadius) {
+        CurvePoint followMe = new CurvePoint(pathPoints.get(0));
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            CurvePoint startLine = pathPoints.get(i);
+            CurvePoint endLine = pathPoints.get(i + 1);
+
+            ArrayList<Point> intersections = lineCircleIntersection(pos, followRadius, startLine.toPoint(), endLine.toPoint());
+
+            double closestAngle = 100000000;
+            for (Point thisIntersection : intersections) { // Find the intersection that's closest to our robot's current orientation
+                double angle = Math.atan2(thisIntersection.y - worldPose.y, thisIntersection.x - worldPose.x);
+                double deltaAngle = Math.abs(AngleWrap(angle - worldPose.heading));
+
+                if (deltaAngle < closestAngle) {
+                    closestAngle = deltaAngle;
+                    followMe.setPoint(thisIntersection);
+                }
+            }
+        }
+        return followMe;
+    }
+
+    public void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) {
+        CurvePoint followMe = getFollowPointPath(allPoints, worldPose.toPoint(), allPoints.get(0).followDistance);
+        goToPosition(new Pose(followMe.x, followMe.y, followAngle), followMe.moveSpeed, followMe.turnSpeed);
     }
 }

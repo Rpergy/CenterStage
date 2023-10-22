@@ -2,6 +2,11 @@ package org.firstinspires.ftc.teamcode.purepursuit;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.purepursuit.utility.CurvePoint;
+import org.firstinspires.ftc.teamcode.purepursuit.utility.Pose;
+
+import java.util.ArrayList;
+
 public class PurePursuit extends OpMode {
     RobotMovement robot;
 
@@ -14,6 +19,11 @@ public class PurePursuit extends OpMode {
     public void loop() {
         robot.updatePosition();
 
-        robot.goToPosition(new Pose(100, 100, 90), 0.5, 0.5);
+        ArrayList<CurvePoint> allPoints = new ArrayList<>();
+        allPoints.add(new CurvePoint(0.0, 0.0, 0.5, 0.5, 50.0));
+        allPoints.add(new CurvePoint(100, 0.0, 0.5, 0.5, 50.0));
+        allPoints.add(new CurvePoint(0.0, 100, 0.5, 0.5, 50.0));
+
+        robot.followCurve(allPoints, Math.toRadians(90));
     }
 }

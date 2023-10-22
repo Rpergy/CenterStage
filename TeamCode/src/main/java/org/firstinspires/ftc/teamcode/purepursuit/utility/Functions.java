@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.purepursuit;
+package org.firstinspires.ftc.teamcode.purepursuit.utility;
 
 import java.util.ArrayList;
 
@@ -34,7 +34,7 @@ public class Functions {
         // If xs are really close we almost have horizontal
         if (Math.abs(linePoint1.x - linePoint2.x) < 0.003) linePoint2.x = linePoint2.x + 0.003;
 
-        double m1 = (linePoint2.y - linePoint1.y)/(linePoint2.x - linePoint2.y);
+        double m1 = (linePoint2.y - linePoint1.y)/(linePoint2.x - linePoint1.x);
 
         // Applies offset relative to the circles center to make calculations easier
         double x1 = linePoint1.x - circleCenter.x;
@@ -74,6 +74,7 @@ public class Functions {
             }
         }
         catch (Exception e){}
+
         return allPoints;
     }
 }
