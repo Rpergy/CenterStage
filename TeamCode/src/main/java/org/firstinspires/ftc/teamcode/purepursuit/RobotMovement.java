@@ -20,7 +20,7 @@ public class RobotMovement {
     double scale;
     public static double lateral_offset;
 
-    public RobotMovement(HardwareMap hardwareMap, double posX, double posY) {
+    public RobotMovement(HardwareMap hardwareMap, Pose startPos) {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
@@ -37,6 +37,8 @@ public class RobotMovement {
         lateral_offset = 0.5;
 
         scale = wheel_circ / ticksPerRev;
+
+        worldPos = startPos;
     }
 
     public void updatePosition() {

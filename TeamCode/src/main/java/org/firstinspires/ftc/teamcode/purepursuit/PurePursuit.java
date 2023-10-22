@@ -7,7 +7,7 @@ public class PurePursuit extends OpMode {
 
     @Override
     public void init() {
-        robot = new RobotMovement(hardwareMap, 0, 0);
+        robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
     }
 
     @Override
