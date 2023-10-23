@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.purepursuit;
 
-import static org.firstinspires.ftc.teamcode.purepursuit.utility.Functions.AngleWrap;
-import static org.firstinspires.ftc.teamcode.purepursuit.utility.Functions.lineCircleIntersection;
+import static org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions.AngleWrap;
+import static org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions.lineCircleIntersection;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -147,5 +147,20 @@ public class RobotMovement {
     public void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) {
         CurvePoint followMe = getFollowPointPath(allPoints, worldPose.toPoint(), allPoints.get(0).followDistance);
         goToPosition(new Pose(followMe.x, followMe.y, followAngle), followMe.moveSpeed, followMe.turnSpeed);
+    }
+
+    /**
+     * Shows a path of points on the FTC Dashboard
+     * @param allPoints List of points to show
+     */
+    public void displayPath(ArrayList<CurvePoint> allPoints) {
+        TelemetryPacket packet = new TelemetryPacket();
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        for (int i = 0; i < allPoints.size() - 1; i++) {
+            CurvePoint point1 = allPoints.get(i);
+            CurvePoint point2 = allPoints.get(i + 1);
+            packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
+        }
+        dashboard.sendTelemetryPacket(packet);
     }
 }

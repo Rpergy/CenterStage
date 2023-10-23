@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.purepursuit;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.purepursuit.utility.CurvePoint;
@@ -23,7 +25,8 @@ public class PurePursuit extends OpMode {
         allPoints.add(new CurvePoint(0.0, 0.0, 0.5, 0.5, 50.0));
         allPoints.add(new CurvePoint(100, 0.0, 0.5, 0.5, 50.0));
         allPoints.add(new CurvePoint(0.0, 100, 0.5, 0.5, 50.0));
-
         robot.followCurve(allPoints, Math.toRadians(90));
+
+        robot.displayPath(allPoints);
     }
 }

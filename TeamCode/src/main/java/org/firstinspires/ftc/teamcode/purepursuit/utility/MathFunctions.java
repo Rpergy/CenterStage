@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.purepursuit.utility;
 
 import java.util.ArrayList;
 
-public class Functions {
+public class MathFunctions {
     /**
      * Makes sure an angle is within the range -3.14 to 3.14 radians
      * @param angle radians
