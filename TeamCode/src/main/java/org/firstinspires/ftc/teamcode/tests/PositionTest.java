@@ -38,17 +38,22 @@ public class PositionTest extends OpMode {
 
     double scale;
 
-    public static double lateral_offset;
+    public static double lateral_multiplier, center_multiplier, perpendicular_multiplier;
 
     @Override
     public void init() {
 
-        wheel_circ = 15.708; // cm
-        track_width = 29.53/2; // cm distance between drive wheels
-        forward_offset = -14.5; // cm distance from center of robot to perp wheel
+        wheel_circ = 6.184; // inches
+        track_width = 11.024/2; // in distance between drive wheels
+        forward_offset = -5.906; // in distance from center of robot to perp wheel
         ticksPerRev = 8192;
 
-        lateral_offset = 0.5;
+        lateral_multiplier = 1.010112392;
+        center_multiplier = 2.05759425438;
+        perpendicular_multiplier = 1.2;
+
+        track_width *= lateral_multiplier;
+//        forward_offset *= center_multiplier;
 
         scale = wheel_circ / ticksPerRev;
 
@@ -108,8 +113,8 @@ public class PositionTest extends OpMode {
         double delta_ticks_back = (backRight.getCurrentPosition() - prev_ticks_back);
 
         dtheta = ((delta_ticks_left - delta_ticks_right) / track_width) * scale;
-        dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * scale;
-        dx_perpendicular = (delta_ticks_back - (forward_offset * ((delta_ticks_left - delta_ticks_right) / track_width))) * scale * lateral_offset;
+        dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * scale * center_multiplier;
+        dx_perpendicular = -1 * (delta_ticks_back - (forward_offset * ((delta_ticks_left - delta_ticks_right) / track_width))) * scale * perpendicular_multiplier;
 
         dx = dx_center * Math.cos(theta) - dx_perpendicular * Math.sin(theta);
         dy = dx_center * Math.sin(theta) + dx_perpendicular * Math.cos(theta);

@@ -48,7 +48,6 @@ public class MathFunctions {
 
         try {
             double xRoot1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c))/(2.0 * a);
-
             double yRoot1 = m1 * (xRoot1 - x1) + y1;
 
             // Re-apply circle offset

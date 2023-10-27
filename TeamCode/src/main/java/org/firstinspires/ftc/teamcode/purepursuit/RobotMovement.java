@@ -27,6 +27,8 @@ public class RobotMovement {
     double scale;
     public static double lateral_offset;
 
+    FtcDashboard dashboard;
+
     public RobotMovement(HardwareMap hardwareMap, Pose startPos) {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
@@ -46,23 +48,11 @@ public class RobotMovement {
         scale = wheel_circ / ticksPerRev;
 
         worldPose = startPos;
+
+        dashboard = FtcDashboard.getInstance();
     }
 
     public void updatePosition() {
-        TelemetryPacket packet = new TelemetryPacket();
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        double[] xs = {(side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
-                (-side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
-                (-side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x,
-                (side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x};
-
-        double[] ys = {(side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
-                (-side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
-                (-side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y,
-                (side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y};
-
-        packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
-
         double delta_ticks_left = (frontLeft.getCurrentPosition() - prev_ticks_left);
         double delta_ticks_right = (frontRight.getCurrentPosition() - prev_ticks_right);
         double delta_ticks_back = (backRight.getCurrentPosition() - prev_ticks_back);
@@ -77,8 +67,6 @@ public class RobotMovement {
         worldPose.x += dx;
         worldPose.y += dy;
         worldPose.heading += -1 * dtheta;
-
-        dashboard.sendTelemetryPacket(packet);
 
         prev_ticks_back = backRight.getCurrentPosition();
         prev_ticks_left = frontLeft.getCurrentPosition();
@@ -155,12 +143,26 @@ public class RobotMovement {
      */
     public void displayPath(ArrayList<CurvePoint> allPoints) {
         TelemetryPacket packet = new TelemetryPacket();
-        FtcDashboard dashboard = FtcDashboard.getInstance();
+        packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
+
         for (int i = 0; i < allPoints.size() - 1; i++) {
             CurvePoint point1 = allPoints.get(i);
             CurvePoint point2 = allPoints.get(i + 1);
             packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
         }
+
+        double[] xs = {(side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (-side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (-side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                (side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x};
+
+        double[] ys = {(side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (-side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (-side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                (side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y};
+
+        packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
+
         dashboard.sendTelemetryPacket(packet);
     }
 }
