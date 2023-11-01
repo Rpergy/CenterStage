@@ -28,52 +28,38 @@ public class MathFunctions {
      * @return List of intersection points
      */
     public static ArrayList<Point> lineCircleIntersection(Point circleCenter, double radius, Point linePoint1, Point linePoint2) {
-        // If ys are really close we almost have a vertical line
-        if(Math.abs(linePoint1.y - linePoint2.y) < 0.003) linePoint1.y = linePoint2.y + 0.03;
+        ArrayList<Point> points = new ArrayList<>();
 
-        // If xs are really close we almost have horizontal
-        if (Math.abs(linePoint1.x - linePoint2.x) < 0.003) linePoint2.x = linePoint2.x + 0.003;
+        double m = (linePoint2.y - linePoint1.y)/(linePoint2.x - linePoint1.x);
+        double r = radius;
+        double b = linePoint1.y - m * linePoint1.x;
+        double w = -circleCenter.x;
+        double c = -circleCenter.y;
 
-        double m1 = (linePoint2.y - linePoint1.y)/(linePoint2.x - linePoint1.x);
+        double discriminant = -Math.pow(b, 2) + 2 * m * b * w - 2 * b * c + Math.pow(m, 2) * Math.pow(r, 2) + 2 * m * c * w + Math.pow(r, 2) - Math.pow(m, 2) * Math.pow(w, 2) - Math.pow(c, 2);
 
-        // Applies offset relative to the circles center to make calculations easier
-        double x1 = linePoint1.x - circleCenter.x;
-        double y1 = linePoint1.y - circleCenter.y;
+        if (discriminant >= 0){
+            double xRoot1 = -(m*b+m*c+w + Math.sqrt(discriminant))/(Math.pow(m, 2) + 1);
+            double xRoot2 = -(m*b+m*c+w - Math.sqrt(discriminant))/(Math.pow(m, 2) + 1);
 
-        double a = 1.0 + Math.pow(m1, 2);
-        double b = (2.0 * m1 * y1) - (2.0 * Math.pow(m1, 2) * x1);
-        double c = ((Math.pow(m1, 2) * Math.pow(x1, 2))) - (2.0 * y1 * m1 * x1) + Math.pow(y1, 2) - Math.pow(radius, 2);
+            double y1 = m * xRoot1 + b;
+            double y2 = m * xRoot2 + b;
 
-        ArrayList<Point> allPoints = new ArrayList<>();
-
-        try {
-            double xRoot1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c))/(2.0 * a);
-            double yRoot1 = m1 * (xRoot1 - x1) + y1;
-
-            // Re-apply circle offset
-            xRoot1 += circleCenter.x;
-            yRoot1 += circleCenter.y;
-
-            // Calculate line bounding box
-            double minX = Math.min(linePoint1.x, linePoint2.x);
-            double maxX = Math.max(linePoint1.x, linePoint2.x);
-
-            if (xRoot1 > minX && xRoot1 < maxX) {
-                allPoints.add(new Point(xRoot1, yRoot1));
-            }
-
-            double xRoot2 = (-b - Math.sqrt(Math.pow(b, 2) - 4.0 * a * c))/(2.0 * a);
-            double yRoot2 = m1 * (xRoot2 - x1) + y1;
-
-            xRoot2 += circleCenter.x;
-            yRoot2 += circleCenter.y;
-
-            if (xRoot2 > minX && xRoot2 < maxX) {
-                allPoints.add(new Point(xRoot2, yRoot2));
+            points.add(new Point(xRoot1, y1));
+            if (discriminant != 0){
+                points.add(new Point(xRoot2, y2));
             }
         }
-        catch (Exception e){}
+        double minX = Math.min(linePoint1.x, linePoint2.x);
+        double maxX = Math.max(linePoint1.x, linePoint2.x);
 
-        return allPoints;
+        ArrayList<Point> intersections = new ArrayList<>();
+        for(int i = 0; i < points.size(); i++) {
+            if (points.get(i).x <= maxX && points.get(i).x >= minX) {
+                intersections.add(points.get(i));
+            }
+        }
+
+        return intersections;
     }
 }

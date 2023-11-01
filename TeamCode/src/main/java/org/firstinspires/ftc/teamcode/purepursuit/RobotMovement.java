@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.purepursuit;
 
-import static org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions.AngleWrap;
 import static org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions.lineCircleIntersection;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.purepursuit.utility.CurvePoint;
+import org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions;
 import org.firstinspires.ftc.teamcode.purepursuit.utility.Point;
 import org.firstinspires.ftc.teamcode.purepursuit.utility.Pose;
 
@@ -80,27 +78,26 @@ public class RobotMovement {
      * @param turnSpeed Robot turn speed
      */
     public void goToPosition(Pose targetPos, double movementSpeed, double turnSpeed) {
-        double distanceToTarget = Math.hypot(targetPos.x - worldPose.x, targetPos.y - worldPose.y);
+        double deltaX = targetPos.x - worldPose.x;
+        double deltaY = targetPos.y - worldPose.y;
 
-        double absoluteAngleToTarget = Math.atan2(targetPos.y - worldPose.y, targetPos.x - worldPose.x);
+        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
-        double relativeAngleToTarget = AngleWrap(absoluteAngleToTarget - worldPose.heading - Math.toRadians(90));
+        double thetaT = 0;
 
-        double relativeXToTarget = Math.cos(relativeAngleToTarget) * distanceToTarget;
-        double relativeYToTarget = Math.sin(relativeAngleToTarget) * distanceToTarget;
-        double relativeTurnAngle = relativeAngleToTarget - Math.toRadians(180) + targetPos.heading;
+        if (distance != 0)
+            thetaT = Math.acos(deltaX/distance);
 
-        // Preserve shape of vector (basically normalize)
-        double movementXPower = relativeXToTarget / (Math.abs(relativeXToTarget) + Math.abs(relativeYToTarget)) * movementSpeed;
-        double movementYPower = relativeYToTarget / (Math.abs(relativeYToTarget) + Math.abs(relativeXToTarget)) * movementSpeed;
-        double turnPower = Range.clip(relativeTurnAngle/Math.toRadians(30), -1, 1) * turnSpeed;
+        double deltaR = MathFunctions.AngleWrap(thetaT - worldPose.heading);
 
-        if (distanceToTarget < 10) turnPower = 0;
+        double movePower = Math.cos(deltaR) * movementSpeed;
+        double strafePower = Math.sin(deltaR) * Math.signum(targetPos.y - worldPose.y) * movementSpeed;
+        double turnPower = (thetaT/Math.PI) * (thetaT - worldPose.heading) * turnSpeed;
 
-        frontLeft.setPower(movementXPower - turnPower + movementYPower);
-        frontRight.setPower(movementXPower + turnPower - movementYPower);
-        backLeft.setPower(movementXPower - turnPower - movementYPower);
-        backRight.setPower(movementXPower + turnPower + movementYPower);
+        frontLeft.setPower(movePower - turnPower + strafePower);
+        frontRight.setPower(movePower + turnPower - strafePower);
+        backLeft.setPower(movePower - turnPower - strafePower);
+        backRight.setPower(movePower + turnPower + strafePower);
     }
 
     /**
@@ -110,44 +107,49 @@ public class RobotMovement {
      * @param followRadius Specifies how far away the algorithm looks for points to follow
      * @return CurvePoint specifying the point that the robot should move towards
      */
-    public CurvePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point pos, double followRadius) {
-        CurvePoint followMe = new CurvePoint(pathPoints.get(0));
+    public Point getFollowPointPath(ArrayList<Point> pathPoints, Point pos, double followRadius) {
+        Point followMe = new Point(pathPoints.get(0));
+
+        ArrayList<Point> intersections = new ArrayList<>();
+
         for (int i = 0; i < pathPoints.size() - 1; i++) {
-            CurvePoint startLine = pathPoints.get(i);
-            CurvePoint endLine = pathPoints.get(i + 1);
+            Point startLine = pathPoints.get(i);
+            Point endLine = pathPoints.get(i + 1);
+            intersections.addAll(lineCircleIntersection(pos, followRadius, startLine, endLine));
+        }
+        double closestAngle = 10000;
+        for (int i = 0; i < intersections.size(); i++) {
+            Point thisIntersection = intersections.get(i);
+            double deltaX = thisIntersection.x - worldPose.x;
+            double deltaY = thisIntersection.y - worldPose.y;
+            double deltaR = Math.abs(Math.atan2(deltaY, deltaX) - worldPose.heading);
 
-            ArrayList<Point> intersections = lineCircleIntersection(pos, followRadius, startLine.toPoint(), endLine.toPoint());
-
-            double closestAngle = 100000000;
-            for (Point thisIntersection : intersections) { // Find the intersection that's closest to our robot's current orientation
-                double angle = Math.atan2(thisIntersection.y - worldPose.y, thisIntersection.x - worldPose.x);
-                double deltaAngle = Math.abs(AngleWrap(angle - worldPose.heading));
-
-                if (deltaAngle < closestAngle) {
-                    closestAngle = deltaAngle;
-                    followMe.setPoint(thisIntersection);
-                }
+            if (deltaR < closestAngle) {
+                closestAngle = deltaR;
+                followMe.x = thisIntersection.x;
+                followMe.y = thisIntersection.y;
             }
         }
+
         return followMe;
     }
 
-    public void followCurve(ArrayList<CurvePoint> allPoints, double followAngle) {
-        CurvePoint followMe = getFollowPointPath(allPoints, worldPose.toPoint(), allPoints.get(0).followDistance);
-        goToPosition(new Pose(followMe.x, followMe.y, followAngle), followMe.moveSpeed, followMe.turnSpeed);
+    public void followCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+        Point followMe = getFollowPointPath(allPoints, worldPose.toPoint(), followDistance);
+        goToPosition(new Pose(followMe.x, followMe.y, followDistance), moveSpeed, turnSpeed);
     }
 
     /**
      * Shows a path of points on the FTC Dashboard
      * @param allPoints List of points to show
      */
-    public void displayPath(ArrayList<CurvePoint> allPoints) {
+    public void displayPath(ArrayList<Point> allPoints) {
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 
         for (int i = 0; i < allPoints.size() - 1; i++) {
-            CurvePoint point1 = allPoints.get(i);
-            CurvePoint point2 = allPoints.get(i + 1);
+            Point point1 = allPoints.get(i);
+            Point point2 = allPoints.get(i + 1);
             packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
         }
 
