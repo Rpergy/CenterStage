@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.purepursuit.utility;
+package org.firstinspires.ftc.teamcode.tests.purepursuit.utility;
 
 import java.util.ArrayList;
 
 public class MathFunctions {
     /**
-     * Makes sure an angle is within the range -3.14 to 3.14 radians
+     * Makes sure an angle is within the range -PI to PI radians
      * @param angle radians
      * @return Wrapped angle
      */
@@ -25,7 +25,7 @@ public class MathFunctions {
      * @param radius Radius of the circle
      * @param linePoint1 Point one of the line
      * @param linePoint2 Point two of the line
-     * @return List of intersection points
+     * @return List of intersection points (0-2)
      */
     public static ArrayList<Point> lineCircleIntersection(Point circleCenter, double radius, Point linePoint1, Point linePoint2) {
         ArrayList<Point> points = new ArrayList<>();

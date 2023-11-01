@@ -1,15 +1,13 @@
-package org.firstinspires.ftc.teamcode.purepursuit;
-
-import static org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions.lineCircleIntersection;
+package org.firstinspires.ftc.teamcode.tests.purepursuit;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.purepursuit.utility.MathFunctions;
-import org.firstinspires.ftc.teamcode.purepursuit.utility.Point;
-import org.firstinspires.ftc.teamcode.purepursuit.utility.Pose;
+import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.MathFunctions;
+import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Point;
+import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Pose;
 
 import java.util.ArrayList;
 
@@ -50,6 +48,9 @@ public class RobotMovement {
         dashboard = FtcDashboard.getInstance();
     }
 
+    /**
+     * Updates the robot's position based off of encoder values from odometry
+     */
     public void updatePosition() {
         double delta_ticks_left = (frontLeft.getCurrentPosition() - prev_ticks_left);
         double delta_ticks_right = (frontRight.getCurrentPosition() - prev_ticks_right);
@@ -74,10 +75,10 @@ public class RobotMovement {
     /**
      * Moves the robot to a specified position
      * @param targetPos Target x, y, and heading for the robot. Heading refers to the preferred angle of the robot
-     * @param movementSpeed Motor power
-     * @param turnSpeed Robot turn speed
+     * @param movementSpeed Motor power multiplier for movement
+     * @param turnSpeed Motor power multiplier for turning
      */
-    public void goToPosition(Pose targetPos, double movementSpeed, double turnSpeed) {
+    public void goToPosition(Point targetPos, double movementSpeed, double turnSpeed) {
         double deltaX = targetPos.x - worldPose.x;
         double deltaY = targetPos.y - worldPose.y;
 
@@ -115,7 +116,7 @@ public class RobotMovement {
         for (int i = 0; i < pathPoints.size() - 1; i++) {
             Point startLine = pathPoints.get(i);
             Point endLine = pathPoints.get(i + 1);
-            intersections.addAll(lineCircleIntersection(pos, followRadius, startLine, endLine));
+            intersections.addAll(MathFunctions.lineCircleIntersection(pos, followRadius, startLine, endLine));
         }
         double closestAngle = 10000;
         for (int i = 0; i < intersections.size(); i++) {
@@ -134,16 +135,23 @@ public class RobotMovement {
         return followMe;
     }
 
+    /**
+     * Makes the robot autonomously follow a curve
+     * @param allPoints Points that make up the curve
+     * @param followDistance Distance that follow points are detected
+     * @param moveSpeed Motor power multiplier for movement
+     * @param turnSpeed Motor power multiplier for turning
+     */
     public void followCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         Point followMe = getFollowPointPath(allPoints, worldPose.toPoint(), followDistance);
-        goToPosition(new Pose(followMe.x, followMe.y, followDistance), moveSpeed, turnSpeed);
+        goToPosition(followMe, moveSpeed, turnSpeed);
     }
 
     /**
-     * Shows a path of points on the FTC Dashboard
+     * Shows a path of points as well as the robot on the FTC Dashboard
      * @param allPoints List of points to show
      */
-    public void displayPath(ArrayList<Point> allPoints) {
+    public void display(ArrayList<Point> allPoints) {
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 
@@ -156,14 +164,18 @@ public class RobotMovement {
         double[] xs = {(side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
                 (-side_length * Math.cos(worldPose.heading) - side_length * Math.sin(worldPose.heading)) + worldPose.x,
                 (-side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x,
-                (side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x};
+                (side_length * Math.cos(worldPose.heading) + side_length * Math.sin(worldPose.heading)) + worldPose.x,
+                Math.cos(worldPose.heading) * side_length + worldPose.x};
 
         double[] ys = {(side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
                 (-side_length * Math.sin(worldPose.heading) + side_length * Math.cos(worldPose.heading)) + worldPose.y,
                 (-side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y,
-                (side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y};
+                (side_length * Math.sin(worldPose.heading) - side_length * Math.cos(worldPose.heading)) + worldPose.y,
+                Math.sin(worldPose.heading) * side_length + worldPose.y};
 
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
+
+        packet.fieldOverlay().strokeLine(worldPose.x, worldPose.y, xs[4], ys[4]).setStroke("white");
 
         dashboard.sendTelemetryPacket(packet);
     }

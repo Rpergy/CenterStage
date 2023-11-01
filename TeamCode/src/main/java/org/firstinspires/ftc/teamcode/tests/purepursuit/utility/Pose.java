@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.purepursuit.utility;
+package org.firstinspires.ftc.teamcode.tests.purepursuit.utility;
 
 public class Pose {
     public double x, y, heading;
@@ -13,6 +13,12 @@ public class Pose {
         this.x = point.x;
         this.y = point.y;
         this.heading = heading;
+    }
+
+    public Pose(Pose newPose) {
+        this.x = newPose.x;
+        this.y = newPose.y;
+        this.heading = newPose.heading;
     }
 
     public Point toPoint() {

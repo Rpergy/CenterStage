@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.purepursuit;
+package org.firstinspires.ftc.teamcode.tests.purepursuit;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.purepursuit.utility.Point;
-import org.firstinspires.ftc.teamcode.purepursuit.utility.Pose;
+import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Point;
+import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Pose;
 
 import java.util.ArrayList;
 
@@ -34,6 +34,6 @@ public class PurePursuit extends OpMode {
 
         robot.followCurve(allPoints, followDistance, moveSpeed, turnSpeed);
 
-        robot.displayPath(allPoints);
+        robot.display(allPoints);
     }
 }
