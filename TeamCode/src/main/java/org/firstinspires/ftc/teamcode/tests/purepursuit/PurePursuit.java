@@ -19,20 +19,21 @@ public class PurePursuit extends OpMode {
     @Override
     public void init() {
         robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
-        moveSpeed = 1;
-        turnSpeed = 1;
+        moveSpeed = 0.4;
+        turnSpeed = 0.01;
+        followDistance = 10;
     }
 
     @Override
     public void loop() {
-        robot.updatePosition();
+        robot.updatePosition(telemetry);
 
         ArrayList<Point> allPoints = new ArrayList<>();
         allPoints.add(new Point(0.0, 0.0));
-        allPoints.add(new Point(100, 0.0));
-        allPoints.add(new Point(0.0, 100));
+        allPoints.add(new Point(20, 0.0));
+        allPoints.add(new Point(20, -20));
 
-        robot.followCurve(allPoints, followDistance, moveSpeed, turnSpeed);
+        robot.followCurve(allPoints, followDistance, moveSpeed, turnSpeed, telemetry);
 
         robot.display(allPoints);
     }

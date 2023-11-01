@@ -61,8 +61,8 @@ public class PositionTest extends OpMode {
         ticksPerRev = 8192;
 
         lateral_multiplier = 1.033174886; //1.010112392;
-        center_multiplier = 1; //2.05759425438;
-        perpendicular_multiplier = 1;//1.2;
+        center_multiplier = 1.08; //2.05759425438;
+        perpendicular_multiplier = 1.06;//1.2;
 
         track_width *= lateral_multiplier;
 
