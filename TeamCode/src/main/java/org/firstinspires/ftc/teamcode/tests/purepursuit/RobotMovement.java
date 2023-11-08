@@ -131,17 +131,24 @@ public class RobotMovement {
         double deltaR = MathFunctions.AngleWrap(thetaT - worldPose.heading);
 
         double movePower = Math.cos(deltaR) * movementSpeed;
-        double strafePower = Math.sin(deltaR) * Math.signum(targetPos.y - worldPose.y) * movementSpeed;
-        double turnPower = -Math.sin((thetaT/Math.PI) * (thetaT - worldPose.heading)) * turnSpeed;
+        double strafePower = -Math.sin(deltaR) * Math.signum(targetPos.y - worldPose.y) * movementSpeed;
+        double turnPower = deltaR/Math.PI * turnSpeed;
 
+//        if (distance <= 10) {
+//            movePower = 0;
+//            strafePower = 0;
+//            turnPower = 0;
+//        }
+
+        telemetry.addData("distance", distance);
         telemetry.addData("movePower", movePower);
         telemetry.addData("strafePower", strafePower);
         telemetry.addData("turnPower", turnPower);
         telemetry.update();
 
         frontLeft.setPower(movePower - turnPower + strafePower);
-        frontRight.setPower(movePower - turnPower - strafePower);
-        backLeft.setPower(movePower + turnPower - strafePower);
+        frontRight.setPower(movePower + turnPower - strafePower);
+        backLeft.setPower(movePower - turnPower - strafePower);
         backRight.setPower(movePower + turnPower + strafePower);
     }
 
@@ -195,9 +202,11 @@ public class RobotMovement {
      * Shows a path of points as well as the robot on the FTC Dashboard
      * @param allPoints List of points to show
      */
-    public void display(ArrayList<Point> allPoints) {
+    public void display(ArrayList<Point> allPoints, double radius) {
         TelemetryPacket packet = new TelemetryPacket();
         // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
+
+        packet.fieldOverlay().strokeCircle(worldPose.x, worldPose.y, radius);
 
         for (int i = 0; i < allPoints.size() - 1; i++) {
             Point point1 = allPoints.get(i);

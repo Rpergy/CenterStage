@@ -25,7 +25,7 @@ public class DragonOp extends OpMode {
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Initialized");
     }
@@ -36,9 +36,9 @@ public class DragonOp extends OpMode {
         double turn = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
 
-        frontLeft.setPower(move + turn - strafe);
-        frontRight.setPower(move - turn + strafe);
-        backLeft.setPower(move + turn + strafe);
-        backRight.setPower(move - turn - strafe);
+        frontLeft.setPower(move - turn + strafe);
+        frontRight.setPower(move + turn - strafe);
+        backLeft.setPower(move - turn - strafe);
+        backRight.setPower(move + turn + strafe);
     }
 }

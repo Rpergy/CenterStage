@@ -19,9 +19,9 @@ public class PurePursuit extends OpMode {
     @Override
     public void init() {
         robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
-        moveSpeed = 0.4;
-        turnSpeed = 0.01;
-        followDistance = 10;
+        moveSpeed = 0.2;
+        turnSpeed = 0.9;
+        followDistance = 3;
     }
 
     @Override
@@ -30,11 +30,11 @@ public class PurePursuit extends OpMode {
 
         ArrayList<Point> allPoints = new ArrayList<>();
         allPoints.add(new Point(0.0, 0.0));
-        allPoints.add(new Point(20, 0.0));
-        allPoints.add(new Point(20, -20));
+        allPoints.add(new Point(60, 0));
+        allPoints.add(new Point(60, -60));
 
         robot.followCurve(allPoints, followDistance, moveSpeed, turnSpeed, telemetry);
 
-        robot.display(allPoints);
+        robot.display(allPoints, followDistance);
     }
 }
