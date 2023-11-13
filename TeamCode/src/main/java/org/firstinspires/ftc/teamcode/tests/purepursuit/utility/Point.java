@@ -12,4 +12,12 @@ public class Point {
         this.x = replace.x;
         this.y = replace.y;
     }
+
+    public boolean equals(Point p) {
+        return p.x == x && p.y == y;
+    }
+
+    public boolean inRange(Point p, double range) {
+        return (p.x >= x - range && p.x <= x + range) && (p.y >= y - range && p.y <= y + range);
+    }
 }
