@@ -141,7 +141,6 @@ public class PositionTest extends OpMode {
 
         end_time = System.nanoTime();
 
-
         telemetry.addData("ticks back", prev_ticks_back);
         telemetry.addData("ticks right", prev_ticks_right);
         telemetry.addData("ticks left", prev_ticks_left);

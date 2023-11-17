@@ -25,6 +25,8 @@ public class RobotMovement {
     double side_length = 5;
     double scale;
 
+    double searchIncrease;
+
     double center_multiplier, lateral_multiplier, perpendicular_multiplier;
 
     boolean lockOnEnd;
@@ -65,8 +67,10 @@ public class RobotMovement {
         ticksPerRev = 8192;
 
         lateral_multiplier = 1.033174886;
-        perpendicular_multiplier = 1.06;//1.2;
         center_multiplier = 1.08;
+        perpendicular_multiplier = 1.06;//1.2;
+
+        searchIncrease = 1;
 
         track_width *= lateral_multiplier;
 
@@ -106,9 +110,9 @@ public class RobotMovement {
         robotPose.y += dy;
         robotPose.heading += -1 * dtheta;
 
-        prev_ticks_back = backRight.getCurrentPosition();
-        prev_ticks_left = frontLeft.getCurrentPosition();
-        prev_ticks_right = frontRight.getCurrentPosition();
+        prev_ticks_back = ticks_back;
+        prev_ticks_left = ticks_left;
+        prev_ticks_right = ticks_right;
 
 //        telemetry.addData("X", worldPose.x);
 //        telemetry.addData("Y", worldPose.y);
@@ -122,39 +126,36 @@ public class RobotMovement {
      * @param movementSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
-    public void goToPosition(Point targetPos, double movementSpeed, double turnSpeed, Telemetry telemetry) {
+    public void goToPosition(Point targetPos, double movementSpeed, double turnSpeed) {
+        TelemetryPacket packet = new TelemetryPacket();
+
         double deltaX = targetPos.x - robotPose.x;
         double deltaY = targetPos.y - robotPose.y;
 
+        double tTheta = Math.atan2(deltaY, deltaX);
+        double deltaTheta = tTheta - robotPose.heading;
+
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
-        double thetaT = 0;
-
-        if (distance != 0)
-            thetaT = Math.acos(deltaX/distance);
-
-        double deltaR = Math.abs(MathFunctions.AngleWrap(robotPose.heading - thetaT));
-
-        double movePower = -Math.cos(deltaR) * movementSpeed;
-        double strafePower = 0; //-Math.sin(deltaR) * Math.signum(targetPos.y - robotPose.y) * movementSpeed;
-        double turnPower = deltaR/Math.PI * turnSpeed;
+        double turnPower = deltaTheta/Math.PI * turnSpeed;
+        double movePower = -Math.cos(turnPower/Math.PI) * movementSpeed;
+        double strafePower = Math.sin(turnPower/Math.PI) * movementSpeed;
 
         if (distance <= 5) {
+            turnPower = 0;
             movePower = 0;
             strafePower = 0;
-            turnPower = 0;
         }
 
-        telemetry.addData("movePower", movePower);
-        telemetry.addData("turnPower", turnPower);
+        packet.put("move", movePower);
+        packet.put("turn", turnPower);
 
-        telemetry.addData("deltaR", deltaR);
-        telemetry.update();
+        frontLeft.setPower(movePower + turnPower - strafePower);
+        frontRight.setPower(movePower - turnPower + strafePower);
+        backLeft.setPower(movePower + turnPower + strafePower);
+        backRight.setPower(movePower - turnPower - strafePower);
 
-        frontLeft.setPower(movePower - turnPower + strafePower);
-        frontRight.setPower(movePower + turnPower - strafePower);
-        backLeft.setPower(movePower - turnPower - strafePower);
-        backRight.setPower(movePower + turnPower + strafePower);
+        // dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -169,11 +170,15 @@ public class RobotMovement {
 
         ArrayList<Point> intersections = new ArrayList<>();
 
-        for (int i = 0; i < pathPoints.size() - 1; i++) {
-            Point startLine = pathPoints.get(i);
-            Point endLine = pathPoints.get(i + 1);
-            intersections.addAll(MathFunctions.lineCircleIntersection(pos, followRadius, startLine, endLine));
+        while (intersections.size() == 0) {
+            for (int i = 0; i < pathPoints.size() - 1; i++) {
+                Point startLine = pathPoints.get(i);
+                Point endLine = pathPoints.get(i + 1);
+                intersections.addAll(MathFunctions.lineCircleIntersection(pos, followRadius, startLine, endLine));
+            }
+            followRadius += searchIncrease;
         }
+
         double closestAngle = 10000;
         for (int i = 0; i < intersections.size(); i++) {
             Point thisIntersection = intersections.get(i);
@@ -198,14 +203,14 @@ public class RobotMovement {
      * @param moveSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
-    public void followCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed, Telemetry telemetry) {
+    public void followCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         Point followMe = getFollowPointPath(allPoints, robotPose.toPoint(), followDistance);
         if (followMe.inRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
-            goToPosition(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed, telemetry);
+            goToPosition(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
             lockOnEnd = true;
         }
         else
-            goToPosition(followMe, moveSpeed, turnSpeed, telemetry);
+            goToPosition(followMe, moveSpeed, turnSpeed);
     }
 
     /**
@@ -233,11 +238,6 @@ public class RobotMovement {
         Point followMe = getFollowPointPath(allPoints, robotPose.toPoint(), radius);
         packet.fieldOverlay().setStroke("red");
         packet.fieldOverlay().strokeCircle(followMe.x, followMe.y, 2);
-
-        packet.put("Robot X", robotPose.x);
-        packet.put("Robot Y", robotPose.y);
-        packet.put("Target X", followMe.x);
-        packet.put("Target Y", followMe.y);
 
         packet.fieldOverlay().setStroke("black");
         for (int i = 0; i < allPoints.size() - 1; i++) {
