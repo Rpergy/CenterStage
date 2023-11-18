@@ -4,8 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Point;
-import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.Point;
+import org.firstinspires.ftc.teamcode.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.RobotMovement;
+import org.firstinspires.ftc.teamcode.utility.RobotMovement.*;
 
 import com.arcrobotics.ftclib.gamepad.*;
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests.purepursuit;
+package org.firstinspires.ftc.teamcode.utility;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.MathFunctions;
-import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Point;
-import org.firstinspires.ftc.teamcode.tests.purepursuit.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.MathFunctions;
+import org.firstinspires.ftc.teamcode.utility.Point;
+import org.firstinspires.ftc.teamcode.utility.Pose;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class RobotMovement {
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public static double wheel_circ, ticksPerRev, track_width, forward_offset;
-    Pose robotPose;
+    public Pose robotPose;
     double prev_ticks_left = 0, prev_ticks_right = 0, prev_ticks_back = 0;
     double dx, dy, dtheta;
     double dx_center, dx_perpendicular;
@@ -141,7 +141,7 @@ public class RobotMovement {
         double movePower = -Math.cos(turnPower/Math.PI) * movementSpeed;
         double strafePower = Math.sin(turnPower/Math.PI) * movementSpeed;
 
-        if (distance <= 5) {
+        if (distance <= 4) {
             turnPower = 0;
             movePower = 0;
             strafePower = 0;
@@ -155,7 +155,39 @@ public class RobotMovement {
         backLeft.setPower(movePower + turnPower + strafePower);
         backRight.setPower(movePower - turnPower - strafePower);
 
-        // dashboard.sendTelemetryPacket(packet);
+         dashboard.sendTelemetryPacket(packet);
+    }
+
+    public void goToPose(Pose targetPose, double movementSpeed, double turnSpeed) {
+        TelemetryPacket packet = new TelemetryPacket();
+
+        double deltaX = targetPose.x - robotPose.x;
+        double deltaY = targetPose.y - robotPose.y;
+
+        double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
+
+        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+
+        double turnPower = deltaTheta/Math.PI * turnSpeed;
+        double movePower = -Math.cos(turnPower/Math.PI) * movementSpeed;
+        double strafePower = Math.sin(turnPower/Math.PI) * movementSpeed;
+
+        if (distance <= 4) {
+            turnPower = 0;
+            movePower = 0;
+            strafePower = 0;
+        }
+
+        packet.put("move", movePower);
+        packet.put("turn", turnPower);
+        packet.put("strafe", strafePower);
+
+        frontLeft.setPower(movePower + turnPower - strafePower);
+        frontRight.setPower(movePower - turnPower + strafePower);
+        backLeft.setPower(movePower + turnPower + strafePower);
+        backRight.setPower(movePower - turnPower - strafePower);
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     /**

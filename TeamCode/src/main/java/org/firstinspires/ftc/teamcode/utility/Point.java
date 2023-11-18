@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests.purepursuit.utility;
+package org.firstinspires.ftc.teamcode.utility;
 
 public class Point {
     public double x, y;
