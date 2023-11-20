@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utility.actuation.ActuationConstants;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
@@ -115,8 +114,8 @@ public class RobotMovement {
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
-        double movePower = -Math.cos(turnPower/Math.PI) * movementSpeed;
-        double strafePower = Math.sin(turnPower/Math.PI) * movementSpeed;
+        double movePower = -Math.cos(turnPower*Math.PI) * movementSpeed;
+        double strafePower = Math.sin(turnPower*Math.PI) * movementSpeed;
 
         if (distance <= 4) {
             turnPower = 0;
@@ -146,8 +145,8 @@ public class RobotMovement {
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
-        double movePower = -Math.cos(turnPower/Math.PI) * movementSpeed;
-        double strafePower = Math.sin(turnPower/Math.PI) * movementSpeed;
+        double movePower = -Math.sin(deltaTheta) * movementSpeed;
+        double strafePower = Math.cos(deltaTheta) * movementSpeed;
 
         if (distance <= 4) {
             turnPower = 0;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utility.actuation;
+package org.firstinspires.ftc.teamcode.utility;
 
 import com.acmerobotics.dashboard.config.Config;
 
@@ -7,9 +7,9 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 public class ActuationConstants {
     @Config
     public static class Autonomous {
-        public static Pose robotStart = new Pose(0, 0, 0);
+        public static Pose robotStart = new Pose(-50, 25, 0);
         public static double moveSpeed = 0.3;
-        public static double turnSpeed = 0.4;
+        public static double turnSpeed = 0.8;
         public static double followDistance = 10;
     }
 

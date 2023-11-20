@@ -44,9 +44,5 @@ public class DragonOp extends OpMode {
         frontRight.setPower(move + turn + strafe);
         backLeft.setPower(move - turn + strafe);
         backRight.setPower(move + turn - strafe);
-
-        CustomGamepad gamepad = new CustomGamepad(gamepad1);
-
-
     }
 }
