@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utility.MathFunctions;
-import org.firstinspires.ftc.teamcode.utility.Point;
-import org.firstinspires.ftc.teamcode.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.actuation.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,17 +17,13 @@ import java.util.List;
 public class RobotMovement {
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    public static double wheel_circ, ticksPerRev, track_width, forward_offset;
     public Pose robotPose;
     double prev_ticks_left = 0, prev_ticks_right = 0, prev_ticks_back = 0;
     double dx, dy, dtheta;
     double dx_center, dx_perpendicular;
     double side_length = 5;
-    double scale;
 
     double searchIncrease;
-
-    double center_multiplier, lateral_multiplier, perpendicular_multiplier;
 
     boolean lockOnEnd;
 
@@ -60,21 +56,7 @@ public class RobotMovement {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
-        wheel_circ = 6.184; // inches
-        track_width = 11.024; // in distance between drive wheels
-        forward_offset = -5.906; // in distance from center of robot to perp wheel
-        ticksPerRev = 8192;
-
-        lateral_multiplier = 1.033174886;
-        center_multiplier = 1.08;
-        perpendicular_multiplier = 1.06;//1.2;
-
         searchIncrease = 1;
-
-        track_width *= lateral_multiplier;
-
-        scale = wheel_circ / ticksPerRev;
 
         robotPose = startPos;
 
@@ -99,9 +81,9 @@ public class RobotMovement {
         double delta_ticks_right = (ticks_right - prev_ticks_right);
         double delta_ticks_back = (ticks_back - prev_ticks_back);
 
-        dtheta = ((delta_ticks_left - delta_ticks_right) / track_width) * scale;
-        dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * scale * center_multiplier;
-        dx_perpendicular = -1 * (delta_ticks_back - (forward_offset * ((delta_ticks_left - delta_ticks_right) / track_width))) * scale * perpendicular_multiplier;
+        dtheta = ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width) * ActuationConstants.Drivetrain.scale;
+        dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.center_multiplier;
+        dx_perpendicular = -1 * (delta_ticks_back - (ActuationConstants.Drivetrain.forward_offset * ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width))) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.perpendicular_multiplier;
 
         dx = dx_center * Math.cos(robotPose.heading) - dx_perpendicular * Math.sin(robotPose.heading);
         dy = dx_center * Math.sin(robotPose.heading) + dx_perpendicular * Math.cos(robotPose.heading);
@@ -113,11 +95,6 @@ public class RobotMovement {
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
         prev_ticks_right = ticks_right;
-
-//        telemetry.addData("X", worldPose.x);
-//        telemetry.addData("Y", worldPose.y);
-//        telemetry.addData("Heading", worldPose.heading);
-//        telemetry.update();
     }
 
     /**

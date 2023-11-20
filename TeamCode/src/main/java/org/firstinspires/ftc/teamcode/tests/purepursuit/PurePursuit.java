@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.tests.purepursuit;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.utility.CurvePoint;
-import org.firstinspires.ftc.teamcode.utility.Point;
-import org.firstinspires.ftc.teamcode.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.actuation.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
 
 import java.util.ArrayList;
@@ -14,16 +14,9 @@ import java.util.ArrayList;
 public class PurePursuit extends OpMode {
     RobotMovement robot;
 
-    double moveSpeed;
-    double turnSpeed;
-    double followDistance;
-
     @Override
     public void init() {
-        robot = new RobotMovement(hardwareMap, new Pose(-50, 25, 0));
-        moveSpeed = 0.3;
-        turnSpeed = 0.4;
-        followDistance = 10;
+        robot = new RobotMovement(hardwareMap, ActuationConstants.Autonomous.robotStart);
     }
 
     @Override
@@ -34,10 +27,10 @@ public class PurePursuit extends OpMode {
         allPoints.add(new Point(-50, 25));
         allPoints.add(new Point(0, 25));
 
-        robot.goToPose(new Pose(0, 25, Math.PI/2), moveSpeed, turnSpeed);
+        robot.goToPose(new Pose(0, 25, Math.PI/2), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
-//        robot.followCurve(allPoints, followDistance, moveSpeed, turnSpeed);
+//        robot.followCurve(allPoints, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
-        robot.display(allPoints, followDistance);
+        robot.display(allPoints, ActuationConstants.Autonomous.followDistance);
     }
 }

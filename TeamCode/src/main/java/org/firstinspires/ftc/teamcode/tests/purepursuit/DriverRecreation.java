@@ -4,12 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.utility.Point;
-import org.firstinspires.ftc.teamcode.utility.Pose;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
-import org.firstinspires.ftc.teamcode.utility.RobotMovement.*;
-
-import com.arcrobotics.ftclib.gamepad.*;
 
 import java.util.ArrayList;
 
@@ -32,8 +29,6 @@ public class DriverRecreation extends OpMode {
 
     double moveSpeed, turnSpeed, followDistance;
 
-    GamepadEx gamepadEx;
-
     @Override
     public void init() {
         robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
@@ -45,7 +40,6 @@ public class DriverRecreation extends OpMode {
 
         pathPoints = new ArrayList<>();
 
-        gamepadEx = new GamepadEx(gamepad1);
 
         moveSpeed = 0.3;
         turnSpeed = 0.7;

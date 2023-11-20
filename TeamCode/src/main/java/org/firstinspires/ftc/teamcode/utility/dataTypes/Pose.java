@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.utility.dataTypes;
 
 public class Pose {
     public double x, y, heading;
