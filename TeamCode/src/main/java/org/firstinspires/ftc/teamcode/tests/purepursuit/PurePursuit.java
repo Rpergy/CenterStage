@@ -25,9 +25,10 @@ public class PurePursuit extends OpMode {
 
         ArrayList<Point> allPoints = new ArrayList<>();
         allPoints.add(new Point(-50, 25));
-        allPoints.add(new Point(0, 45));
+        allPoints.add(new Point(0, 25));
+        allPoints.add(new Point(0, -45));
 
-        robot.goToPose(new Pose(0, 45, Math.PI/2), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        robot.goToPose(new Pose(0, 25, Math.PI/2), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
 //        robot.followCurve(allPoints, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 

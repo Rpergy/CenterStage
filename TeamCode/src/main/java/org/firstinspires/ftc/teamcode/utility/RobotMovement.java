@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
@@ -103,35 +104,12 @@ public class RobotMovement {
      * @param turnSpeed Motor power multiplier for turning
      */
     public void goToPosition(Point targetPos, double movementSpeed, double turnSpeed) {
-        TelemetryPacket packet = new TelemetryPacket();
-
         double deltaX = targetPos.x - robotPose.x;
         double deltaY = targetPos.y - robotPose.y;
 
         double tTheta = Math.atan2(deltaY, deltaX);
-        double deltaTheta = tTheta - robotPose.heading;
 
-        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-
-        double turnPower = deltaTheta/Math.PI * turnSpeed;
-        double movePower = -Math.cos(turnPower*Math.PI) * movementSpeed;
-        double strafePower = Math.sin(turnPower*Math.PI) * movementSpeed;
-
-        if (distance <= 4) {
-            turnPower = 0;
-            movePower = 0;
-            strafePower = 0;
-        }
-
-        packet.put("move", movePower);
-        packet.put("turn", turnPower);
-
-        frontLeft.setPower(movePower + turnPower - strafePower);
-        frontRight.setPower(movePower - turnPower + strafePower);
-        backLeft.setPower(movePower + turnPower + strafePower);
-        backRight.setPower(movePower - turnPower - strafePower);
-
-         dashboard.sendTelemetryPacket(packet);
+        goToPose(new Pose(targetPos, tTheta), movementSpeed, turnSpeed);
     }
 
     public void goToPose(Pose targetPose, double movementSpeed, double turnSpeed) {
@@ -145,8 +123,13 @@ public class RobotMovement {
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
-        double movePower = -Math.sin(deltaTheta) * movementSpeed;
-        double strafePower = Math.cos(deltaTheta) * movementSpeed;
+        double movePower = -Range.clip(Math.sin(deltaTheta) + Math.cos((targetPose.x - robotPose.x) / distance), -1, 1) * movementSpeed;
+
+        double strafePower;
+        if (Math.abs(deltaTheta) >= Math.PI/8)
+            strafePower = Range.clip(Math.cos(deltaTheta) + Math.cos((targetPose.y - robotPose.y) / distance), -1, 1) * movementSpeed;
+        else
+            strafePower = 0;
 
         if (distance <= 4) {
             turnPower = 0;
