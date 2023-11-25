@@ -9,9 +9,11 @@ public class ActuationConstants {
     public static class Autonomous {
         public static Pose robotStart = new Pose(-50, 25, 0);
         public static double moveSpeed = 0.5;
-        public static double turnSpeed = 0.8;
+        public static double turnSpeed = 0.3;
         public static double followDistance = 15;
         //omkar is gay
+        public static double minTurnSpeed = 0.3;
+        public static double accelMult = 0.2;
     }
 
     @Config
@@ -31,18 +33,21 @@ public class ActuationConstants {
 
     @Config
     public static class Claw {
-        public static double wristDown = 0.0;
-        public static double wristUp = 0.0;
+        public static double wristIntake = 0.55;
+        public static double wristDeposit = 1.0;
         public static double open = 0.0;
-        public static double closed = 0.0;
+        public static double closed = 0.1;
     }
 
     @Config
     public static class Extension {
-        public static double[] targetPositions = {
-                0.0, // down
-                0.0, // midway
-                0.0  // all out
-        };
+        public static int maxPos = -3500;
+        public static int extensionStart = 0;
+
+        public static double tiltIntake = 0.206;
+        public static double tiltDeposit = 0.65;
+        //omkar is gay amog us
+        //I have hrard throug the grapevine that shreyas is the opps!!!!!!!!!
+        //be sure to comment on your code!!!!!!!!!!!!!!
     }
 }

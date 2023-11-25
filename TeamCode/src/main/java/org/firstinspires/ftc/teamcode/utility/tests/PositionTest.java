@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.utility.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import java.util.List;
 
 @TeleOp(group = "Tests", name = "Position Test")
-@Config
 public class PositionTest extends OpMode {
     BHI260IMU imu;
 

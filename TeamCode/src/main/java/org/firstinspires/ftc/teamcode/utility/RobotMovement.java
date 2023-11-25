@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
@@ -58,7 +57,7 @@ public class RobotMovement {
 
         searchIncrease = 1;
 
-        robotPose = startPos;
+        robotPose = new Pose(startPos);
 
         lockOnEnd = false;
 
@@ -118,21 +117,32 @@ public class RobotMovement {
         double deltaX = targetPose.x - robotPose.x;
         double deltaY = targetPose.y - robotPose.y;
 
-        double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
-
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
-        double turnPower = deltaTheta/Math.PI * turnSpeed;
-        double movePower = -Range.clip(Math.sin(deltaTheta) + Math.cos((targetPose.x - robotPose.x) / distance), -1, 1) * movementSpeed;
+        double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
 
-        double strafePower;
-        if (Math.abs(deltaTheta) >= Math.PI/8)
-            strafePower = Range.clip(Math.cos(deltaTheta) + Math.cos((targetPose.y - robotPose.y) / distance), -1, 1) * movementSpeed;
-        else
-            strafePower = 0;
+        double turnPower = deltaTheta/Math.PI * turnSpeed;
+
+        if (Math.abs(deltaTheta) <= Math.toRadians(5)) {
+            turnPower = 0;
+        }
+        else if (deltaTheta > 0) {
+            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
+        }
+        else {
+            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
+        }
+
+        double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.accelMult) * Math.sin(robotPose.heading));
+        double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.accelMult) * Math.cos(robotPose.heading));
+
+        double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.accelMult) * Math.cos(robotPose.heading));
+        double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.accelMult) * Math.sin(robotPose.heading));
+
+        double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
+        double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
 
         if (distance <= 4) {
-            turnPower = 0;
             movePower = 0;
             strafePower = 0;
         }
@@ -141,10 +151,10 @@ public class RobotMovement {
         packet.put("turn", turnPower);
         packet.put("strafe", strafePower);
 
-        frontLeft.setPower(movePower + turnPower - strafePower);
-        frontRight.setPower(movePower - turnPower + strafePower);
-        backLeft.setPower(movePower + turnPower + strafePower);
-        backRight.setPower(movePower - turnPower - strafePower);
+        frontLeft.setPower(-movePower + turnPower - strafePower);
+        frontRight.setPower(-movePower - turnPower + strafePower);
+        backLeft.setPower(-movePower + turnPower + strafePower);
+        backRight.setPower(-movePower - turnPower - strafePower);
 
         dashboard.sendTelemetryPacket(packet);
     }

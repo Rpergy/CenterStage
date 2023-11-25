@@ -24,4 +24,8 @@ public class Pose {
     public Point toPoint() {
         return new Point(x, y);
     }
+
+    public boolean inRange(Point p, double range) {
+        return (p.x >= x - range && p.x <= x + range) && (p.y >= y - range && p.y <= y + range);
+    }
 }

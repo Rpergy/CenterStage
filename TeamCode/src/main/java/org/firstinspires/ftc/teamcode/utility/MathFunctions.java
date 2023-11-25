@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.ArrayList;
 

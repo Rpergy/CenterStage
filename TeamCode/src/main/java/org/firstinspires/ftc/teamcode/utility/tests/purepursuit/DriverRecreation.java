@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests.purepursuit;
+package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
