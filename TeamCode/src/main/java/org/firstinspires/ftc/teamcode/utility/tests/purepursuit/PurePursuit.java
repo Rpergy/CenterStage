@@ -23,15 +23,15 @@ public class PurePursuit extends OpMode {
     public void loop() {
         robot.updatePosition(telemetry);
 
-        ArrayList<Point> allPoints = new ArrayList<>();
-        allPoints.add(new Point(-50, 25));
-        allPoints.add(new Point(0, 25));
-        allPoints.add(new Point(0, -45));
+        ArrayList<Pose> allPoses = new ArrayList<>();
+        allPoses.add(new Pose(-50, 25, 0));
+        allPoses.add(new Pose(0, 25, Math.toRadians(90)));
+        allPoses.add(new Pose(0, -45, Math.toRadians(180)));
 
 //        robot.goToPose(new Pose(0, 45, Math.toRadians(90)), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
-        robot.followCurve(allPoints, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        robot.followPoseCurve(allPoses, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
-        robot.display(allPoints, ActuationConstants.Autonomous.followDistance);
+        robot.displayPoses(allPoses, ActuationConstants.Autonomous.followDistance);
     }
 }

@@ -31,6 +31,8 @@ public class RobotMovement {
     List<LynxModule> allHubs;
     private TelemetryPacket packet;
 
+    int targetControlPoint;
+
     public RobotMovement(HardwareMap hardwareMap, Pose startPos) {
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) {
@@ -62,10 +64,12 @@ public class RobotMovement {
         lockOnEnd = false;
 
         dashboard = FtcDashboard.getInstance();
+
+        targetControlPoint = 0;
     }
 
     /**
-     * Updates the robot's position based off of encoder values from odometry
+     * Updates the robot's pose based off of encoder values from odometry
      */
     public void updatePosition(Telemetry telemetry) {
         for (LynxModule module : allHubs) {
@@ -98,7 +102,7 @@ public class RobotMovement {
 
     /**
      * Moves the robot to a specified position
-     * @param targetPos Target x, y, and heading for the robot. Heading refers to the preferred angle of the robot
+     * @param targetPos Target x and y for the robot.
      * @param movementSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
@@ -111,6 +115,12 @@ public class RobotMovement {
         goToPose(new Pose(targetPos, tTheta), movementSpeed, turnSpeed);
     }
 
+    /**
+     * Moves the robot to a specified pose
+     * @param targetPose Target x, y, and heading for the robot. Heading refers to the preferred angle of the robot
+     * @param movementSpeed Motor power multiplier for movement
+     * @param turnSpeed Motor power multiplier for turning
+     */
     public void goToPose(Pose targetPose, double movementSpeed, double turnSpeed) {
         TelemetryPacket packet = new TelemetryPacket();
 
@@ -164,7 +174,7 @@ public class RobotMovement {
      * @param pathPoints List including all points for the lines in the trajectory
      * @param pos Position of the robot
      * @param followRadius Specifies how far away the algorithm looks for points to follow
-     * @return CurvePoint specifying the point that the robot should move towards
+     * @return Point specifying the point that the robot should move towards
      */
     public Point getFollowPointPath(ArrayList<Point> pathPoints, Point pos, double followRadius) {
         Point followMe = new Point(pathPoints.get(0));
@@ -198,15 +208,48 @@ public class RobotMovement {
     }
 
     /**
-     * Makes the robot autonomously follow a curve
+     * Finds the current pose that the robot should be following
+     * @param pathPoints List including all poses for the lines in the trajectory
+     * @param pos Pose of the robot
+     * @param followRadius Specifies how far away the algorithm looks for poses to follow
+     * @return Pose specifying the pose that the robot should move towards
+     */
+    public Pose getFollowPosePath(ArrayList<Pose> pathPoints, Pose pos, double followRadius) {
+        Pose followMe = new Pose(pathPoints.get(0));
+
+        ArrayList<Pose> intersections = new ArrayList<>();
+
+        while (intersections.size() == 0) {
+            for (int i = 0; i < pathPoints.size() - 1; i++) {
+                Pose startLine = pathPoints.get(i);
+                Pose endLine = pathPoints.get(i + 1);
+                intersections.addAll(MathFunctions.lineCircleIntersection(pos.toPoint(), followRadius, startLine, endLine));
+            }
+            followRadius += searchIncrease;
+        }
+        double minDistance = Integer.MAX_VALUE;
+        for (int i = 0; i < intersections.size(); i++) {
+            Pose thisIntersection = intersections.get(i);
+            double dist = MathFunctions.distance(thisIntersection.toPoint(), pathPoints.get(targetControlPoint).toPoint());
+            if (dist < minDistance) {
+                followMe = new Pose(thisIntersection);
+                minDistance = dist;
+            }
+        }
+
+        return followMe;
+    }
+
+    /**
+     * Makes the robot autonomously follow a curve of points
      * @param allPoints Points that make up the curve
      * @param followDistance Distance that follow points are detected
      * @param moveSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
-    public void followCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+    public void followPointCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         Point followMe = getFollowPointPath(allPoints, robotPose.toPoint(), followDistance);
-        if (followMe.inRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
+        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
             goToPosition(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
             lockOnEnd = true;
         }
@@ -215,10 +258,33 @@ public class RobotMovement {
     }
 
     /**
+     * Makes the robot autonomously follow a curve of poses
+     * @param allPoints Poses that make up the curve
+     * @param followDistance Distance that follow points are detected
+     * @param moveSpeed Motor power multiplier for movement
+     * @param turnSpeed Motor power multiplier for turning
+     */
+    public void followPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+        double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
+
+        if (distanceToTarget <= followDistance && targetControlPoint < allPoints.size()-1) {
+            targetControlPoint++;
+        }
+
+        Pose followMe = getFollowPosePath(allPoints, robotPose, followDistance);
+        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
+            goToPose(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
+            lockOnEnd = true;
+        }
+        else
+            goToPose(followMe, moveSpeed, turnSpeed);
+    }
+
+    /**
      * Shows a path of points as well as the robot on the FTC Dashboard
      * @param allPoints List of points to show
      */
-    public void display(ArrayList<Point> allPoints, double radius) {
+    public void displayPoints(ArrayList<Point> allPoints, double radius) {
         TelemetryPacket packet = new TelemetryPacket();
         // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 
@@ -244,6 +310,59 @@ public class RobotMovement {
         for (int i = 0; i < allPoints.size() - 1; i++) {
             Point point1 = allPoints.get(i);
             Point point2 = allPoints.get(i + 1);
+            packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
+        }
+
+        double[] xs = {(side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (-side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (-side_length * Math.cos(robotPose.heading) + side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (side_length * Math.cos(robotPose.heading) + side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                Math.cos(robotPose.heading) * side_length + robotPose.x};
+
+        double[] ys = {(side_length * Math.sin(robotPose.heading) + side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (-side_length * Math.sin(robotPose.heading) + side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (-side_length * Math.sin(robotPose.heading) - side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (side_length * Math.sin(robotPose.heading) - side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                Math.sin(robotPose.heading) * side_length + robotPose.y};
+
+        packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
+
+        packet.fieldOverlay().setStroke("white");
+        packet.fieldOverlay().strokeLine(robotPose.x, robotPose.y, xs[4], ys[4]);
+
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+    /**
+     * Shows a path of poses as well as the robot on the FTC Dashboard
+     * @param allPoints List of points to show
+     */
+    public void displayPoses(ArrayList<Pose> allPoints, double radius) {
+        TelemetryPacket packet = new TelemetryPacket();
+        // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
+
+        packet.fieldOverlay().strokeCircle(robotPose.x, robotPose.y, radius);
+
+        ArrayList<Pose> intersections = new ArrayList<>();
+
+        for (int i = 0; i < allPoints.size() - 1; i++) {
+            Pose startLine = allPoints.get(i);
+            Pose endLine = allPoints.get(i + 1);
+            intersections.addAll(MathFunctions.lineCircleIntersection(robotPose.toPoint(), radius, startLine, endLine));
+        }
+
+        for(int i = 0; i < intersections.size(); i++) {
+            packet.fieldOverlay().strokeCircle(intersections.get(i).x, intersections.get(i).y, 2);
+        }
+
+        Pose followMe = getFollowPosePath(allPoints, robotPose, radius);
+        packet.fieldOverlay().setStroke("red");
+        packet.fieldOverlay().strokeCircle(followMe.x, followMe.y, 2);
+
+        packet.fieldOverlay().setStroke("black");
+        for (int i = 0; i < allPoints.size() - 1; i++) {
+            Pose point1 = allPoints.get(i);
+            Pose point2 = allPoints.get(i + 1);
             packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
         }
 

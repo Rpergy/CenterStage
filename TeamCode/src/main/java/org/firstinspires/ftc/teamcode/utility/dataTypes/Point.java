@@ -17,7 +17,7 @@ public class Point {
         return p.x == x && p.y == y;
     }
 
-    public boolean inRange(Point p, double range) {
+    public boolean withinRange(Point p, double range) {
         return (p.x >= x - range && p.x <= x + range) && (p.y >= y - range && p.y <= y + range);
     }
 }

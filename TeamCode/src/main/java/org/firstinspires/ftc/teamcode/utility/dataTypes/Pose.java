@@ -25,7 +25,12 @@ public class Pose {
         return new Point(x, y);
     }
 
-    public boolean inRange(Point p, double range) {
+    public boolean withinRange(Pose p, double range) {
         return (p.x >= x - range && p.x <= x + range) && (p.y >= y - range && p.y <= y + range);
+    }
+
+    @Override
+    public String toString() {
+        return "X: " + x + ", Y: " + y + ", H: " + heading;
     }
 }

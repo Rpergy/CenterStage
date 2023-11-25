@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
@@ -23,7 +24,7 @@ public class DriverRecreation extends OpMode {
 
     double pollTime;
 
-    ArrayList<Point> pathPoints;
+    ArrayList<Pose> pathPoints;
 
     boolean pollPoints, pollPressedToggle, driving, drivePressedToggle;
 
@@ -31,7 +32,7 @@ public class DriverRecreation extends OpMode {
 
     @Override
     public void init() {
-        robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
+        robot = new RobotMovement(hardwareMap, ActuationConstants.Autonomous.robotStart);
 
         pollTime = 0.1;
 
@@ -39,7 +40,6 @@ public class DriverRecreation extends OpMode {
         driving = true;
 
         pathPoints = new ArrayList<>();
-
 
         moveSpeed = 0.3;
         turnSpeed = 0.7;
@@ -62,6 +62,8 @@ public class DriverRecreation extends OpMode {
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        pathPoints.add(new Pose(robot.robotPose));
     }
 
     public void loop() {
@@ -69,11 +71,11 @@ public class DriverRecreation extends OpMode {
 
         robot.updatePosition(telemetry);
 
-        if (gamepad1.square && !drivePressedToggle) {
+        if (gamepad1.cross && !drivePressedToggle) {
             driving = !driving;
             drivePressedToggle = true;
         }
-        else if (!gamepad1.square){
+        else if (!gamepad1.cross){
             drivePressedToggle = false;
         }
 
@@ -99,12 +101,13 @@ public class DriverRecreation extends OpMode {
             totalTime += end_time - start_time;
 
             if (totalTime >= pollTime && pollPoints) {
-                pathPoints.add(robot.robotPose.toPoint());
+                pathPoints.add(0, new Pose(robot.robotPose));
                 totalTime = 0;
             }
         }
         else {
-            robot.followCurve(pathPoints, followDistance, moveSpeed, turnSpeed);
+            robot.followPoseCurve(pathPoints, followDistance, moveSpeed, turnSpeed);
+            robot.displayPoses(pathPoints, followDistance);
         }
 
         telemetry.addData("Polling", pollPoints);
