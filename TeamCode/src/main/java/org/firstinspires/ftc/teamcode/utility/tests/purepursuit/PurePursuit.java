@@ -21,7 +21,7 @@ public class PurePursuit extends OpMode {
 
     @Override
     public void loop() {
-        robot.updatePosition(telemetry);
+        robot.updatePosition();
 
         ArrayList<Pose> allPoses = new ArrayList<>();
         allPoses.add(new Pose(-50, 25, 0));

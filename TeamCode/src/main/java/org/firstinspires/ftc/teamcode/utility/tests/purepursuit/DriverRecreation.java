@@ -69,7 +69,7 @@ public class DriverRecreation extends OpMode {
     public void loop() {
         start_time = System.currentTimeMillis() / 1000.0;
 
-        robot.updatePosition(telemetry);
+        robot.updatePosition();
 
         if (gamepad1.cross && !drivePressedToggle) {
             driving = !driving;

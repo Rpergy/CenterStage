@@ -71,7 +71,7 @@ public class RobotMovement {
     /**
      * Updates the robot's pose based off of encoder values from odometry
      */
-    public void updatePosition(Telemetry telemetry) {
+    public void updatePosition() {
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
@@ -266,6 +266,7 @@ public class RobotMovement {
      */
     public void followPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
+        double headingToTarget = allPoints.get(targetControlPoint).heading - robotPose.heading;
 
         if (distanceToTarget <= followDistance && targetControlPoint < allPoints.size()-1) {
             targetControlPoint++;
