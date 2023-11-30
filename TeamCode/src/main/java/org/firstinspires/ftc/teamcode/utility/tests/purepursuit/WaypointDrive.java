@@ -3,12 +3,19 @@ package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.FieldConstants;
+import org.firstinspires.ftc.teamcode.utility.MathFunctions;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
+import java.lang.reflect.Field;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @TeleOp(name="Waypoint Drive")
 public class WaypointDrive extends OpMode {
@@ -18,23 +25,84 @@ public class WaypointDrive extends OpMode {
     public void init() {
         Actuation.setup(hardwareMap);
         robot = new RobotMovement(hardwareMap, new Pose(50, -50, 0));
-
-//        toBlueCanvas = new ArrayList<>();
-//        toBlueCanvas.add(new Pose(50, -50, Math.toRadians(0)));
-//        toBlueCanvas.add(new Pose(0, -35, Math.toRadians(0)));
-//        toBlueCanvas.add(new Pose(0, 35, Math.toRadians(90)));
-//        toBlueCanvas.add(new Pose(-40, 55, Math.toRadians(90)));
     }
 
     @Override
     public void loop() {
         robot.updatePosition();
 
-//        if (gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x >= 0.1)
-//            Actuation.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
-//        else
-//            robot.followPoseCurve(toBlueCanvas, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        FieldConstants.Waypoint startPose = FieldConstants.Waypoint.BLUE_WING;
+        FieldConstants.Waypoint endPose = FieldConstants.Waypoint.BLUE_CANVAS;
 
-//        robot.displayPoses(toBlueCanvas, ActuationConstants.Autonomous.followDistance);
+        ArrayList<Pose> path = buildPath(startPose.ordinal(), endPose.ordinal());
+
+        robot.followPoseCurve(path, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        robot.displayPoses(path, ActuationConstants.Autonomous.followDistance);
+    }
+
+    public ArrayList<Pose> buildPath(int startPose, int endPose) {
+        ArrayList<Integer> verticies = new ArrayList<>();
+        ArrayList<Double> dist = new ArrayList<>();
+        ArrayList<Integer> prev = new ArrayList<>();
+
+        ArrayList<Integer> path = new ArrayList<>();
+
+        for (int i = 0; i < FieldConstants.waypointConnections.length; i++) {
+            dist.add(Double.MAX_VALUE);
+            prev.add(Integer.MIN_VALUE);
+            verticies.add(i);
+        }
+
+        dist.set(startPose, 0.0);
+
+        while (verticies.size() != 0) {
+            double minDistance = Double.MAX_VALUE;
+            int u = 0;
+
+            for (int i = 0; i < dist.size(); i++) {
+                if (dist.get(i) < minDistance && verticies.contains(i)) {
+                    minDistance = dist.get(i);
+                    u = i;
+                }
+            }
+
+            if (u == endPose) {
+                if (prev.get(u) != Integer.MIN_VALUE || u == startPose) {
+                    while (u != Integer.MIN_VALUE) {
+                        path.add(0, u);
+                        u = prev.get(u);
+                    }
+                }
+                break;
+            }
+
+            verticies.remove(u);
+
+            ArrayList<Integer> neighbors = new ArrayList<>();
+
+            for (int i = 0; i < FieldConstants.waypointConnections.length; i++) {
+                if (FieldConstants.waypointConnections[u][i] != 0) neighbors.add(i);
+            }
+
+            for (int i = 0; i < neighbors.size(); i++) {
+                int n = neighbors.get(i);
+
+                if (verticies.contains(n)) {
+                    double alt = dist.get(u) + FieldConstants.waypointConnections[u][n];
+                    if(alt < dist.get(n)) {
+                        dist.set(n, alt);
+                        prev.set(n, u);
+                    }
+                }
+            }
+        }
+
+        ArrayList<Pose> waypointPath = new ArrayList<>();
+
+        for (int i = 0; i < path.size(); i++) {
+            waypointPath.add(FieldConstants.waypointPositions[path.get(i)]);
+        }
+
+        return waypointPath;
     }
 }
