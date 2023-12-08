@@ -6,7 +6,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Actuation {
-    private static boolean closeClaw = false;
+    private static boolean closeClawL = false;
+    private static boolean closeClawR = false;
+
     private static boolean wristUp = false;
     private static boolean tiltUp = false;
 
@@ -45,7 +47,6 @@ public class Actuation {
             extension = map.dcMotor.get("extension");
             extension.setPower(1.0);
             extension.setTargetPosition(ActuationConstants.Extension.extensionStart);
-            extension.setDirection(DcMotorSimple.Direction.REVERSE);
             extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -54,8 +55,8 @@ public class Actuation {
         backLeft = map.get(DcMotor.class, "backLeft");
         backRight = map.get(DcMotor.class, "backRight");
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -67,14 +68,50 @@ public class Actuation {
 
     public static void toggleClaw(boolean input) {
         if (input && !clawToggle) {
-            closeClaw = !closeClaw;
-            lClaw.setPosition(closeClaw ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
-            rClaw.setPosition(closeClaw ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
+            closeClawL = !closeClawL;
+            closeClawR = !closeClawR;
+            lClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
+            rClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
             clawToggle = true;
         }
         else if (!input) {
             clawToggle = false;
         }
+    }
+
+    public static void toggleLClaw(boolean input) {
+        if (input && !clawToggle) {
+            closeClawL = !closeClawL;
+            lClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
+            clawToggle = true;
+        }
+        else if (!input) {
+            clawToggle = false;
+        }
+    }
+
+    public static void toggleRClaw(boolean input) {
+        if (input && !clawToggle) {
+            closeClawR = !closeClawR;
+            rClaw.setPosition(closeClawR ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
+            clawToggle = true;
+        }
+        else if (!input) {
+            clawToggle = false;
+        }
+    }
+
+    public static void setClaw(double input) {
+        lClaw.setPosition(input);
+        rClaw.setPosition(input);
+    }
+
+    public static void setLClaw(double input) {
+        lClaw.setPosition(input);
+    }
+
+    public static void setRClaw(double input) {
+        rClaw.setPosition(input);
     }
 
     public static void toggleWrist(boolean input) {
@@ -88,18 +125,25 @@ public class Actuation {
         }
     }
 
-    public static void setExtension(int posChange) {
+    public static void setWrist(double input) {
+        wrist.setPosition(input);
+    }
+
+    public static void incrementExtension(int posChange) {
+//        if (posChange + extension.getCurrentPosition() > ActuationConstants.Extension.maxExtension) posChange = ActuationConstants.Extension.maxExtension - extension.getCurrentPosition();
         extension.setTargetPosition(extension.getCurrentPosition() + posChange);
     }
 
-    public static void toggleTilt(boolean input) {
-        if (input && !tiltToggle) {
-            tiltUp = !tiltUp;
-            arm.setPosition(tiltUp ? ActuationConstants.Extension.tiltDeposit : ActuationConstants.Extension.tiltIntake);
-            tiltToggle = true;
-        }
-        else if (!input) {
-            tiltToggle = false;
-        }
+    public static void setExtension(int newPos) {
+        if (newPos > ActuationConstants.Extension.maxExtension) newPos = ActuationConstants.Extension.maxExtension;
+        extension.setTargetPosition(-newPos);
+    }
+
+    public static int getExtension() {
+        return extension.getCurrentPosition();
+    }
+
+    public static void setTilt(double input) {
+        arm.setPosition(input);
     }
 }

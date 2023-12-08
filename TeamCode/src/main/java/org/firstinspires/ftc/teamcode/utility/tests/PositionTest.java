@@ -12,9 +12,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+
 import java.util.List;
 
 @TeleOp(group = "Tests", name = "Position Test")
+@Config
 public class PositionTest extends OpMode {
     BHI260IMU imu;
 
@@ -54,26 +57,24 @@ public class PositionTest extends OpMode {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
-        wheel_circ = 6.184; // inches
-        track_width = 11.024; // in distance between drive wheels
-        forward_offset = -5.906; // in distance from center of robot to perp wheel
+        wheel_circ = ActuationConstants.Drivetrain.wheel_circ; // inches
+        track_width = ActuationConstants.Drivetrain.track_width; // in distance between drive wheels
+        forward_offset = ActuationConstants.Drivetrain.forward_offset; // in distance from center of robot to perp wheel
         ticksPerRev = 8192;
 
-        lateral_multiplier = 1.033174886; //1.010112392;
-        center_multiplier = 1.08; //2.05759425438;
-        perpendicular_multiplier = 1.06;//1.2;
+        lateral_multiplier = ActuationConstants.Drivetrain.lateral_multiplier; //1.010112392;
+        center_multiplier = ActuationConstants.Drivetrain.center_multiplier; //2.05759425438;
+        perpendicular_multiplier = ActuationConstants.Drivetrain.perpendicular_multiplier;//1.2;
 
-        track_width *= lateral_multiplier;
-
-        scale = wheel_circ / ticksPerRev;
+        scale = ActuationConstants.Drivetrain.scale;
 
         frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,14 +115,28 @@ public class PositionTest extends OpMode {
 
         packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
 
-        double move = gamepad1.left_stick_y;
-        double turn = gamepad1.right_stick_x;
-        double strafe = gamepad1.left_stick_x;
+        double move = -gamepad1.left_stick_y;
+        double turn = -gamepad1.right_stick_x;
+        double strafe = -gamepad1.left_stick_x;
 
-        frontLeft.setPower(move - turn - strafe);
-        frontRight.setPower(move + turn + strafe);
-        backLeft.setPower(move - turn + strafe);
-        backRight.setPower(move + turn - strafe);
+        if (gamepad1.dpad_up) {
+            frontLeft.setPower(0.3);
+            frontRight.setPower(0.3);
+            backLeft.setPower(0.3);
+            backRight.setPower(0.3);
+        }
+        else if (gamepad1.dpad_down) {
+            frontLeft.setPower(-0.3);
+            frontRight.setPower(-0.3);
+            backLeft.setPower(-0.3);
+            backRight.setPower(-0.3);
+        }
+        else {
+            frontLeft.setPower(move - turn - strafe);
+            frontRight.setPower(move + turn + strafe);
+            backLeft.setPower(move - turn + strafe);
+            backRight.setPower(move + turn - strafe);
+        }
 
         double delta_ticks_left = (ticks_left - prev_ticks_left);
         double delta_ticks_right = (ticks_right - prev_ticks_right);
