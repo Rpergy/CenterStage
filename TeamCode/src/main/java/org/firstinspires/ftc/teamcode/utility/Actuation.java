@@ -146,4 +146,5 @@ public class Actuation {
     public static void setTilt(double input) {
         arm.setPosition(input);
     }
+    public static double getTilt() { return arm.getPosition(); }
 }

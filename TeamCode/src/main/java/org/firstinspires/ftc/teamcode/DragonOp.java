@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 
 @TeleOp(name="Dragon Op")
 public class DragonOp extends OpMode {
+    private int currentTilt = 3;
     @Override
     public void init() {
         Actuation.setup(hardwareMap);
@@ -24,24 +25,29 @@ public class DragonOp extends OpMode {
         Actuation.drive(move, turn, strafe);
 
         if (gamepad2.dpad_left){
-            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[0]);
             Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
-            Actuation.setTilt(ActuationConstants.Claw.wristDeposit);
+            currentTilt = 0;
         }
         else if (gamepad2.dpad_up){
-            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[1]);
             Actuation.setTilt(ActuationConstants.Extension.tiltPresets[1]);
-            Actuation.setTilt(ActuationConstants.Claw.wristDeposit);
+            currentTilt = 1;
         }
         else if (gamepad2.dpad_right){
-            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[2]);
             Actuation.setTilt(ActuationConstants.Extension.tiltPresets[2]);
-            Actuation.setTilt(ActuationConstants.Claw.wristDeposit);
+            currentTilt = 2;
         }
         else if (gamepad2.dpad_down){
-            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[3]);
+            currentTilt = 3;
             Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]);
-            Actuation.setTilt(ActuationConstants.Claw.wristDeposit);
+            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[3]);
+            Actuation.setWrist(ActuationConstants.Claw.wristIntake);
+        }
+
+        if (gamepad2.square) {
+            if (currentTilt != 3) {
+                Actuation.setExtension(ActuationConstants.Extension.extensionPresets[currentTilt]);
+                Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
+            }
         }
 
         Actuation.toggleClaw(gamepad1.left_bumper);

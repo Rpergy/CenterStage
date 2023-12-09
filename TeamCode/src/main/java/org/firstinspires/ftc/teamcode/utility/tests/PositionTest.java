@@ -131,6 +131,18 @@ public class PositionTest extends OpMode {
             backLeft.setPower(-0.3);
             backRight.setPower(-0.3);
         }
+        else if (gamepad1.dpad_left) {
+            frontLeft.setPower(-0.2);
+            frontRight.setPower(0.2);
+            backLeft.setPower(0.2);
+            backRight.setPower(-0.2);
+        }
+        else if (gamepad1.dpad_right) {
+            frontLeft.setPower(0.2);
+            frontRight.setPower(-0.2);
+            backLeft.setPower(-0.2);
+            backRight.setPower(0.2);
+        }
         else {
             frontLeft.setPower(move - turn - strafe);
             frontRight.setPower(move + turn + strafe);
@@ -176,6 +188,5 @@ public class PositionTest extends OpMode {
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
         prev_ticks_right = ticks_right;
-
     }
 }
