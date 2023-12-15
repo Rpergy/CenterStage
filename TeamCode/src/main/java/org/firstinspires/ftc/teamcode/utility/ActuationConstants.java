@@ -20,9 +20,9 @@ public class ActuationConstants {
     public static class Drivetrain {
         public static final double ticksPerRev = 2000;
 
-        public static double center_multiplier = 0.38766532; // responsible for move (test robot: 1.08
-        public static double lateral_multiplier = 2.52259852; // responsible for turn (test robot: 1.033174886)
-        public static double perpendicular_multiplier = 0.37831279; // responsible for strafe (test robot: 1.06)
+        public static double center_multiplier = -0.38766532; // responsible for move (test robot: 1.08
+        public static double lateral_multiplier = -2.52259852; // responsible for turn (test robot: 1.033174886)
+        public static double perpendicular_multiplier = -0.37831279; // responsible for strafe (test robot: 1.06)
 
         public static double wheel_circ = 15.07; // cm
         public static double track_width = 12.25 * lateral_multiplier; // inches distance between drive wheels (test robot: 11.024)
@@ -35,6 +35,7 @@ public class ActuationConstants {
     public static class Claw {
         public static double wristIntake = 0.3;
         public static double wristDeposit = 0.8;
+        public static double wristAutoInit = 1.0;
         public static double open = 1.0;
         public static double closed = 0.9;
     }
@@ -47,17 +48,17 @@ public class ActuationConstants {
         public static double tiltIntake = 0.15;
 
         public static int[] extensionPresets = {
-                500,
-                900,
-                1200,
-                0
+                500, // level 1
+                900, // level 2
+                1200, // level 3
+                0 // intake
         };
 
-        public static double[] tiltPresets = { // 0.21 (intake) - 0.61 (closest deposit)
-                0.55,
-                0.50,
-                0.45,
-                0.15
+        public static double[] tiltPresets = { // 0.15 (intake) - 0.55 (closest deposit)
+                0.55, // level 1
+                0.50, // level 2
+                0.45, // level 3
+                0.15 // level 4
         };
         //omkar is gay amog us
         //I have hrard throug the grapevine that shreyas is the opps!!!!!!!!!

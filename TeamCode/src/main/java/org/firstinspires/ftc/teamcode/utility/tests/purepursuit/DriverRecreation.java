@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.utility.RobotMovement;
 import java.util.ArrayList;
 
 @TeleOp(name = "DriverRecreation")
+@Disabled
 public class DriverRecreation extends OpMode {
     RobotMovement robot;
 

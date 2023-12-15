@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility.tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,7 @@ import java.nio.file.attribute.AclEntryType;
 
 @TeleOp(name = "Lift Test")
 @Config
+@Disabled
 public class LiftTest extends OpMode {
     public static double tiltPos, clawPos, wristPos;
 

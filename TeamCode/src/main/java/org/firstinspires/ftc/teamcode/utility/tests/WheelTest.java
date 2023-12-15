@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.utility.tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "Wheel Test")
+@Disabled
 public class WheelTest extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
 

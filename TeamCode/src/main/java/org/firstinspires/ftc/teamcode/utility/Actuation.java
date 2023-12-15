@@ -24,23 +24,23 @@ public class Actuation {
     public static void setup(HardwareMap map) {
         if (map.servo.contains("extensionTilt")) {
             arm = map.servo.get("extensionTilt");
-            arm.setPosition(ActuationConstants.Extension.tiltIntake);
+            arm.setPosition(0.3);
         }
 
         if (map.servo.contains("clawWrist")) {
             wrist = map.servo.get("clawWrist");
-            wrist.setPosition(ActuationConstants.Claw.wristIntake);
+            wrist.setPosition(ActuationConstants.Claw.wristAutoInit);
         }
 
         if (map.servo.contains("leftClaw")) {
             lClaw = map.servo.get("leftClaw");
-            lClaw.setPosition(ActuationConstants.Claw.open);
+            lClaw.setPosition(ActuationConstants.Claw.closed);
         }
 
         if (map.servo.contains("rightClaw")) {
             rClaw = map.servo.get("rightClaw");
             rClaw.setDirection(Servo.Direction.REVERSE);
-            rClaw.setPosition(ActuationConstants.Claw.open);
+            rClaw.setPosition(ActuationConstants.Claw.closed);
         }
 
         if (map.dcMotor.contains("extension")) {
@@ -55,8 +55,18 @@ public class Actuation {
         backLeft = map.get(DcMotor.class, "backLeft");
         backRight = map.get(DcMotor.class, "backRight");
 
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -77,6 +87,10 @@ public class Actuation {
         else if (!input) {
             clawToggle = false;
         }
+    }
+
+    public static boolean getClawState() {
+        return closeClawL || closeClawR;
     }
 
     public static void toggleLClaw(boolean input) {

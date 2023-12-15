@@ -25,6 +25,12 @@ public class Pose {
         return new Point(x, y);
     }
 
+    /**
+     * Checks if another pose is within [-range, range] of the parent point
+     * @param p Comparison pose
+     * @param range Range of comparison
+     * @return if p is within [-range, range] of pose
+     */
     public boolean withinRange(Pose p, double range) {
         return (p.x >= x - range && p.x <= x + range) && (p.y >= y - range && p.y <= y + range);
     }

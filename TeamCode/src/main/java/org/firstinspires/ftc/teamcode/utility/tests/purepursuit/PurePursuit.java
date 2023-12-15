@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import java.util.ArrayList;
 
 @Autonomous(group = "Test", name = "PurePursuit")
+@Disabled
 public class PurePursuit extends OpMode {
     RobotMovement robot;
 
