@@ -3,19 +3,13 @@ package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 import org.firstinspires.ftc.teamcode.utility.FieldConstants;
-import org.firstinspires.ftc.teamcode.utility.MathFunctions;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
-import java.lang.reflect.Field;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @TeleOp(name="Waypoint Drive")
 public class WaypointDrive extends OpMode {
@@ -36,7 +30,7 @@ public class WaypointDrive extends OpMode {
 
         ArrayList<Pose> path = buildPath(startPose.ordinal(), endPose.ordinal());
 
-        robot.followPoseCurve(path, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        robot.incrementPoseCurve(path, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
         robot.displayPoses(path, ActuationConstants.Autonomous.followDistance);
     }
 

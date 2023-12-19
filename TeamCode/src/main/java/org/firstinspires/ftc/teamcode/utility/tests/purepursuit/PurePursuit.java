@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
@@ -32,7 +31,7 @@ public class PurePursuit extends OpMode {
 
 //        robot.goToPose(new Pose(0, 45, Math.toRadians(90)), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
-        robot.followPoseCurve(allPoses, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+        robot.incrementPoseCurve(allPoses, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
 
         robot.displayPoses(allPoses, ActuationConstants.Autonomous.followDistance);
     }

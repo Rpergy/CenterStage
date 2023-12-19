@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import org.firstinspires.ftc.teamcode.utility.RobotMovement;
 
@@ -108,7 +107,7 @@ public class DriverRecreation extends OpMode {
             }
         }
         else {
-            robot.followPoseCurve(pathPoints, followDistance, moveSpeed, turnSpeed);
+            robot.incrementPoseCurve(pathPoints, followDistance, moveSpeed, turnSpeed);
             robot.displayPoses(pathPoints, followDistance);
         }
 

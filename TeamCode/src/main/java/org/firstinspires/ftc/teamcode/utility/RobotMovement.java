@@ -247,7 +247,7 @@ public class RobotMovement {
      * @param moveSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
-    public void followPointCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+    public void incrementPointCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         Point followMe = getFollowPointPath(allPoints, robotPose.toPoint(), followDistance);
         if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
             goToPosition(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
@@ -264,9 +264,8 @@ public class RobotMovement {
      * @param moveSpeed Motor power multiplier for movement
      * @param turnSpeed Motor power multiplier for turning
      */
-    public void followPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+    public void incrementPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
-        double headingToTarget = allPoints.get(targetControlPoint).heading - robotPose.heading;
 
         if (distanceToTarget <= followDistance && targetControlPoint < allPoints.size()-1) {
             targetControlPoint++;
@@ -279,6 +278,36 @@ public class RobotMovement {
         }
         else
             goToPose(followMe, moveSpeed, turnSpeed);
+    }
+
+    public void followPoseCurve(Telemetry tel, ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+        double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
+        double rotToTargetHeading = Math.abs(robotPose.heading - allPoints.get(targetControlPoint).heading);
+        do {
+            updatePosition();
+
+            if (distanceToTarget <= followDistance && rotToTargetHeading <= Math.toRadians(10) && targetControlPoint < allPoints.size()-1) {
+                targetControlPoint++;
+            }
+
+            Pose followMe = getFollowPosePath(allPoints, robotPose, followDistance);
+            if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd && targetControlPoint == allPoints.size()-1) {
+                goToPose(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
+                lockOnEnd = true;
+            }
+            else
+                goToPose(followMe, moveSpeed, turnSpeed);
+
+            distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
+
+            tel.addData("distance", distanceToTarget);
+            tel.addData("point", targetControlPoint);
+            tel.update();
+            displayPoses(allPoints, followDistance);
+        }
+        while (Math.abs(distanceToTarget) > 3.0);
+
+//        targetControlPoint = 0;
     }
 
     /**
@@ -335,7 +364,7 @@ public class RobotMovement {
     }
 
     /**
-     * Shows a path of poses as well as the robot on the FTC Dashboard
+     * Shows a path of poses as well as the robot's position on the FTC Dashboard
      * @param allPoints List of points to show
      */
     public void displayPoses(ArrayList<Pose> allPoints, double radius) {
