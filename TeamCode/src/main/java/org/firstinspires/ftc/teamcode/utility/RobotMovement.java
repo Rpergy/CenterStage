@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotMovement {
+    VoltageSensor voltageSensor;
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public Pose robotPose;
@@ -57,6 +59,8 @@ public class RobotMovement {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
+
         searchIncrease = 1;
 
         robotPose = new Pose(startPos);
@@ -91,9 +95,9 @@ public class RobotMovement {
         dx = dx_center * Math.cos(robotPose.heading) - dx_perpendicular * Math.sin(robotPose.heading);
         dy = dx_center * Math.sin(robotPose.heading) + dx_perpendicular * Math.cos(robotPose.heading);
 
-        robotPose.x += dx;
-        robotPose.y += dy;
-        robotPose.heading += -1 * dtheta;
+        robotPose.x += -1 * dx;
+        robotPose.y += -1 * dy;
+        robotPose.heading += dtheta;
 
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
@@ -133,38 +137,45 @@ public class RobotMovement {
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
 
-        if (Math.abs(deltaTheta) <= Math.toRadians(5)) {
-            turnPower = 0;
-        }
-        else if (deltaTheta > 0) {
+//        if (Math.abs(deltaTheta) <= Math.toRadians(1)) {
+//            turnPower = 0;
+//        }
+        if (deltaTheta > 0) {
             turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
         }
         else {
             turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
         }
 
-        double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.accelMult) * Math.sin(robotPose.heading));
-        double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.accelMult) * Math.cos(robotPose.heading));
+        double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading));
+        double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading));
 
-        double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.accelMult) * Math.cos(robotPose.heading));
-        double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.accelMult) * Math.sin(robotPose.heading));
+        double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.strafeAccelMult) * Math.cos(robotPose.heading));
+        double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.strafeAccelMult) * Math.sin(robotPose.heading));
 
         double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
         double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
 
-        if (distance <= 4) {
-            movePower = 0;
-            strafePower = 0;
-        }
+//        if (distance <= 0.5) {
+//            movePower = 0;
+//            strafePower = 0;
+//        }
 
         packet.put("move", movePower);
         packet.put("turn", turnPower);
         packet.put("strafe", strafePower);
 
-        frontLeft.setPower(-movePower + turnPower - strafePower);
-        frontRight.setPower(-movePower - turnPower + strafePower);
-        backLeft.setPower(-movePower + turnPower + strafePower);
-        backRight.setPower(-movePower - turnPower - strafePower);
+        double v1 = -movePower + turnPower - strafePower;
+        double v2 = -movePower - turnPower + strafePower;
+        double v3 = -movePower + turnPower + strafePower;
+        double v4 = -movePower - turnPower - strafePower;
+
+        double voltageComp = 12 / voltageSensor.getVoltage();
+
+        frontLeft.setPower(v1 * voltageComp);
+        frontRight.setPower(v2 * voltageComp);
+        backLeft.setPower(v3 * voltageComp);
+        backRight.setPower(v4 * voltageComp);
 
         dashboard.sendTelemetryPacket(packet);
     }
@@ -249,7 +260,7 @@ public class RobotMovement {
      */
     public void incrementPointCurve(ArrayList<Point> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         Point followMe = getFollowPointPath(allPoints, robotPose.toPoint(), followDistance);
-        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
+        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd && targetControlPoint == allPoints.size()-1) {
             goToPosition(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
             lockOnEnd = true;
         }
@@ -272,7 +283,7 @@ public class RobotMovement {
         }
 
         Pose followMe = getFollowPosePath(allPoints, robotPose, followDistance);
-        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd) {
+        if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd && targetControlPoint == allPoints.size()-1) {
             goToPose(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
             lockOnEnd = true;
         }
