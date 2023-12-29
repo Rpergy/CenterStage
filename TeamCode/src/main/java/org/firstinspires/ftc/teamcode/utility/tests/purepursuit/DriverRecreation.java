@@ -33,7 +33,7 @@ public class DriverRecreation extends OpMode {
 
     @Override
     public void init() {
-        robot = new RobotMovement(hardwareMap, ActuationConstants.Autonomous.robotStart);
+        robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
 
         pollTime = 0.1;
 

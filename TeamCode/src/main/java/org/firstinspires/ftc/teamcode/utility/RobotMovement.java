@@ -22,7 +22,7 @@ public class RobotMovement {
     double prev_ticks_left = 0, prev_ticks_right = 0, prev_ticks_back = 0;
     double dx, dy, dtheta;
     double dx_center, dx_perpendicular;
-    double side_length = 5;
+    double side_length = 7;
 
     double searchIncrease;
 
@@ -76,6 +76,7 @@ public class RobotMovement {
      * Updates the robot's pose based off of encoder values from odometry
      */
     public void updatePosition() {
+        TelemetryPacket packet = new TelemetryPacket();
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
@@ -92,9 +93,19 @@ public class RobotMovement {
         dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.center_multiplier;
         dx_perpendicular = -1 * (delta_ticks_back - (ActuationConstants.Drivetrain.forward_offset * ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width))) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.perpendicular_multiplier;
 
-        dx = dx_center * Math.cos(robotPose.heading) - dx_perpendicular * Math.sin(robotPose.heading);
-        dy = dx_center * Math.sin(robotPose.heading) + dx_perpendicular * Math.cos(robotPose.heading);
-
+//        pose exponential terribleness
+//        a = robotPose.heading
+//        b = dtheta
+//        c = dx_center
+//        d = dx_perpendicular
+        if(dtheta != 0) {
+            dx = (dx_center * (Math.sin(dtheta) * Math.cos(robotPose.heading) - Math.sin(robotPose.heading) * (-Math.cos(dtheta) + 1)) + dx_perpendicular * (Math.cos(robotPose.heading) * (Math.cos(dtheta) - 1) - Math.sin(dtheta) * Math.sin(robotPose.heading))) / dtheta;
+            dy = (dx_center * (Math.sin(dtheta) * Math.sin(robotPose.heading) + Math.cos(robotPose.heading) * (-Math.cos(dtheta) + 1)) + dx_perpendicular * (Math.sin(robotPose.heading) * (Math.cos(dtheta) - 1) + Math.sin(dtheta) * Math.cos(robotPose.heading))) / dtheta;
+        }
+        else {
+            dx = dx_center * Math.cos(robotPose.heading) - dx_perpendicular * Math.sin(robotPose.heading);
+            dy = dx_center * Math.sin(robotPose.heading) + dx_perpendicular * Math.cos(robotPose.heading);
+        }
         robotPose.x += -1 * dx;
         robotPose.y += -1 * dy;
         robotPose.heading += dtheta;
@@ -102,6 +113,10 @@ public class RobotMovement {
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
         prev_ticks_right = ticks_right;
+        packet.put("dx", dx);
+        packet.put("dy", dy);
+        packet.put("dtheta", dtheta);
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -177,7 +192,7 @@ public class RobotMovement {
         backLeft.setPower(v3 * voltageComp);
         backRight.setPower(v4 * voltageComp);
 
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -230,6 +245,7 @@ public class RobotMovement {
 
         ArrayList<Pose> intersections = new ArrayList<>();
 
+//        iteratively increasing followRadius until valid line circle intersection is found(?)
         while (intersections.size() == 0) {
             for (int i = 0; i < pathPoints.size() - 1; i++) {
                 Pose startLine = pathPoints.get(i);
@@ -278,47 +294,52 @@ public class RobotMovement {
     public void incrementPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
 
+//        only move along the point list if we are closer to the target than the follow distance
+//        and if targetControlPoint is less than the last point in the list
+//        targetControlPoint is an index into the list
+//        since it starts at zero this condition is just stopping incrementing the pose curve list
+//        when we reach the end of it so we don't get an out of bounds exception
         if (distanceToTarget <= followDistance && targetControlPoint < allPoints.size()-1) {
             targetControlPoint++;
         }
+
 
         Pose followMe = getFollowPosePath(allPoints, robotPose, followDistance);
         if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd && targetControlPoint == allPoints.size()-1) {
             goToPose(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
             lockOnEnd = true;
         }
-        else
+        else {
             goToPose(followMe, moveSpeed, turnSpeed);
+        }
     }
 
     public void followPoseCurve(Telemetry tel, ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
-        double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
-        double rotToTargetHeading = Math.abs(robotPose.heading - allPoints.get(targetControlPoint).heading);
-        do {
+//        while (targetControlPoint != allPoints.size()-1 || MathFunctions.distance(robotPose, allPoints.get(allPoints.size()-1)) > 1.9) {
+//        || 0.9 > MathFunctions.cosineDistance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint())
+        double dist = MathFunctions.distance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint());
+        double rotDist = Math.abs(robotPose.heading - allPoints.get(allPoints.size()-1).heading);
+        while (targetControlPoint != allPoints.size()-1 || (dist > 0.45 && rotDist > Math.toRadians(2))) {
+
             updatePosition();
-
-            if (distanceToTarget <= followDistance && rotToTargetHeading <= Math.toRadians(10) && targetControlPoint < allPoints.size()-1) {
-                targetControlPoint++;
-            }
-
-            Pose followMe = getFollowPosePath(allPoints, robotPose, followDistance);
-            if (followMe.withinRange(allPoints.get(allPoints.size()-1), 1.0) || lockOnEnd && targetControlPoint == allPoints.size()-1) {
-                goToPose(allPoints.get(allPoints.size()-1), moveSpeed, turnSpeed);
-                lockOnEnd = true;
-            }
-            else
-                goToPose(followMe, moveSpeed, turnSpeed);
-
-            distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
-
-            tel.addData("distance", distanceToTarget);
-            tel.addData("point", targetControlPoint);
-            tel.update();
+            incrementPoseCurve(allPoints, followDistance, moveSpeed, turnSpeed);
             displayPoses(allPoints, followDistance);
-        }
-        while (Math.abs(distanceToTarget) > 3.0);
 
-//        targetControlPoint = 0;
+            dist = MathFunctions.distance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint());
+            rotDist = Math.abs(robotPose.heading - allPoints.get(allPoints.size()-1).heading);
+
+            tel.addData("dist to end", dist);
+            tel.addData("rot to end", rotDist);
+            tel.update();
+        }
+
+        frontLeft.setPower(0.0);
+        frontRight.setPower(0.0);
+        backLeft.setPower(0.0);
+        backRight.setPower(0.0);
+
+        targetControlPoint = 0;
+        lockOnEnd = false;
     }
 
     /**
@@ -406,6 +427,30 @@ public class RobotMovement {
             Pose point2 = allPoints.get(i + 1);
             packet.fieldOverlay().strokeLine(point1.x, point1.y, point2.x, point2.y);
         }
+
+        double[] xs = {(side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (-side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (-side_length * Math.cos(robotPose.heading) + side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                (side_length * Math.cos(robotPose.heading) + side_length * Math.sin(robotPose.heading)) + robotPose.x,
+                Math.cos(robotPose.heading) * side_length + robotPose.x};
+
+        double[] ys = {(side_length * Math.sin(robotPose.heading) + side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (-side_length * Math.sin(robotPose.heading) + side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (-side_length * Math.sin(robotPose.heading) - side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                (side_length * Math.sin(robotPose.heading) - side_length * Math.cos(robotPose.heading)) + robotPose.y,
+                Math.sin(robotPose.heading) * side_length + robotPose.y};
+
+        packet.fieldOverlay().fillPolygon(xs, ys).setFill("blue");
+
+        packet.fieldOverlay().setStroke("white");
+        packet.fieldOverlay().strokeLine(robotPose.x, robotPose.y, xs[4], ys[4]);
+
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+    public void displayPosition(double radius){
+        TelemetryPacket packet = new TelemetryPacket();
+        // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 
         double[] xs = {(side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,
                 (-side_length * Math.cos(robotPose.heading) - side_length * Math.sin(robotPose.heading)) + robotPose.x,

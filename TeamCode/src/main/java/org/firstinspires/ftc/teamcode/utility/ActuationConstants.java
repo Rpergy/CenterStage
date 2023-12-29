@@ -7,12 +7,11 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 public class ActuationConstants {
     @Config
     public static class Autonomous {
-        public static Pose robotStart = new Pose(-50, 25, 0);
-        public static double moveSpeed = 0.5;
-        public static double turnSpeed = 0.3;
+        public static double moveSpeed = 0.4;
+        public static double turnSpeed = 0.8;
         public static double followDistance = 15;
         //omkar is gay
-        public static double minTurnSpeed = 0.05;
+        public static double minTurnSpeed = 0.1;
         public static double moveAccelMult = 0.2;
         public static double strafeAccelMult = 0.9;
     }
@@ -38,7 +37,7 @@ public class ActuationConstants {
         public static double wristDeposit = 0.8;
         public static double wristAutoInit = 1.0;
         public static double open = 1.0;
-        public static double closed = 0.9;
+        public static double closed = 0.92;
     }
 
     @Config
@@ -59,7 +58,7 @@ public class ActuationConstants {
                 0.55, // level 1
                 0.50, // level 2
                 0.45, // level 3
-                0.15 // level 4
+                0.15 // intake
         };
         //omkar is gay amog us
         //I have hrard throug the grapevine that shreyas is the opps!!!!!!!!!

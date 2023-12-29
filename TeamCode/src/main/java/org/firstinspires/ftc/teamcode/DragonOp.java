@@ -5,21 +5,31 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.RobotMovement;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
+
+import java.util.ArrayList;
 
 @TeleOp(name="Dragon Op")
 public class DragonOp extends OpMode {
     private int currentTilt = 3;
     private boolean slowModeToggle = false;
     private boolean slowMode = false;
+    private RobotMovement robot;
     @Override
     public void init() {
         Actuation.setup(hardwareMap);
+        robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
 
         telemetry.addData("Status", "Initialized");
     }
 
     @Override
     public void loop() {
+
+        robot.updatePosition();
+        robot.displayPosition(ActuationConstants.Autonomous.followDistance);
+
         double move = gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
@@ -74,9 +84,12 @@ public class DragonOp extends OpMode {
 
         Actuation.toggleWrist(gamepad1.triangle);
 
-        telemetry.addData("Extension Pos", Actuation.getExtension());
-        telemetry.addData("Slow mode", slowMode);
-        telemetry.addData("claw", Actuation.getClawState());
+//        telemetry.addData("Extension Pos", Actuation.getExtension());
+//        telemetry.addData("Slow mode", slowMode);
+//        telemetry.addData("claw", Actuation.getClawState());
+        telemetry.addData("x", robot.robotPose.x);
+        telemetry.addData("y", robot.robotPose.y);
+        telemetry.addData("heading", robot.robotPose.heading);
         telemetry.update();
     }
 }

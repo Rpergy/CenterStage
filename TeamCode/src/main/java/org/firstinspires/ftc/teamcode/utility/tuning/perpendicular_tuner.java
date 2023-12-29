@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utility.tuning;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 
 @Config
 @TeleOp(name="Perpendicular Tuner", group="tuning")
+@Disabled
 public class perpendicular_tuner extends OpMode {
     RobotMovement robot;
     public static double measured_dist = 0.0;

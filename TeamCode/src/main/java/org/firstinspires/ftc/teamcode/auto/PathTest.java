@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,16 +16,15 @@ import java.util.ArrayList;
 public class PathTest extends LinearOpMode {
     @Override
     public void runOpMode() {
-        RobotMovement robot = new RobotMovement(hardwareMap, new Pose(10, 66, Math.toRadians(-90)));
+        RobotMovement robot = new RobotMovement(hardwareMap, new Pose(11.5, 63, Math.toRadians(-90)));
 
-        ArrayList<Pose> startToCanvas = new ArrayList<>();
-        startToCanvas.add(new Pose(10, 66, Math.toRadians(-90)));
-        startToCanvas.add(new Pose(40, 66, Math.toRadians(0)));
-        startToCanvas.add(new Pose(40, 40, Math.toRadians(0)));
+        ArrayList<Pose> traj = new ArrayList<>();
+        traj.add(new Pose(11.5, 63, Math.toRadians(-90)));
+        traj.add(new Pose(10, 50, Math.toRadians(-100)));
 
         waitForStart();
         while (opModeIsActive()) {
-            robot.displayPoses(startToCanvas, ActuationConstants.Autonomous.followDistance);
+            robot.displayPoses(traj, ActuationConstants.Autonomous.followDistance);
         }
     }
 }
