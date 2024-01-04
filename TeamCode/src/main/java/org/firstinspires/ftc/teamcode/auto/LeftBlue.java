@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -71,7 +73,7 @@ public class LeftBlue extends LinearOpMode {
 //        I think there's an issue where if you command the robot to turn more than it can in the path length is doesn't make the full rotation(?)
         ArrayList<Pose> startToRight = new ArrayList<>();
         startToRight.add(new Pose(11.5, 63, Math.toRadians(-90)));
-        startToRight.add(new Pose(11.5, 50, Math.toRadians(-100)));
+        startToRight.add(new Pose(11.5, 63, Math.toRadians(-180)));
 
         ArrayList<Pose> rightToCanvas = new ArrayList<>();
         rightToCanvas.add(new Pose(9, 36, Math.toRadians(-180)));
@@ -102,24 +104,37 @@ public class LeftBlue extends LinearOpMode {
 //        midToCanvas.add(new Pose(10, 17, Math.toRadians(-180)));
 //        midToCanvas.add(new Pose(50, 36, Math.toRadians(-180)));
 //
+
+        FtcDashboard dashboard = FtcDashboard.getInstance();
         waitForStart();
 
-        robot.followPoseCurve(telemetry, startToRight, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
-        Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]);
-        Actuation.setWrist(ActuationConstants.Claw.wristIntake);
-        sleep(500);
-        Actuation.setLClaw(ActuationConstants.Claw.open);
-        sleep(200);
-        Actuation.setTilt(0.3);
-        sleep(500);
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("deltaTheta", 0);
+        dashboard.sendTelemetryPacket(packet);
 
-        Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
-        Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
-        Actuation.setExtension(200);
-        robot.followPoseCurve(telemetry, rightToCanvas, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
-        sleep(1200);
-        Actuation.setClaw(ActuationConstants.Claw.open);
-        sleep(250);
+        sleep(5000);
+
+        while(true) {
+            robot.goToPose(new Pose(11.5, 63, Math.toRadians(-180)), ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+            robot.updatePosition();
+        }
+
+//        robot.followPoseCurve(telemetry, startToRight, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+//        Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]);
+//        Actuation.setWrist(ActuationConstants.Claw.wristIntake);
+//        sleep(500);
+//        Actuation.setLClaw(ActuationConstants.Claw.open);
+//        sleep(200);
+//        Actuation.setTilt(0.3);
+//        sleep(500);
+//
+//        Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
+//        Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
+//        Actuation.setExtension(200);
+//        robot.followPoseCurve(telemetry, rightToCanvas, ActuationConstants.Autonomous.followDistance, ActuationConstants.Autonomous.moveSpeed, ActuationConstants.Autonomous.turnSpeed);
+//        sleep(1200);
+//        Actuation.setClaw(ActuationConstants.Claw.open);
+//        sleep(250);
 
 //        Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
 //        Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);

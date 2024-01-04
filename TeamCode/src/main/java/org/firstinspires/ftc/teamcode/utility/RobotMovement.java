@@ -35,6 +35,8 @@ public class RobotMovement {
 
     int targetControlPoint;
 
+    double movePower, turnPower, strafePower;
+
     public RobotMovement(HardwareMap hardwareMap, Pose startPos) {
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) {
@@ -150,7 +152,7 @@ public class RobotMovement {
 
         double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
 
-        double turnPower = deltaTheta/Math.PI * turnSpeed;
+        turnPower = deltaTheta/Math.PI * turnSpeed;
 
 //        if (Math.abs(deltaTheta) <= Math.toRadians(1)) {
 //            turnPower = 0;
@@ -168,8 +170,8 @@ public class RobotMovement {
         double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.strafeAccelMult) * Math.cos(robotPose.heading));
         double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.strafeAccelMult) * Math.sin(robotPose.heading));
 
-        double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
-        double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
+        movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
+        strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
 
 //        if (distance <= 0.5) {
 //            movePower = 0;
@@ -179,6 +181,7 @@ public class RobotMovement {
         packet.put("move", movePower);
         packet.put("turn", turnPower);
         packet.put("strafe", strafePower);
+        packet.put("deltaTheta", deltaTheta);
 
         double v1 = -movePower + turnPower - strafePower;
         double v2 = -movePower - turnPower + strafePower;
@@ -192,7 +195,7 @@ public class RobotMovement {
         backLeft.setPower(v3 * voltageComp);
         backRight.setPower(v4 * voltageComp);
 
-//        dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -319,11 +322,11 @@ public class RobotMovement {
 //        || 0.9 > MathFunctions.cosineDistance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint())
         double dist = MathFunctions.distance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint());
         double rotDist = Math.abs(robotPose.heading - allPoints.get(allPoints.size()-1).heading);
-        while (targetControlPoint != allPoints.size()-1 || (dist > 0.45 && rotDist > Math.toRadians(2))) {
+        while (dist > 0.45 || rotDist > Math.toRadians(2)) {
+            displayPoses(allPoints, followDistance);
 
             updatePosition();
             incrementPoseCurve(allPoints, followDistance, moveSpeed, turnSpeed);
-            displayPoses(allPoints, followDistance);
 
             dist = MathFunctions.distance(robotPose.toPoint(), allPoints.get(allPoints.size()-1).toPoint());
             rotDist = Math.abs(robotPose.heading - allPoints.get(allPoints.size()-1).heading);
@@ -444,6 +447,12 @@ public class RobotMovement {
 
         packet.fieldOverlay().setStroke("white");
         packet.fieldOverlay().strokeLine(robotPose.x, robotPose.y, xs[4], ys[4]);
+
+        packet.put("move", movePower);
+        packet.put("strafe", strafePower);
+        packet.put("turn", turnPower);
+        packet.put("target point", targetControlPoint);
+        packet.put("locked on end", lockOnEnd);
 
         dashboard.sendTelemetryPacket(packet);
     }
