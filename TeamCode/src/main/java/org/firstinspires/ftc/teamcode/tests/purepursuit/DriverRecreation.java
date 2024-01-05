@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.teamcode.utility.tests.purepursuit;
+package org.firstinspires.ftc.teamcode.tests.purepursuit;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
-import org.firstinspires.ftc.teamcode.utility.RobotMovement;
+import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
 
 import java.util.ArrayList;
 

@@ -5,23 +5,11 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
-import org.firstinspires.ftc.teamcode.utility.RobotMovement;
+import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Range;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
-import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @Autonomous(name="left blue")

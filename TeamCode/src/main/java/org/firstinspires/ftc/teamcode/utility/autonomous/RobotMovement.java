@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.utility.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.MathFunctions;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Point;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 

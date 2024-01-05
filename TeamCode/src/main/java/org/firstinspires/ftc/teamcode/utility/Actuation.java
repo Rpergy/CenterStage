@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 
 public class Actuation {
     private static boolean closeClawL = false;
@@ -19,9 +20,11 @@ public class Actuation {
     private static boolean wristToggle = false;
     private static boolean tiltToggle = false;
 
-    private static DcMotor frontLeft, frontRight, backLeft, backRight;
+    public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public static void setup(HardwareMap map) {
+        AutoMovement.setup(map);
+
         if (map.servo.contains("extensionTilt")) {
             arm = map.servo.get("extensionTilt");
             arm.setPosition(0.3);
