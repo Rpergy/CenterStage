@@ -14,9 +14,9 @@ import java.util.ArrayList;
 @Config
 @TeleOp(name="Perpendicular Tuner", group="tuning")
 @Disabled
-public class perpendicular_tuner extends OpMode {
+public class perpendicularTuner extends OpMode {
     RobotMovement robot;
-    public static double measured_dist = 0.0;
+    public static double measuredDist = 0.0;
 
     ArrayList<Pose> traj;
 
@@ -36,8 +36,8 @@ public class perpendicular_tuner extends OpMode {
         robot.displayPoses(traj, ActuationConstants.Autonomous.followDistance);
 
         telemetry.addData("X pos", robot.robotPose.x);
-        telemetry.addData("diff", measured_dist/robot.robotPose.x);
-        telemetry.addData("new perpendicular multiplier", ActuationConstants.Drivetrain.perpendicular_multiplier * (measured_dist/robot.robotPose.x));
+        telemetry.addData("diff", measuredDist /robot.robotPose.x);
+        telemetry.addData("new perpendicular multiplier", ActuationConstants.Drivetrain.perpendicularMultiplier * (measuredDist /robot.robotPose.x));
         telemetry.update();
     }
 }

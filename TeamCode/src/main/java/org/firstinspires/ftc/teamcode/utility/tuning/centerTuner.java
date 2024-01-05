@@ -14,9 +14,9 @@ import java.util.ArrayList;
 @Config
 @TeleOp(name="Center Tuner", group="tuning")
 @Disabled
-public class center_tuner extends OpMode {
+public class centerTuner extends OpMode {
     RobotMovement robot;
-    public static double measured_dist = 0.0;
+    public static double measuredDist = 0.0;
 
     ArrayList<Pose> traj;
 
@@ -36,8 +36,8 @@ public class center_tuner extends OpMode {
         robot.displayPoses(traj, ActuationConstants.Autonomous.followDistance);
 
         telemetry.addData("X pos", robot.robotPose.x);
-        telemetry.addData("diff", measured_dist/robot.robotPose.x);
-        telemetry.addData("new center multiplier: ", ActuationConstants.Drivetrain.center_multiplier * (measured_dist/robot.robotPose.x));
+        telemetry.addData("diff", measuredDist /robot.robotPose.x);
+        telemetry.addData("new center multiplier: ", ActuationConstants.Drivetrain.centerMultiplier * (measuredDist /robot.robotPose.x));
         telemetry.update();
     }
 }
