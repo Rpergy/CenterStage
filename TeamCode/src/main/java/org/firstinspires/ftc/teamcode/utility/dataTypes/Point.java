@@ -8,9 +8,14 @@ public class Point {
         this.y = y;
     }
 
-    public Point(Point replace) {
-        this.x = replace.x;
-        this.y = replace.y;
+    public Point(Point newPoint) {
+        this.x = newPoint.x;
+        this.y = newPoint.y;
+    }
+
+    public Point(Pose pose) {
+        this.x = pose.x;
+        this.y = pose.y;
     }
 
     public boolean equals(Point p) {

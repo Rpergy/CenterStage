@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.utility;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
-
 public class ActuationConstants {
     @Config
     public static class Autonomous {
@@ -20,9 +18,9 @@ public class ActuationConstants {
     public static class Drivetrain {
         public static final double ticksPerRev = 2000;
 
-        public static double center_multiplier = 0.3863728657; // responsible for move (test robot: 1.08
+        public static double centerMultiplier = 0.3863728657; // responsible for move (test robot: 1.08
         public static double lateral_multiplier = 2.514924912; // responsible for turn (test robot: 1.033174886)
-        public static double perpendicular_multiplier = 0.3902688729; // responsible for strafe (test robot: 1.06)
+        public static double perpendicularMultiplier = 0.3902688729; // responsible for strafe (test robot: 1.06)
 
         public static double wheel_circ = 15.07; // cm
         public static double track_width = 12.25 * lateral_multiplier; // inches distance between drive wheels (test robot: 11.024)
