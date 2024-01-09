@@ -17,7 +17,7 @@ public class WaypointDrive extends OpMode {
 
     @Override
     public void init() {
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
         robot = new RobotMovement(hardwareMap, new Pose(50, -50, 0));
     }
 

@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 public class Actuation {
     private static boolean closeClawL = false;
@@ -13,17 +15,16 @@ public class Actuation {
     private static boolean wristUp = false;
     private static boolean tiltUp = false;
 
-    private static Servo arm, wrist, lClaw, rClaw;
-    private static DcMotor extension;
+    static Servo arm, wrist, lClaw, rClaw;
+    static DcMotor extension;
 
     private static boolean clawToggle = false;
     private static boolean wristToggle = false;
-    private static boolean tiltToggle = false;
 
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    public static void setup(HardwareMap map) {
-        AutoMovement.setup(map);
+    public static void setup(HardwareMap map, Telemetry telemetry) {
+        AutoMovement.setup(map, telemetry);
 
         if (map.servo.contains("extensionTilt")) {
             arm = map.servo.get("extensionTilt");

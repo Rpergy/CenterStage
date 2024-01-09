@@ -6,6 +6,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 import org.firstinspires.ftc.teamcode.utility.MathFunctions;
@@ -33,11 +34,15 @@ public class AutoMovement {
 
     static FtcDashboard dashboard;
 
+    public static Telemetry telemetry;
+
     /**
      * Necessary in order to correctly initialize reading from odometry and accessing voltage sensor
      * @param hardwareMap Current hardware map
      */
-    public static void setup(HardwareMap hardwareMap) {
+    public static void setup(HardwareMap hardwareMap, Telemetry tel) {
+        telemetry = tel;
+
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -105,12 +110,12 @@ public class AutoMovement {
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
 
-        if (deltaTheta > 0) {
-            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
-        }
-        else {
-            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
-        }
+//        if (deltaTheta > 0) {
+//            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
+//        }
+//        else {
+//            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
+//        }
 
         double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading));
         double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading));
@@ -138,10 +143,10 @@ public class AutoMovement {
         double deltaTheta = MathFunctions.AngleWrap(targetHeading - robotPose.heading);
         double turnPower = deltaTheta/Math.PI * turnSpeed;
 
-        if (deltaTheta > 0)
-            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
-        else
-            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
+//        if (deltaTheta > 0)
+//            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
+//        else
+//            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
 
         double voltageComp = 12 / voltageSensor.getVoltage();
 

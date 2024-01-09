@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class RightRed extends LinearOpMode {
     @Override
     public void runOpMode() {
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
         Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
         Actuation.setTilt(0.3);
 

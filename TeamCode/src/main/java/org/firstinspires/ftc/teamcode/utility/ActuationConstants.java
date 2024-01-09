@@ -6,11 +6,11 @@ public class ActuationConstants {
     @Config
     public static class Autonomous {
         public static double moveSpeed = 0.4;
-        public static double turnSpeed = 2.0;
+        public static double turnSpeed = 3.0;
         public static double followDistance = 10;
         //omkar is gay
         public static double minTurnSpeed = 0.06;
-        public static double moveAccelMult = 0.2;
+        public static double moveAccelMult = 0.6;
         public static double strafeAccelMult = 0.9;
     }
 

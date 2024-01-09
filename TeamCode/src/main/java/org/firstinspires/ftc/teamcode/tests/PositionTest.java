@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 
 import java.util.List;
 
-@TeleOp(group = "Tests", name = "Position Test")
+@TeleOp(group = "tests", name = "Position Test")
 @Config
 public class PositionTest extends OpMode {
     BHI260IMU imu;

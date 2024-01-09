@@ -10,12 +10,12 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Drift Test")
+@Autonomous(name = "Drift Test", group="tests")
 //@Disabled
 public class DriftTest extends LinearOpMode {
     @Override
     public void runOpMode() {
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
         Actuation.setClaw(ActuationConstants.Claw.closed);
         Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
         Actuation.setTilt(0.3);

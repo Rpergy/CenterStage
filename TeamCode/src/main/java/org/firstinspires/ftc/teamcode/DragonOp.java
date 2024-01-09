@@ -16,7 +16,7 @@ public class DragonOp extends OpMode {
     private RobotMovement robot;
     @Override
     public void init() {
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
         robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
 
         telemetry.addData("Status", "Initialized");

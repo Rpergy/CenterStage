@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 
 import java.nio.file.attribute.AclEntryType;
 
-@TeleOp(name = "Lift Test")
+@TeleOp(name = "Lift Test", group="tests")
 @Config
 public class LiftTest extends OpMode {
     public static double tiltPos, clawPos, wristPos;
@@ -27,7 +27,7 @@ public class LiftTest extends OpMode {
         clawPos = ActuationConstants.Claw.open;
         wristPos = ActuationConstants.Claw.wristIntake;
 
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
     }
 
     @Override

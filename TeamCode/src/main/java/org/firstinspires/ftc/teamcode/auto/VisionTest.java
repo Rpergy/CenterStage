@@ -38,7 +38,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp
+@TeleOp(name="Vision Test", group="tests")
 public class VisionTest extends LinearOpMode
 {
     OpenCvWebcam webcam;
@@ -49,7 +49,7 @@ public class VisionTest extends LinearOpMode
     @Override
     public void runOpMode()
     {
-        Actuation.setup(hardwareMap);
+        Actuation.setup(hardwareMap, telemetry);
         Actuation.setClaw(ActuationConstants.Claw.closed);
         Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
         Actuation.setTilt(0.3);
