@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tests.purepursuit;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import java.util.ArrayList;
 
 @TeleOp(name="Waypoint Drive")
+@Disabled
 public class WaypointDrive extends OpMode {
     RobotMovement robot;
 

@@ -64,8 +64,8 @@ public class PositionTest extends OpMode {
         ticksPerRev = 8192;
 
         lateral_multiplier = ActuationConstants.Drivetrain.lateral_multiplier; //1.010112392;
-        center_multiplier = ActuationConstants.Drivetrain.center_multiplier; //2.05759425438;
-        perpendicular_multiplier = ActuationConstants.Drivetrain.perpendicular_multiplier;//1.2;
+        center_multiplier = ActuationConstants.Drivetrain.centerMultiplier; //2.05759425438;
+        perpendicular_multiplier = ActuationConstants.Drivetrain.perpendicularMultiplier;//1.2;
 
         scale = ActuationConstants.Drivetrain.scale;
 

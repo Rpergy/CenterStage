@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests.purepursuit;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name="Dodge Test")
+@Disabled
 public class DodgeTest extends OpMode {
     DodgeMovement robot;
 

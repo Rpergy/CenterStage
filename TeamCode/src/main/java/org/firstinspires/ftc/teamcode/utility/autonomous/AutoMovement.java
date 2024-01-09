@@ -109,13 +109,7 @@ public class AutoMovement {
         double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
-
-//        if (deltaTheta > 0) {
-//            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
-//        }
-//        else {
-//            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
-//        }
+        
 
         double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading));
         double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading));

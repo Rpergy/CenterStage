@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
 import org.firstinspires.ftc.teamcode.utility.autonomous.Trajectory;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
@@ -58,17 +59,21 @@ public class LeftBlue extends LinearOpMode {
 
 //        commented because testing vision code
         waitForStart();
-        Trajectory leftBlue = new Trajectory(new Pose(11.5, 63, Math.toRadians(-90)))
+        Trajectory start_centerCanvas = new Trajectory(new Pose(11.5, 63, Math.toRadians(-90)))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]))
                 .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristDeposit))
                 .lineTo(new Pose(50, 34.5, Math.toRadians(180)))
                 .action(() -> Actuation.setLClaw(ActuationConstants.Claw.open))
-                .action(() -> sleep(500))
+                .action(() -> sleep(500));
+
+        Trajectory centerCanvas_spike = new Trajectory(AutoMovement.robotPose)
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]))
                 .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake))
                 .lineTo(new Pose(22, 28, Math.toRadians(180)), 0.3)
                 .action(() -> Actuation.setRClaw(ActuationConstants.Claw.open))
-                .action(() -> sleep(500))
+                .action(() -> sleep(500));
+
+        Trajectory centerSpike_stacks = new Trajectory(AutoMovement.robotPose)
                 .lineTo(new Pose(28, 28, Math.toRadians(180)))
                 .lineTo(new Pose(0, 6, Math.toRadians(180)))
                 .lineTo(new Pose(54, 12, Math.toRadians(180)));
