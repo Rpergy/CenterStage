@@ -69,7 +69,7 @@ public class LeftBlue extends LinearOpMode {
         Trajectory centerCanvas_spike = new Trajectory(AutoMovement.robotPose)
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]))
                 .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake))
-                .lineTo(new Pose(22, 28, Math.toRadians(180)), 0.3)
+                .lineTo(new Pose(22, 28, Math.toRadians(180)), 0.3, ActuationConstants.Autonomous.turnSpeed)
                 .action(() -> Actuation.setRClaw(ActuationConstants.Claw.open))
                 .action(() -> sleep(500));
 
@@ -77,6 +77,10 @@ public class LeftBlue extends LinearOpMode {
                 .lineTo(new Pose(28, 28, Math.toRadians(180)))
                 .lineTo(new Pose(0, 6, Math.toRadians(180)))
                 .lineTo(new Pose(54, 12, Math.toRadians(180)));
+
+        start_centerCanvas.run();
+        centerCanvas_spike.run();
+        centerSpike_stacks.run();
     }
 //    class Pipeline extends OpenCvPipeline
 //    {
