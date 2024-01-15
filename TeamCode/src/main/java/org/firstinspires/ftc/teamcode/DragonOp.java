@@ -82,6 +82,8 @@ public class DragonOp extends OpMode {
 
         Actuation.toggleWrist(gamepad1.triangle);
 
+        Actuation.setColors();
+
 //        telemetry.addData("Extension Pos", Actuation.getExtension());
 //        telemetry.addData("Slow mode", slowMode);
 //        telemetry.addData("claw", Actuation.getClawState());

@@ -10,6 +10,7 @@ public class ActuationConstants {
         public static double followDistance = 10;
         //omkar is gay
         public static double minTurnSpeed = 0.06;
+        public static double minMoveSpeed = 0.1;
         public static double moveAccelMult = 0.9;
         public static double strafeAccelMult = 0.9;
     }
@@ -44,6 +45,7 @@ public class ActuationConstants {
         public static int extensionStart = 0;
 
         public static double tiltIntake = 0.15;
+        public static double tiltStacks = 0.18;
 
         public static int[] extensionPresets = {
                 500, // level 1
