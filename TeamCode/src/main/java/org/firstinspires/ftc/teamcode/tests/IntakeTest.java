@@ -6,14 +6,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name="Intake Test", group="tests")
 public class IntakeTest extends OpMode {
-    DcMotor intake;
+    DcMotor intakeL, intakeR;
     @Override
     public void init() {
-        intake = hardwareMap.dcMotor.get("intake");
+        intakeL = hardwareMap.dcMotor.get("intakeL");
+        intakeR = hardwareMap.dcMotor.get("intakeR");
+
+        intakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
     public void loop() {
-        intake.setPower(gamepad1.left_stick_y);
+        intakeL.setPower(gamepad1.left_stick_y);
+        intakeR.setPower(gamepad1.right_stick_y);
     }
 }

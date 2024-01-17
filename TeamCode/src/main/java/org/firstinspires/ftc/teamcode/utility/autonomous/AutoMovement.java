@@ -109,7 +109,6 @@ public class AutoMovement {
         double deltaTheta = MathFunctions.AngleWrap(targetPose.heading - robotPose.heading);
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
-        
 
         double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading));
         double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading));
@@ -119,6 +118,9 @@ public class AutoMovement {
 
         double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
         double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
+
+        if(movePower > 0) movePower = Math.max(movePower, ActuationConstants.Autonomous.minMoveSpeed);
+        else movePower = Math.min(movePower, -ActuationConstants.Autonomous.minMoveSpeed);
 
         double v1 = -movePower + turnPower - strafePower;
         double v2 = -movePower - turnPower + strafePower;
@@ -156,7 +158,7 @@ public class AutoMovement {
      * @param followRadius Intersections search distance
      * @return Interpolated pose which the robot should move towards
      */
-    public Pose getFollowPose(ArrayList<Pose> pathPoints, double followRadius) {
+    public static Pose getFollowPose(ArrayList<Pose> pathPoints, double followRadius) {
         Pose followMe = new Pose(pathPoints.get(0));
 
         ArrayList<Pose> intersections = new ArrayList<>();
@@ -190,7 +192,7 @@ public class AutoMovement {
      * @param moveSpeed Motor power multiplier for movement motion
      * @param turnSpeed Motor power multiplier for turning motion
      */
-    public void incrementPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
+    public static void incrementPoseCurve(ArrayList<Pose> allPoints, double followDistance, double moveSpeed, double turnSpeed) {
         double distanceToTarget = MathFunctions.distance(robotPose.toPoint(), allPoints.get(targetControlPoint).toPoint());
 
 //        only move along the point list if we are closer to the target than the follow distance
@@ -217,7 +219,7 @@ public class AutoMovement {
      * Shows a path of points as well as the robot's position on the FTC Dashboard
      * @param allPoints List of points to show as a path
      */
-    public void displayPoses(ArrayList<Pose> allPoints, double radius) {
+    public static void displayPoses(ArrayList<Pose> allPoints, double radius) {
         TelemetryPacket packet = new TelemetryPacket();
 
         packet.fieldOverlay().strokeCircle(robotPose.x, robotPose.y, radius);
@@ -269,7 +271,7 @@ public class AutoMovement {
      * Displays the robot's position on the FTC dashboard
      * @param radius Radius of the robot's path search
      */
-    public void displayPosition(double radius){
+    public static void displayPosition(double radius){
         TelemetryPacket packet = new TelemetryPacket();
         // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 

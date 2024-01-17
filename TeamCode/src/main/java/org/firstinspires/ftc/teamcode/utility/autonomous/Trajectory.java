@@ -86,8 +86,11 @@ public class Trajectory {
         double dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
         double rotDist = robotPose.heading - targetPose.heading;
 
-        while(dist > 0.45 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(4)) {
+        while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(3)) {
             AutoMovement.updatePosition();
+
+            AutoMovement.displayPosition(ActuationConstants.Autonomous.followDistance);//omkarisgay and fat obese large
+
             AutoMovement.moveTowards(targetPose, moveSpeed, turnSpeed);
 
             dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
@@ -105,12 +108,12 @@ public class Trajectory {
         double dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
         double rotDist = robotPose.heading - targetPose.heading;
 
-        while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(4)) {
+        while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(2)) {
             AutoMovement.updatePosition();
             AutoMovement.moveTowards(targetPose, mSpeed, tSpeed);
 
             dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
-            rotDist = Math.abs(robotPose.heading - targetPose.heading);
+            rotDist = robotPose.heading - targetPose.heading;
 
             AutoMovement.telemetry.addData("dist", dist);
             AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
@@ -121,12 +124,12 @@ public class Trajectory {
     }
 
     private void runTurnTo(double targetHeading) {
-        double rotDist = Math.abs(MathFunctions.AngleWrap(robotPose.heading - targetHeading));
-        while(rotDist > Math.toRadians(2)) {
+        double rotDist = robotPose.heading - targetHeading;
+        while(Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(4)) {
             AutoMovement.updatePosition();
             AutoMovement.turnTowards(targetHeading, turnSpeed);
 
-            rotDist = Math.abs(robotPose.heading - targetHeading);
+            rotDist = robotPose.heading - targetHeading;
         }
 
         Actuation.drive(0, 0, 0);
