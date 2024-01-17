@@ -62,4 +62,12 @@ public class ActuationConstants {
         //I have hrard throug the grapevine that shreyas is the opps!!!!!!!!!
         //be sure to comment on your code!!!!!!!!!!!!!!
     }
+
+    @Config
+    public static class Plane {
+        public static double releaseDown = 0.41;
+        public static double releaseUp = 0.0;
+        public static double tilt = 0.629;
+        //
+    }
 }
