@@ -22,9 +22,14 @@ public class Actuation {
     private static boolean closeClawR = false;
 
     private static boolean wristUp = false;
-    private static boolean tiltUp = false;
+
+    public static boolean slowMode = false;
+    public static boolean fieldCentric = false;
+
     private static boolean clawToggle = false;
     private static boolean wristToggle = false;
+    private static boolean fieldCentricToggle = false;
+    private static boolean slowModeToggle = false;
 
     static Servo arm, wrist, lClaw, rClaw;
     static DcMotor extension;
@@ -79,15 +84,15 @@ public class Actuation {
         backLeft = map.get(DcMotor.class, "backLeft");
         backRight = map.get(DcMotor.class, "backRight");
 
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         imu = map.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -106,19 +111,30 @@ public class Actuation {
         backRight.setPower(move + turn - strafe);
     }
 
-    public static void fieldCentricDrive(double move, double turn, double strafe, Telemetry telemetry) {
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        double heading = orientation.getYaw(AngleUnit.RADIANS);
-        double newMove = strafe*Math.sin(-heading)+move*Math.cos(-heading);
-        double newStrafe = strafe*Math.cos(-heading)-move*Math.sin(-heading);
+    public static void teleDrive(boolean toggleSlowMode, boolean toggleFieldCentric, double move, double turn, double strafe) {
+        if (toggleSlowMode && !slowModeToggle) slowMode = !slowMode;
+        if (toggleFieldCentric && !fieldCentricToggle) fieldCentric = !fieldCentric;
 
-        frontLeft.setPower(newMove+newStrafe+turn);
-        backLeft.setPower(newMove-newStrafe+turn);
-        frontRight.setPower(newMove-newStrafe-turn);
-        backRight.setPower(newMove+newStrafe-turn);
-        telemetry.addData("Yaw (Z)", "%.2f Rad. (Heading)", orientation.getYaw(AngleUnit.RADIANS));
+        double multip = (slowMode) ? 0.5 : 1.0;
+        if (fieldCentric) {
+            double newMove = strafe*Math.sin(-AutoMovement.robotPose.heading)+move*Math.cos(-AutoMovement.robotPose.heading);
+            double newStrafe = strafe*Math.cos(-AutoMovement.robotPose.heading)-move*Math.sin(-AutoMovement.robotPose.heading);
+
+            frontLeft.setPower((newMove+newStrafe+turn) * multip);
+            backLeft.setPower((newMove-newStrafe+turn) * multip);
+            frontRight.setPower((newMove-newStrafe-turn) * multip);
+            backRight.setPower((newMove+newStrafe-turn) * multip);
+        }
+        else {
+            frontLeft.setPower((move+strafe+turn) * multip);
+            backLeft.setPower((move-strafe+turn) * multip);
+            frontRight.setPower((move-strafe-turn) * multip);
+            backRight.setPower((move+strafe-turn) * multip);
+        }
+
+        slowModeToggle = toggleSlowMode;
+        fieldCentricToggle = toggleFieldCentric;
     }
-
     public static PixelColors leftColors() {
         if (colorLeft.red() < 500 && colorLeft.green() < 500 && colorLeft.blue() < 500)
             return PixelColors.EMPTY;
