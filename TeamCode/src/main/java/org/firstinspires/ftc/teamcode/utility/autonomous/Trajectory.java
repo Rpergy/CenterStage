@@ -14,6 +14,9 @@ public class Trajectory {
 
     ArrayList<Runnable> movements;
 
+    /**
+     * Initializes a new trajectory
+     */
     public Trajectory() {
         movements = new ArrayList<>();
 
@@ -22,6 +25,10 @@ public class Trajectory {
         viewDist = ActuationConstants.Autonomous.followDistance;
     }
 
+    /**
+     * Initializes a new trajectory
+     * @param startPos Robot's starting position & heading
+     */
     public Trajectory(Pose startPos) {
         movements = new ArrayList<>();
 
@@ -74,7 +81,7 @@ public class Trajectory {
     }
 
     /**
-     * Runs the trajectory's previously specified movements
+     * Builds and runs the trajectory's previously specified movements
      */
     public void run() {
         for (Runnable movement : movements) {
@@ -89,7 +96,7 @@ public class Trajectory {
         while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(3)) {
             AutoMovement.updatePosition();
 
-            AutoMovement.displayPosition(ActuationConstants.Autonomous.followDistance);//omkarisgay and fat obese large
+//            AutoMovement.displayPosition(ActuationConstants.Autonomous.followDistance);//omkarisgay and fat obese large
 
             AutoMovement.moveTowards(targetPose, moveSpeed, turnSpeed);
 

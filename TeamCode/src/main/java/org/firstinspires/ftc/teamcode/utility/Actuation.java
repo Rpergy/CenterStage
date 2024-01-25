@@ -1,12 +1,17 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.PixelColors;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
@@ -29,6 +34,8 @@ public class Actuation {
     private static RevBlinkinLedDriver leds;
 
     private static ColorSensor colorLeft, colorRight;
+
+    private static IMU imu;
 
     public static void setup(HardwareMap map, Telemetry telemetry) {
         AutoMovement.setup(map, telemetry);
@@ -82,6 +89,12 @@ public class Actuation {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        imu = map.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        )));
+
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -91,6 +104,19 @@ public class Actuation {
         frontRight.setPower(move + turn + strafe);
         backLeft.setPower(move - turn + strafe);
         backRight.setPower(move + turn - strafe);
+    }
+
+    public static void fieldCentricDrive(double move, double turn, double strafe, Telemetry telemetry) {
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        double heading = orientation.getYaw(AngleUnit.RADIANS);
+        double newMove = strafe*Math.sin(-heading)+move*Math.cos(-heading);
+        double newStrafe = strafe*Math.cos(-heading)-move*Math.sin(-heading);
+
+        frontLeft.setPower(newMove+newStrafe+turn);
+        backLeft.setPower(newMove-newStrafe+turn);
+        frontRight.setPower(newMove-newStrafe-turn);
+        backRight.setPower(newMove+newStrafe-turn);
+        telemetry.addData("Yaw (Z)", "%.2f Rad. (Heading)", orientation.getYaw(AngleUnit.RADIANS));
     }
 
     public static PixelColors leftColors() {

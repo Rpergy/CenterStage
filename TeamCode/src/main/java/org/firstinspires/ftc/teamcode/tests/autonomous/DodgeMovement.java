@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests.purepursuit;
+package org.firstinspires.ftc.teamcode.tests.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;

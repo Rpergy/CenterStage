@@ -51,6 +51,10 @@ public class AutoMovement {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         dashboard = FtcDashboard.getInstance();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("turnPower", 0);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -150,6 +154,10 @@ public class AutoMovement {
         Actuation.frontRight.setPower(-turnPower * voltageComp);
         Actuation.backLeft.setPower(turnPower * voltageComp);
         Actuation.backRight.setPower(-turnPower * voltageComp);
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("turnPower", turnPower);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
