@@ -41,6 +41,8 @@ public class AutoMovement {
      * @param hardwareMap Current hardware map
      */
     public static void setup(HardwareMap hardwareMap, Telemetry tel) {
+        robotPose = new Pose(0, 0, 0);
+
         telemetry = tel;
 
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -54,6 +56,8 @@ public class AutoMovement {
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("turnPower", 0);
+        packet.put("movePower", 0);
+        packet.put("strafePower", 0);
         dashboard.sendTelemetryPacket(packet);
     }
 
@@ -114,17 +118,20 @@ public class AutoMovement {
 
         double turnPower = deltaTheta/Math.PI * turnSpeed;
 
-        double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading));
-        double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading));
+        double m1 = (Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading)) * movementSpeed;
+        double m2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading)) * movementSpeed;
 
-        double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.strafeAccelMult) * Math.cos(robotPose.heading));
-        double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.strafeAccelMult) * Math.sin(robotPose.heading));
+        double s1 = (-Math.tanh(deltaY * ActuationConstants.Autonomous.moveAccelMult) * Math.cos(robotPose.heading)) * movementSpeed;
+        double s2 = (Math.tanh(deltaX * ActuationConstants.Autonomous.moveAccelMult) * Math.sin(robotPose.heading)) * movementSpeed;
 
-        double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2)) * movementSpeed;
-        double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2)) * movementSpeed;
+        double movePower = (m1 * Math.abs(m1) + m2 * Math.abs(m2));
+        double strafePower =  (s1 * Math.abs(s1) + s2 * Math.abs(s2));
 
-        if(movePower > 0) movePower = Math.max(movePower, ActuationConstants.Autonomous.minMoveSpeed);
-        else movePower = Math.min(movePower, -ActuationConstants.Autonomous.minMoveSpeed);
+        if(turnPower > 0) turnPower = Math.pow(turnPower, 1.0/ActuationConstants.Autonomous.turnAccelMult) * turnSpeed;
+        else turnPower = -Math.pow(-turnPower, 1.0/ActuationConstants.Autonomous.turnAccelMult) * turnSpeed;
+
+//        if(movePower > 0) movePower = Math.max(movePower, ActuationConstants.Autonomous.minMoveSpeed);
+//        else movePower = Math.min(movePower, -ActuationConstants.Autonomous.minMoveSpeed);
 
         double v1 = -movePower + turnPower - strafePower;
         double v2 = -movePower - turnPower + strafePower;
@@ -137,11 +144,24 @@ public class AutoMovement {
         Actuation.frontRight.setPower(v2 * voltageComp);
         Actuation.backLeft.setPower(v3 * voltageComp);
         Actuation.backRight.setPower(v4 * voltageComp);
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("movePower", movePower);
+        packet.put("turnPower", turnPower);
+        packet.put("strafePower", strafePower);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public static void turnTowards(double targetHeading, double turnSpeed) {
         double deltaTheta = MathFunctions.AngleWrap(targetHeading - robotPose.heading);
-        double turnPower = deltaTheta/Math.PI * turnSpeed;
+        double turnPower = deltaTheta/Math.PI;
+
+        if(turnPower > 0) {
+            turnPower = Math.pow(turnPower, 1.0/ActuationConstants.Autonomous.turnAccelMult) * turnSpeed;
+        }
+        else {
+            turnPower = -Math.pow(-turnPower, 1.0/ActuationConstants.Autonomous.turnAccelMult) * turnSpeed;
+        }
 
 //        if (deltaTheta > 0)
 //            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
@@ -277,9 +297,8 @@ public class AutoMovement {
 
     /**
      * Displays the robot's position on the FTC dashboard
-     * @param radius Radius of the robot's path search
      */
-    public static void displayPosition(double radius){
+    public static void displayPosition(){
         TelemetryPacket packet = new TelemetryPacket();
         // packet.fieldOverlay().drawImage("centerstageField.jpg", 0, 0, 150, 150);
 

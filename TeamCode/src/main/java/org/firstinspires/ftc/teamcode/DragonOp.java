@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.MathFunctions;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
 
@@ -23,7 +24,7 @@ public class DragonOp extends OpMode {
     @Override
     public void loop() {
         AutoMovement.updatePosition();
-        AutoMovement.displayPosition(ActuationConstants.Autonomous.followDistance);
+        AutoMovement.displayPosition();
 
         double move = gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
@@ -72,9 +73,9 @@ public class DragonOp extends OpMode {
 
         telemetry.addData("Slow mode", Actuation.slowMode);
         telemetry.addData("Field centric", Actuation.fieldCentric);
-        telemetry.addData("x", robot.robotPose.x);
-        telemetry.addData("y", robot.robotPose.y);
-        telemetry.addData("heading", robot.robotPose.heading);
+        telemetry.addData("x", AutoMovement.robotPose.x);
+        telemetry.addData("y", AutoMovement.robotPose.y);
+        telemetry.addData("heading", Math.toDegrees(MathFunctions.AngleWrap(AutoMovement.robotPose.heading)));
         telemetry.update();
     }
 }

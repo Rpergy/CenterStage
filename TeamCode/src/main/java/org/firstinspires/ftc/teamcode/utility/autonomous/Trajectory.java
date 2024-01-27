@@ -106,6 +106,9 @@ public class Trajectory {
             AutoMovement.telemetry.addData("dist", dist);
             AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
             AutoMovement.telemetry.update();
+
+            moveSpeed = ActuationConstants.Autonomous.moveSpeed;
+            turnSpeed = ActuationConstants.Autonomous.turnSpeed;
         }
 
         Actuation.drive(0, 0, 0);
@@ -132,7 +135,7 @@ public class Trajectory {
 
     private void runTurnTo(double targetHeading) {
         double rotDist = robotPose.heading - targetHeading;
-        while(Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(4)) {
+        while(Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(2)) {
             AutoMovement.updatePosition();
             AutoMovement.turnTowards(targetHeading, turnSpeed);
 

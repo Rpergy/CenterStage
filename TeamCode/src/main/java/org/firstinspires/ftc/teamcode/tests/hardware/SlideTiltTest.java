@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.tests.hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +11,6 @@ public class SlideTiltTest extends OpMode {
     public void init() {
         tiltL = hardwareMap.servo.get("tiltL");
         tiltR = hardwareMap.servo.get("tiltR");
-        tiltL.setDirection(Servo.Direction.REVERSE);
 
         tiltL.setPosition(1.0);
         tiltR.setPosition(1.0);
