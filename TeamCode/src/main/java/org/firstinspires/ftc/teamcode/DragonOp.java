@@ -5,44 +5,30 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.utility.Actuation;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
+import org.firstinspires.ftc.teamcode.utility.MathFunctions;
+import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 @TeleOp(name="Dragon Op")
 public class DragonOp extends OpMode {
     private int currentTilt = 3;
-    private boolean slowModeToggle = false;
-    private boolean slowMode = false;
+
     private RobotMovement robot;
     @Override
     public void init() {
         Actuation.setup(hardwareMap, telemetry);
-        robot = new RobotMovement(hardwareMap, new Pose(0, 0, 0));
 
         telemetry.addData("Status", "Initialized");
     }
 
     @Override
     public void loop() {
-
-        robot.updatePosition();
-        robot.displayPosition(ActuationConstants.Autonomous.followDistance);
+        AutoMovement.updatePosition();
+        AutoMovement.displayPosition();
 
         double move = gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
-
-        if (slowMode)
-            Actuation.drive(move*0.5, turn*0.5, strafe*0.5);
-        else
-            Actuation.drive(move, turn, strafe);
-
-        if(gamepad1.right_stick_button && !slowModeToggle) {
-            slowMode = !slowMode;
-            slowModeToggle = true;
-        }
-        else if(!gamepad1.right_stick_button)
-            slowModeToggle = false;
 
         if (gamepad2.dpad_left){
             Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
@@ -70,7 +56,6 @@ public class DragonOp extends OpMode {
             }
         }
 
-        Actuation.toggleClaw(gamepad1.left_bumper);
         if (Actuation.getClawState()) {
             gamepad1.setLedColor(0, 1.0, 0, 200);
             gamepad2.setLedColor(0, 1.0, 0, 200);
@@ -80,16 +65,17 @@ public class DragonOp extends OpMode {
             gamepad2.setLedColor(1.0, 0.0, 0, 200);
         }
 
+        Actuation.toggleClaw(gamepad1.left_bumper);
         Actuation.toggleWrist(gamepad1.triangle);
+        Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, strafe, turn);
 
         Actuation.setColors();
 
-//        telemetry.addData("Extension Pos", Actuation.getExtension());
-//        telemetry.addData("Slow mode", slowMode);
-//        telemetry.addData("claw", Actuation.getClawState());
-        telemetry.addData("x", robot.robotPose.x);
-        telemetry.addData("y", robot.robotPose.y);
-        telemetry.addData("heading", robot.robotPose.heading);
+        telemetry.addData("Slow mode", Actuation.slowMode);
+        telemetry.addData("Field centric", Actuation.fieldCentric);
+        telemetry.addData("x", AutoMovement.robotPose.x);
+        telemetry.addData("y", AutoMovement.robotPose.y);
+        telemetry.addData("heading", Math.toDegrees(MathFunctions.AngleWrap(AutoMovement.robotPose.heading)));
         telemetry.update();
     }
 }

@@ -1,12 +1,17 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.PixelColors;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
@@ -17,9 +22,14 @@ public class Actuation {
     private static boolean closeClawR = false;
 
     private static boolean wristUp = false;
-    private static boolean tiltUp = false;
+
+    public static boolean slowMode = false;
+    public static boolean fieldCentric = false;
+
     private static boolean clawToggle = false;
     private static boolean wristToggle = false;
+    private static boolean fieldCentricToggle = false;
+    private static boolean slowModeToggle = false;
 
     static Servo arm, wrist, lClaw, rClaw;
     static DcMotor extension;
@@ -29,6 +39,8 @@ public class Actuation {
     private static RevBlinkinLedDriver leds;
 
     private static ColorSensor colorLeft, colorRight;
+
+    private static IMU imu;
 
     public static void setup(HardwareMap map, Telemetry telemetry) {
         AutoMovement.setup(map, telemetry);
@@ -82,6 +94,12 @@ public class Actuation {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        imu = map.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        )));
+
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -93,6 +111,30 @@ public class Actuation {
         backRight.setPower(move + turn - strafe);
     }
 
+    public static void teleDrive(boolean toggleSlowMode, boolean toggleFieldCentric, double move, double turn, double strafe) {
+        if (toggleSlowMode && !slowModeToggle) slowMode = !slowMode;
+        if (toggleFieldCentric && !fieldCentricToggle) fieldCentric = !fieldCentric;
+
+        double multip = (slowMode) ? 0.5 : 1.0;
+        if (fieldCentric) {
+            double newMove = strafe*Math.sin(-AutoMovement.robotPose.heading)+move*Math.cos(-AutoMovement.robotPose.heading);
+            double newStrafe = strafe*Math.cos(-AutoMovement.robotPose.heading)-move*Math.sin(-AutoMovement.robotPose.heading);
+
+            frontLeft.setPower((newMove+newStrafe+turn) * multip);
+            backLeft.setPower((newMove-newStrafe+turn) * multip);
+            frontRight.setPower((newMove-newStrafe-turn) * multip);
+            backRight.setPower((newMove+newStrafe-turn) * multip);
+        }
+        else {
+            frontLeft.setPower((move+strafe+turn) * multip);
+            backLeft.setPower((move-strafe+turn) * multip);
+            frontRight.setPower((move-strafe-turn) * multip);
+            backRight.setPower((move+strafe-turn) * multip);
+        }
+
+        slowModeToggle = toggleSlowMode;
+        fieldCentricToggle = toggleFieldCentric;
+    }
     public static PixelColors leftColors() {
         if (colorLeft.red() < 500 && colorLeft.green() < 500 && colorLeft.blue() < 500)
             return PixelColors.EMPTY;
