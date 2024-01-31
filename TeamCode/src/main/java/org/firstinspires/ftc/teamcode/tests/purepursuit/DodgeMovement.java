@@ -25,6 +25,7 @@ public class DodgeMovement {
     double dx, dy, dtheta;
     double dx_center, dx_perpendicular;
     double side_length = 7;
+    double radius = 9 * Math.sqrt(2);
 
     double searchIncrease;
 
@@ -485,24 +486,103 @@ public class DodgeMovement {
         dashboard.sendTelemetryPacket(packet);
     }
 
+    /**
+     * Populates Pose list with new Poses based on nearby objects
+     * @param allPoints List of current Pose path
+     */
     public void populateDodgePoses(ArrayList<Pose> allPoints) {
-        // EVERYTHING UNTIL THE NEXT LARGE SPACE NEEDS TO BE UPDATED TO WORK WITH OCCUPANCY MAP...
-        // DEPENDING ON HOW QUERYING WITH MAP WORKS, EITHER CHECK FOR INTERSECTS ALONG A LINE OR EVERY r/2 DISTANCE OR 1/2 the segment length if smaller than r/2
+        // POTENTIAL ISSUES:
+        // what if continuous dodging in one direction (resulting in solely lateral movement)
+        double lengthCheckedAhead = 0;
+        int segmentIndex = targetControlPoint;
+        while (lengthCheckedAhead < 4 * radius && segmentIndex < allPoints.size()) {
+            Point p1 = new Point(allPoints.get(segmentIndex - 1));
+            Point p2 = new Point(allPoints.get(segmentIndex));
 
-        // p1 and p2 should be obtained from allPoints, but need to account for case when the current and current-1 pose are not sufficiently far away
-        Point p1 = new Point(allPoints.get(targetControlPoint - 1));
-        Point p2 = new Point(allPoints.get(targetControlPoint));
+            double distanceBetweenPoints = MathFunctions.distance(p1, p2);
+            double offsetDistance = radius * 0.95;
 
-        // should obtain intersects from occupancy map, need to account for driver recreation (organic curves) and smaller than r/2 segments
-        // use this as an arraylist or just call again from new starting point?
-        Point intersect = findIntersect(p1, p2);
+            double denominator = p2.x - p1.x;
+            double slope = (denominator == 0) ? Double.MAX_VALUE : (double)(p2.y - p1.y) / denominator;
+            double perpendicularSlope = (slope == 0) ? Double.MAX_VALUE : -1 / slope;
+            double slopeSquared = slope * slope;
 
+            boolean hasIntersect = false;
+            if (distanceBetweenPoints < radius / 2) {
+                Point midpoint = new Point((p2.x+p1.x)/2, (p2.y+p1.y)/2);
+                Point midpointIntersection = findIntersect(midpoint);
+                if (midpointIntersection != null) {
+                    hasIntersect = true;
+                    resolveIntersect(allPoints, p1, p2, midpointIntersection, segmentIndex);
+                }
 
+                // the following is a derived formula, split into parts for efficiency
+                double part1 = slope * (-slope * (-2 * midpoint.x - (2 * midpoint.x) / slopeSquared));
+                double part2 = 2 * offsetDistance * Math.sqrt(1 + slopeSquared);
 
+                Point[] possiblePoints = {
+                        new Point((part1 + part2) / (2 * (slopeSquared + 1)), 0),
+                        new Point((part1 - part2) / (2 * (slopeSquared + 1)), 0)
+                };
 
+                possiblePoints[0].y = (perpendicularSlope) * (possiblePoints[0].x - midpoint.x) + midpoint.y;
+                possiblePoints[1].y = (perpendicularSlope) * (possiblePoints[1].x - midpoint.x) + midpoint.y;
 
-        double radius = 9 * Math.sqrt(2);
+                Point possibleIntersection0 = findIntersect(possiblePoints[0]);
+                Point possibleIntersection1 = findIntersect(possiblePoints[1]);
+                if (possibleIntersection0 != null && !hasIntersect) {
+                    hasIntersect = true;
+                    resolveIntersect(allPoints, p1, p2, possibleIntersection0, segmentIndex);
+                }
+                if (possibleIntersection1 != null && !hasIntersect) {
+                    hasIntersect = true;
+                    resolveIntersect(allPoints, p1, p2, possibleIntersection1, segmentIndex);
+                }
+            } else {
+                int numPrimaryChecks = (int) (distanceBetweenPoints / (radius / 2));
+                double distanceBeforeChecking = distanceBetweenPoints / (radius / 2) - numPrimaryChecks * (distanceBetweenPoints / (radius / 2));
 
+                for (int i = 0; i < numPrimaryChecks; i++) {
+                    double checkDistance = (radius / 2) * i + distanceBeforeChecking;
+
+                    Point linePoint = new Point(p1.x + (checkDistance / distanceBetweenPoints) * (p2.x - p1.x), p1.y + (checkDistance / distanceBetweenPoints) * (p2.y - p1.y));
+                    Point lineIntersection = findIntersect(linePoint);
+                    if (lineIntersection != null && !hasIntersect) {
+                        hasIntersect = true;
+                        resolveIntersect(allPoints, p1, p2, lineIntersection, segmentIndex);
+                    }
+
+                    // the following is a derived formula, split into parts for efficiency
+                    double part1 = slope * (-slope * (-2 * linePoint.x - (2 * linePoint.x) / slopeSquared));
+                    double part2 = 2 * offsetDistance * Math.sqrt(1 + slopeSquared);
+
+                    Point[] possiblePoints = {
+                            new Point((part1 + part2) / (2 * (slopeSquared + 1)), 0),
+                            new Point((part1 - part2) / (2 * (slopeSquared + 1)), 0)
+                    };
+
+                    possiblePoints[0].y = (perpendicularSlope) * (possiblePoints[0].x - linePoint.x) + linePoint.y;
+                    possiblePoints[1].y = (perpendicularSlope) * (possiblePoints[1].x - linePoint.x) + linePoint.y;
+
+                    Point possibleIntersection0 = findIntersect(possiblePoints[0]);
+                    Point possibleIntersection1 = findIntersect(possiblePoints[1]);
+                    if (possibleIntersection0 != null && !hasIntersect) {
+                        hasIntersect = true;
+                        resolveIntersect(allPoints, p1, p2, possibleIntersection0, segmentIndex);
+                    }
+                    if (possibleIntersection1 != null && !hasIntersect) {
+                        hasIntersect = true;
+                        resolveIntersect(allPoints, p1, p2, possibleIntersection1, segmentIndex);
+                    }
+                }
+            }
+
+            segmentIndex += (hasIntersect) ? 0 : 1;
+            lengthCheckedAhead += (hasIntersect) ? 0 : distanceBetweenPoints;
+        }
+    }
+
+    public void resolveIntersect(ArrayList<Pose> allPoints, Point p1, Point p2, Point intersect, int segmentIndex) {
         double denominator = p2.x - p1.x;
         double slope = (denominator == 0) ? Double.MAX_VALUE : (double)(p2.y - p1.y) / denominator;
         double perpendicularSlope = (slope == 0) ? Double.MAX_VALUE : -1 / slope;
@@ -511,11 +591,10 @@ public class DodgeMovement {
         // the following is a derived formula, split into parts for efficiency
         double part1 = slope * (-slope * (-2 * intersect.x - (2 * intersect.x) / slopeSquared));
         double part2 = 2 * radius * Math.sqrt(1 + slopeSquared);
-        double part3 = 2 * (slopeSquared + 1);
 
         Point[] possiblePoints = {
-                new Point((part1 + part2) / part3, 0),
-                new Point((part1 - part2) / part3, 0)
+                new Point((part1 + part2) / (2 * (slopeSquared + 1)), 0),
+                new Point((part1 - part2) / (2 * (slopeSquared + 1)), 0)
         };
 
         possiblePoints[0].y = (perpendicularSlope) * (possiblePoints[0].x - intersect.x) + intersect.y;
@@ -524,12 +603,12 @@ public class DodgeMovement {
         double distance0 = Math.abs(slope * possiblePoints[0].x - possiblePoints[0].y - slope * p1.x + p1.y) / Math.sqrt(slopeSquared + 1);
         double distance1 = Math.abs(slope * possiblePoints[1].x - possiblePoints[1].y - slope * p1.x + p1.y) / Math.sqrt(slopeSquared + 1);
 
-        double distanceFromLastPoint = MathFunctions.distance(allPoints.get(targetControlPoint-1).toPoint(), intersect);
-        double distanceFromNextPoint = MathFunctions.distance(allPoints.get(targetControlPoint).toPoint(), intersect);
+        double distanceFromLastPoint = MathFunctions.distance(allPoints.get(segmentIndex-1).toPoint(), intersect);
+        double distanceFromNextPoint = MathFunctions.distance(allPoints.get(segmentIndex).toPoint(), intersect);
         double distanceMult = distanceFromLastPoint + distanceFromNextPoint;
         distanceMult = (distanceMult == 0) ? 0.5 : distanceFromLastPoint / distanceMult;
-        double heading = allPoints.get(targetControlPoint-1).heading
-                + (allPoints.get(targetControlPoint).heading - allPoints.get(targetControlPoint-1).heading) * distanceMult;
+        double heading = allPoints.get(segmentIndex-1).heading
+                + (allPoints.get(segmentIndex).heading - allPoints.get(segmentIndex-1).heading) * distanceMult;
 
         ArrayList<Pose> pointsToAdd = new ArrayList<>();
 
@@ -552,12 +631,16 @@ public class DodgeMovement {
         pointsToAdd.add(0, new Pose(turningPoints[0], heading));
         pointsToAdd.add(new Pose(turningPoints[1], heading));
 
-        allPoints.addAll(targetControlPoint, pointsToAdd);
+        allPoints.addAll(segmentIndex, pointsToAdd);
     }
 
-    public Point findIntersect(Point p1, Point p2) {
+    public Point findIntersect(Point p1) {
+        return findIntersect(p1.x, p1.y);
+    }
+
+    public Point findIntersect(double x, double y) {
         // obtain intersects from occupancy map
 
-        return new Point(1, 0);
-    }
+        return new Point(x, y);
+    } // NULL VALUE SIGNIFIES NO INTERSECT
 }
