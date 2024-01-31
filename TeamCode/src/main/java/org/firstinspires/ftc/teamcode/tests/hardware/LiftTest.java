@@ -15,6 +15,7 @@ import java.nio.file.attribute.AclEntryType;
 
 @TeleOp(name = "Lift Test", group="tests")
 @Config
+@Disabled
 public class LiftTest extends OpMode {
     public static double tiltPos, clawPos, wristPos;
 

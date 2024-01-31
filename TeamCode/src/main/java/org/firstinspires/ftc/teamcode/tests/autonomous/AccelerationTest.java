@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.tests.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.utility.autonomous.Trajectory;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 @TeleOp(name = "Acceleration Test", group="tests")
+@Disabled
 public class AccelerationTest extends LinearOpMode {
     @Override
     public void runOpMode() {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tests.autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import java.util.ArrayList;
 
 @TeleOp(name="path test", group="tests")
+@Disabled
 public class PathTest extends LinearOpMode {
     @Override
     public void runOpMode() {

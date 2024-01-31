@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.tests.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 @TeleOp(name = "Color Test", group = "tests")
+@Disabled
 public class ColorTest extends OpMode {
     ColorSensor left, right;
 

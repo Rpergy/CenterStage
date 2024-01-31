@@ -41,6 +41,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp(name="Vision Test", group="tests")
+@Disabled
 public class VisionTest extends LinearOpMode
 {
     OpenCvWebcam webcam;

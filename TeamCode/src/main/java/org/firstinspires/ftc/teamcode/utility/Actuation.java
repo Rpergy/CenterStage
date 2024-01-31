@@ -45,6 +45,8 @@ public class Actuation {
     public static void setup(HardwareMap map, Telemetry telemetry) {
         AutoMovement.setup(map, telemetry);
 
+        // nigerian prince scam
+
         if (map.servo.contains("extensionTilt")) {
             arm = map.servo.get("extensionTilt");
             arm.setPosition(0.3);

@@ -19,6 +19,7 @@ import java.util.List;
 
 @TeleOp(group = "tests", name = "Position Test")
 @Config
+@Disabled
 public class PositionTest extends OpMode {
     BHI260IMU imu;
 

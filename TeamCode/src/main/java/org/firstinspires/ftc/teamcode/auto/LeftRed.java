@@ -27,10 +27,10 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.ArrayList;
 
-@Autonomous(name="left blue", group = "auto")
-public class LeftBlue extends LinearOpMode {
+@Autonomous(name="left red", group = "auto")
+public class LeftRed extends LinearOpMode {
     OpenCvWebcam webcam;
-    double left = 0;
+    double left = 1.0;
     double middle = 0;
     double right = 0;
     @Override
@@ -40,9 +40,9 @@ public class LeftBlue extends LinearOpMode {
         Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
         Actuation.setTilt(0.3);
 
-        left = 1;
-        right = 0;
-        middle = 0;
+        left = 0.0;
+        right = 1.0;
+        middle = 0.0;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -73,39 +73,22 @@ public class LeftBlue extends LinearOpMode {
 
 //        commented because testing vision code
         waitForStart();
-        Trajectory start_spike = new Trajectory(FieldConstants.Blue.Left.start)
-                .lineTo(FieldConstants.Blue.Left.transition);
+
+        Trajectory start_spike = new Trajectory(FieldConstants.Red.Left.start)
+                .lineTo(FieldConstants.Red.Left.transition);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike)
-                    .lineTo(new Pose(11.5, 45, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.centerSpike)
+                    .lineTo(new Pose(-36.5, -40, Math.toRadians(0)));
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Blue.Left.leftSpike)
-                    .lineTo(new Pose(23, 48, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.leftSpike)
+                    .lineTo(new Pose(-46.5, -44, Math.toRadians(0)));
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Blue.Left.rightSpike)
-                    .lineTo(new Pose(12, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(24, 36, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.rightSpike)
+                    .lineTo(new Pose(-34, -42, Math.toRadians(0)));
         }
-
-        Trajectory canvas_farStack = new Trajectory()
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks))
-                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake - 0.03))
-                .lineTo(new Pose(32, 14, Math.toRadians(180)))
-                .lineTo(new Pose(28, 14, Math.toRadians(180)))
-                .lineTo(new Pose(0, 14, Math.toRadians(180)), 0.6, ActuationConstants.Autonomous.turnSpeed)
-                .lineTo(new Pose(-57, 16.5, Math.toRadians(180)))
-                .action(() -> sleep(300))
-                .action(() -> Actuation.setLClaw(ActuationConstants.Claw.closed))
-                .action(() -> sleep(300))
-                .lineTo(new Pose(-55,16.5, Math.toRadians(180)))
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks - 0.006))
-                .turnTo(Math.toRadians(165))
-                .lineTo(new Pose(-59.5, 17.5, Math.toRadians(165)))
-                .action(() -> Actuation.setRClaw(ActuationConstants.Claw.closed))
-                .action(() -> sleep(500));
 
         Trajectory farStack_Canvas = new Trajectory()
                 .lineTo(new Pose(-40, 14, Math.toRadians(180)))
@@ -153,9 +136,9 @@ public class LeftBlue extends LinearOpMode {
             Imgproc.cvtColor(right_sub, hsv_right, Imgproc.COLOR_RGB2HSV);
             Imgproc.cvtColor(left_sub, hsv_left, Imgproc.COLOR_RGB2HSV);
             Imgproc.cvtColor(mid_sub, hsv_mid, Imgproc.COLOR_RGB2HSV);
-            Core.inRange(hsv_left, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_left);
-            Core.inRange(hsv_right, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_right);
-            Core.inRange(hsv_mid, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_mid);
+            Core.inRange(hsv_left, new Scalar(0, 100, 100), new Scalar(255, 255, 255), hsv_left);
+            Core.inRange(hsv_right, new Scalar(0, 100, 100), new Scalar(255, 255, 255), hsv_right);
+            Core.inRange(hsv_mid, new Scalar(0, 100, 100), new Scalar(255, 255, 255), hsv_mid);
             left = Core.sumElems(hsv_left).val[0]/(80*50*255);
             right = Core.sumElems(hsv_right).val[0]/(80*40*255);
             middle = Core.sumElems(hsv_mid).val[0]/(60*150*255);
