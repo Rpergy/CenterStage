@@ -36,9 +36,7 @@ public class LeftBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
-        Actuation.setClaw(ActuationConstants.Claw.closed);
-        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
-        Actuation.setTilt(0.3);
+//        Actuation.setTilt(0.3);
 
         left = 1;
         right = 0;
@@ -90,39 +88,39 @@ public class LeftBlue extends LinearOpMode {
                     .lineTo(new Pose(24, 36, Math.toRadians(0)));
         }
 
-        Trajectory canvas_farStack = new Trajectory()
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks))
-                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake - 0.03))
-                .lineTo(new Pose(32, 14, Math.toRadians(180)))
-                .lineTo(new Pose(28, 14, Math.toRadians(180)))
-                .lineTo(new Pose(0, 14, Math.toRadians(180)), 0.6, ActuationConstants.Autonomous.turnSpeed)
-                .lineTo(new Pose(-57, 16.5, Math.toRadians(180)))
-                .action(() -> sleep(300))
-                .action(() -> Actuation.setLClaw(ActuationConstants.Claw.closed))
-                .action(() -> sleep(300))
-                .lineTo(new Pose(-55,16.5, Math.toRadians(180)))
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks - 0.006))
-                .turnTo(Math.toRadians(165))
-                .lineTo(new Pose(-59.5, 17.5, Math.toRadians(165)))
-                .action(() -> Actuation.setRClaw(ActuationConstants.Claw.closed))
-                .action(() -> sleep(500));
-
-        Trajectory farStack_Canvas = new Trajectory()
-                .lineTo(new Pose(-40, 14, Math.toRadians(180)))
-                .lineTo(new Pose(30, 14, Math.toRadians(180)), 0.5, ActuationConstants.Autonomous.turnSpeed)
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]))
-                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristDeposit))
-                .lineTo(new Pose(43, 34.5, Math.toRadians(180)))
-                .lineTo(FieldConstants.Blue.Canvas.center)
-                .action(() -> sleep(1500))
-                .action(() -> Actuation.setClaw(ActuationConstants.Claw.open))
-                .action(() -> sleep(400));
-
-        Trajectory canvas_park = new Trajectory()
-                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]))
-                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake))
-                .lineTo(new Pose(47, 10, Math.toRadians(180)))
-                .lineTo(new Pose(54, 10, Math.toRadians(180)));
+//        Trajectory canvas_farStack = new Trajectory()
+//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks))
+//                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake - 0.03))
+//                .lineTo(new Pose(32, 14, Math.toRadians(180)))
+//                .lineTo(new Pose(28, 14, Math.toRadians(180)))
+//                .lineTo(new Pose(0, 14, Math.toRadians(180)), 0.6, ActuationConstants.Autonomous.turnSpeed)
+//                .lineTo(new Pose(-57, 16.5, Math.toRadians(180)))
+//                .action(() -> sleep(300))
+//                .action(() -> Actuation.setLClaw(ActuationConstants.Claw.closed))
+//                .action(() -> sleep(300))
+//                .lineTo(new Pose(-55,16.5, Math.toRadians(180)))
+//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltStacks - 0.006))
+//                .turnTo(Math.toRadians(165))
+//                .lineTo(new Pose(-59.5, 17.5, Math.toRadians(165)))
+//                .action(() -> Actuation.setRClaw(ActuationConstants.Claw.closed))
+//                .action(() -> sleep(500));
+//
+//        Trajectory farStack_Canvas = new Trajectory()
+//                .lineTo(new Pose(-40, 14, Math.toRadians(180)))
+//                .lineTo(new Pose(30, 14, Math.toRadians(180)), 0.5, ActuationConstants.Autonomous.turnSpeed)
+//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]))
+//                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristDeposit))
+//                .lineTo(new Pose(43, 34.5, Math.toRadians(180)))
+//                .lineTo(FieldConstants.Blue.Canvas.center)
+//                .action(() -> sleep(1500))
+//                .action(() -> Actuation.setClaw(ActuationConstants.Claw.open))
+//                .action(() -> sleep(400));
+//
+//        Trajectory canvas_park = new Trajectory()
+//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]))
+//                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake))
+//                .lineTo(new Pose(47, 10, Math.toRadians(180)))
+//                .lineTo(new Pose(54, 10, Math.toRadians(180)));
 
         start_spike.run();
 

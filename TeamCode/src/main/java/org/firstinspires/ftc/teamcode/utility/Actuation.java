@@ -5,6 +5,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,68 +19,56 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 
 public class Actuation {
-    private static boolean closeClawL = false;
-    private static boolean closeClawR = false;
-
-    private static boolean wristUp = false;
 
     public static boolean slowMode = false;
     public static boolean fieldCentric = false;
-
-    private static boolean clawToggle = false;
-    private static boolean wristToggle = false;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
 
-    static Servo arm, wrist, lClaw, rClaw;
-    static DcMotor extension;
-
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
+    public static DcMotor slidesLeft, slidesRight;
+    public static Servo tiltLeft, tiltRight;
+    public static Servo depositTilt, deposit;
+
     private static RevBlinkinLedDriver leds;
-
-    private static ColorSensor colorLeft, colorRight;
-
-    private static IMU imu;
 
     public static void setup(HardwareMap map, Telemetry telemetry) {
         AutoMovement.setup(map, telemetry);
 
         // nigerian prince scam
 
-        if (map.servo.contains("extensionTilt")) {
-            arm = map.servo.get("extensionTilt");
-            arm.setPosition(0.3);
+        if (map.dcMotor.contains("slidesLeft") && map.dcMotor.contains("slidesRight")) {
+            slidesLeft = map.dcMotor.get("slidesLeft");
+            slidesRight = map.dcMotor.get("slidesRight");
+
+            slidesLeft.setPower(1.0);
+            slidesLeft.setTargetPosition(ActuationConstants.Extension.slidePositions[0]);
+            slidesLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            slidesRight.setDirection(DcMotorSimple.Direction.REVERSE);
+            slidesRight.setPower(1.0);
+            slidesRight.setTargetPosition(ActuationConstants.Extension.slidePositions[0]);
+            slidesRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        if (map.servo.contains("clawWrist")) {
-            wrist = map.servo.get("clawWrist");
-            wrist.setPosition(ActuationConstants.Claw.wristAutoInit);
+        if(map.servo.contains("tiltLeft") && map.servo.contains("tiltRight")) {
+            tiltLeft.setDirection(Servo.Direction.REVERSE);
+
+            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
         }
 
-        if (map.servo.contains("leftClaw")) {
-            lClaw = map.servo.get("leftClaw");
-            lClaw.setPosition(ActuationConstants.Claw.closed);
+        if (map.servo.contains("depositTilt")) {
+            depositTilt = map.servo.get("depositTilt");
         }
 
-        if (map.servo.contains("rightClaw")) {
-            rClaw = map.servo.get("rightClaw");
-            rClaw.setDirection(Servo.Direction.REVERSE);
-            rClaw.setPosition(ActuationConstants.Claw.closed);
-        }
-
-        if (map.dcMotor.contains("extension")) {
-            extension = map.dcMotor.get("extension");
-            extension.setPower(1.0);
-            extension.setTargetPosition(ActuationConstants.Extension.extensionStart);
-            extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (map.servo.contains("deposit")) {
+            deposit = map.servo.get("deposit");
         }
 
         leds = map.get(RevBlinkinLedDriver.class, "lights");
         leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-
-        if (map.colorSensor.contains("colorLeft")) colorLeft = map.colorSensor.get("colorLeft");
-        if (map.colorSensor.contains("colorRight")) colorRight = map.colorSensor.get("colorRight");
 
         frontLeft  = map.get(DcMotor.class, "frontLeft");
         frontRight = map.get(DcMotor.class, "frontRight");
@@ -95,12 +84,6 @@ public class Actuation {
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        imu = map.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-        )));
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -137,126 +120,14 @@ public class Actuation {
         slowModeToggle = toggleSlowMode;
         fieldCentricToggle = toggleFieldCentric;
     }
-    public static PixelColors leftColors() {
-        if (colorLeft.red() < 500 && colorLeft.green() < 500 && colorLeft.blue() < 500)
-            return PixelColors.EMPTY;
-        else if (colorLeft.green() > colorLeft.blue() && colorLeft.green() > colorLeft.red())
-            return PixelColors.GREEN;
-        else if (colorLeft.green() > colorLeft.blue() && colorLeft.red() > colorLeft.blue())
-            return PixelColors.YELLOW;
-        else if (colorLeft.blue() > colorLeft.red() && colorLeft.green() > colorLeft.red())
-            return PixelColors.PURPLE;
-        else
-            return PixelColors.WHITE;
+
+    public static void setTilt(double pos) {
+        tiltLeft.setPosition(pos);
+        tiltRight.setPosition(pos);
     }
 
-    public static PixelColors rightColors() {
-        if (colorRight.red() < 500 && colorRight.green() < 500 && colorRight.blue() < 500)
-            return PixelColors.EMPTY;
-        else if (colorRight.green() > colorRight.blue() && colorRight.green() > colorRight.red())
-            return PixelColors.GREEN;
-        else if (colorRight.green() > colorRight.blue() && colorRight.red() > colorRight.blue())
-            return PixelColors.YELLOW;
-        else if (colorRight.blue() > colorRight.red() && colorRight.green() > colorRight.red())
-            return PixelColors.PURPLE;
-        else
-            return PixelColors.WHITE;
+    public static void setSlides(int pos) {
+        slidesLeft.setTargetPosition(pos);
+        slidesRight.setTargetPosition(pos);
     }
-
-    public static void setColors() {
-        if (rightColors() == PixelColors.EMPTY && leftColors() == PixelColors.EMPTY)
-            leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        else if (rightColors() != PixelColors.EMPTY && leftColors() == PixelColors.EMPTY)
-            leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-        else if (rightColors() == PixelColors.EMPTY && leftColors() != PixelColors.EMPTY)
-            leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-        else
-            leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-    }
-
-    public static void toggleClaw(boolean input) {
-        if (input && !clawToggle) {
-            closeClawL = !closeClawL;
-            closeClawR = !closeClawR;
-            lClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
-            rClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
-            clawToggle = true;
-        }
-        else if (!input) {
-            clawToggle = false;
-        }
-    }
-
-    public static boolean getClawState() {
-        return closeClawL || closeClawR;
-    }
-
-    public static void toggleLClaw(boolean input) {
-        if (input && !clawToggle) {
-            closeClawL = !closeClawL;
-            lClaw.setPosition(closeClawL ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
-            clawToggle = true;
-        }
-        else if (!input) {
-            clawToggle = false;
-        }
-    }
-
-    public static void toggleRClaw(boolean input) {
-        if (input && !clawToggle) {
-            closeClawR = !closeClawR;
-            rClaw.setPosition(closeClawR ? ActuationConstants.Claw.closed : ActuationConstants.Claw.open);
-            clawToggle = true;
-        }
-        else if (!input) {
-            clawToggle = false;
-        }
-    }
-
-    public static void setClaw(double input) {
-        lClaw.setPosition(input);
-        rClaw.setPosition(input);
-    }
-
-    public static void setLClaw(double input) {
-        lClaw.setPosition(input);
-    }
-
-    public static void setRClaw(double input) {
-        rClaw.setPosition(input);
-    }
-
-    public static void toggleWrist(boolean input) {
-        if (input && !wristToggle) {
-            wristUp = !wristUp;
-            wrist.setPosition(wristUp ? ActuationConstants.Claw.wristDeposit : ActuationConstants.Claw.wristIntake);
-            wristToggle = true;
-        }
-        else if (!input) {
-            wristToggle = false;
-        }
-    }
-
-    public static void setWrist(double input) {
-        wrist.setPosition(input);
-    }
-
-    public static void incrementExtension(int posChange) {
-//        if (posChange + extension.getCurrentPosition() > ActuationConstants.Extension.maxExtension) posChange = ActuationConstants.Extension.maxExtension - extension.getCurrentPosition();
-        extension.setTargetPosition(extension.getCurrentPosition() + posChange);
-    }
-
-    public static void setExtension(int newPos) {
-        if (newPos > ActuationConstants.Extension.maxExtension) newPos = ActuationConstants.Extension.maxExtension;
-        extension.setTargetPosition(-newPos);
-    }
-
-    public static int getExtension() {
-        return extension.getCurrentPosition();
-    }
-
-    public static void setTilt(double input) {
-        arm.setPosition(input);
-    }
-    public static double getTilt() { return arm.getPosition(); }
 }

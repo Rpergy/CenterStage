@@ -23,19 +23,19 @@ public class LiftTest extends OpMode {
 
     @Override
     public void init() {
-        extensionPos = ActuationConstants.Extension.extensionStart;
-        tiltPos = ActuationConstants.Extension.tiltIntake;
-        clawPos = ActuationConstants.Claw.open;
-        wristPos = ActuationConstants.Claw.wristIntake;
-
-        Actuation.setup(hardwareMap, telemetry);
+//        extensionPos = ActuationConstants.Extension.extensionStart;
+//        tiltPos = ActuationConstants.Extension.tiltIntake;
+//        clawPos = ActuationConstants.Claw.open;
+//        wristPos = ActuationConstants.Claw.wristIntake;
+//
+//        Actuation.setup(hardwareMap, telemetry);
     }
 
     @Override
     public void loop() {
-        Actuation.setExtension(extensionPos);
-        Actuation.setClaw(clawPos);
-        Actuation.setWrist(wristPos);
-        Actuation.setTilt(tiltPos);
+//        Actuation.setExtension(extensionPos);
+//        Actuation.setClaw(clawPos);
+//        Actuation.setWrist(wristPos);
+//        Actuation.setTilt(tiltPos);
     }
 }

@@ -31,38 +31,30 @@ public class ActuationConstants {
     }
 
     @Config
-    public static class Claw {
-        public static double wristIntake = 0.3;
-        public static double wristDeposit = 0.8;
-        public static double wristAutoInit = 1.0;
-        public static double open = 1.0;
-        public static double closed = 0.92;
+    public static class Extension {
+        public static int[] tiltPositions = {
+                0, // intake
+                0,
+                0,
+                0 // highest
+        };
+
+        public static int[] slidePositions = {
+                0, // intake
+                0,
+                0,
+                0 // highest
+        };
     }
 
     @Config
-    public static class Extension {
-        public static int maxExtension = 2270;
-        public static int extensionStart = 0;
+    public static class Deposit {
+        public static double intakeTilt = 0.0;
+        public static double depositTilt = 0.0;
 
-        public static double tiltIntake = 0.15;
-        public static double tiltStacks = 0.18;
-
-        public static int[] extensionPresets = {
-                500, // level 1
-                900, // level 2
-                1200, // level 3
-                0 // intake
-        };
-
-        public static double[] tiltPresets = { // 0.15 (intake) - 0.55 (closest deposit)
-                0.55, // level 1
-                0.50, // level 2
-                0.45, // level 3
-                0.15 // intake
-        };
-        //omkar is gay amog us
-        //I have hrard throug the grapevine that shreyas is the opps!!!!!!!!!
-        //be sure to comment on your code!!!!!!!!!!!!!!
+        public static double loaded = 0.0;
+        public static double halfDrop = 0.0;
+        public static double fullDrop = 0.0;
     }
 
     @Config

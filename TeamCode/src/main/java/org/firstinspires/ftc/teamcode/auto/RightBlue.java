@@ -36,9 +36,9 @@ public class RightBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
-        Actuation.setClaw(ActuationConstants.Claw.closed);
-        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
-        Actuation.setTilt(ActuationConstants.Extension.tiltStacks);
+//        Actuation.setClaw(ActuationConstants.Claw.closed);
+//        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
+//        Actuation.setTilt(ActuationConstants.Extension.tiltStacks);
 
         left = 0.4;
         right = 0.1;

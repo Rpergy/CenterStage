@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.tests.localization;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -17,9 +17,6 @@ public class DriftTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
-        Actuation.setClaw(ActuationConstants.Claw.closed);
-        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
-        Actuation.setTilt(0.3);
 
         RobotMovement robot = new RobotMovement(hardwareMap, new Pose(0, 0, Math.toRadians(0)));
 

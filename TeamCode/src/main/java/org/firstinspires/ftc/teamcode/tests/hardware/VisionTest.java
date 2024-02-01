@@ -53,9 +53,6 @@ public class VisionTest extends LinearOpMode
     public void runOpMode()
     {
         Actuation.setup(hardwareMap, telemetry);
-        Actuation.setClaw(ActuationConstants.Claw.closed);
-        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
-        Actuation.setTilt(0.3);
         
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);

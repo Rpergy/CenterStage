@@ -30,46 +30,46 @@ public class DragonOp extends OpMode {
         double turn = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
 
-        if (gamepad2.dpad_left){
-            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
-            currentTilt = 0;
-        }
-        else if (gamepad2.dpad_up){
-            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[1]);
-            currentTilt = 1;
-        }
-        else if (gamepad2.dpad_right){
-            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[2]);
-            currentTilt = 2;
-        }
-        else if (gamepad2.dpad_down){
-            currentTilt = 3;
-            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]);
-            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[3]);
-            Actuation.setWrist(ActuationConstants.Claw.wristIntake);
-        }
-
-        if (gamepad2.square) {
-            if (currentTilt != 3) {
-                Actuation.setExtension(ActuationConstants.Extension.extensionPresets[currentTilt]);
-                Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
-            }
-        }
-
-        if (Actuation.getClawState()) {
-            gamepad1.setLedColor(0, 1.0, 0, 200);
-            gamepad2.setLedColor(0, 1.0, 0, 200);
-        }
-        else {
-            gamepad1.setLedColor(1.0, 0.0, 0.0, 200);
-            gamepad2.setLedColor(1.0, 0.0, 0, 200);
-        }
-
-        Actuation.toggleClaw(gamepad1.left_bumper);
-        Actuation.toggleWrist(gamepad1.triangle);
+//        if (gamepad2.dpad_left){
+//            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]);
+//            currentTilt = 0;
+//        }
+//        else if (gamepad2.dpad_up){
+//            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[1]);
+//            currentTilt = 1;
+//        }
+//        else if (gamepad2.dpad_right){
+//            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[2]);
+//            currentTilt = 2;
+//        }
+//        else if (gamepad2.dpad_down){
+//            currentTilt = 3;
+//            Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]);
+//            Actuation.setExtension(ActuationConstants.Extension.extensionPresets[3]);
+//            Actuation.setWrist(ActuationConstants.Claw.wristIntake);
+//        }
+//
+//        if (gamepad2.square) {
+//            if (currentTilt != 3) {
+//                Actuation.setExtension(ActuationConstants.Extension.extensionPresets[currentTilt]);
+//                Actuation.setWrist(ActuationConstants.Claw.wristDeposit);
+//            }
+//        }
+//
+//        if (Actuation.getClawState()) {
+//            gamepad1.setLedColor(0, 1.0, 0, 200);
+//            gamepad2.setLedColor(0, 1.0, 0, 200);
+//        }
+//        else {
+//            gamepad1.setLedColor(1.0, 0.0, 0.0, 200);
+//            gamepad2.setLedColor(1.0, 0.0, 0, 200);
+//        }
+//
+//        Actuation.toggleClaw(gamepad1.left_bumper);
+//        Actuation.toggleWrist(gamepad1.triangle);
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, strafe, turn);
-
-        Actuation.setColors();
+//
+//        Actuation.setColors();
 
         telemetry.addData("Slow mode", Actuation.slowMode);
         telemetry.addData("Field centric", Actuation.fieldCentric);
