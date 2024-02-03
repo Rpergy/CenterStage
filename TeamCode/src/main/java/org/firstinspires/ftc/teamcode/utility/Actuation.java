@@ -53,6 +53,9 @@ public class Actuation {
         }
 
         if(map.servo.contains("tiltLeft") && map.servo.contains("tiltRight")) {
+            tiltLeft = map.servo.get("tiltLeft");
+            tiltRight = map.servo.get("tiltRight");
+
             tiltLeft.setDirection(Servo.Direction.REVERSE);
 
             tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
@@ -67,8 +70,8 @@ public class Actuation {
             deposit = map.servo.get("deposit");
         }
 
-        leds = map.get(RevBlinkinLedDriver.class, "lights");
-        leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+//        leds = map.get(RevBlinkinLedDriver.class, "lights");
+//        leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 
         frontLeft  = map.get(DcMotor.class, "frontLeft");
         frontRight = map.get(DcMotor.class, "frontRight");
@@ -85,8 +88,8 @@ public class Actuation {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -105,16 +108,16 @@ public class Actuation {
             double newMove = strafe*Math.sin(-AutoMovement.robotPose.heading)+move*Math.cos(-AutoMovement.robotPose.heading);
             double newStrafe = strafe*Math.cos(-AutoMovement.robotPose.heading)-move*Math.sin(-AutoMovement.robotPose.heading);
 
-            frontLeft.setPower((newMove+newStrafe+turn) * multip);
-            backLeft.setPower((newMove-newStrafe+turn) * multip);
-            frontRight.setPower((newMove-newStrafe-turn) * multip);
-            backRight.setPower((newMove+newStrafe-turn) * multip);
+            frontLeft.setPower((newMove-turn-newStrafe) * multip);
+            backLeft.setPower((newMove+turn-newStrafe) * multip);
+            frontRight.setPower((newMove+turn+newStrafe) * multip);
+            backRight.setPower((newMove-turn+newStrafe) * multip);
         }
         else {
-            frontLeft.setPower((move+strafe+turn) * multip);
-            backLeft.setPower((move-strafe+turn) * multip);
-            frontRight.setPower((move-strafe-turn) * multip);
-            backRight.setPower((move+strafe-turn) * multip);
+            frontLeft.setPower((move-turn-strafe) * multip);
+            backLeft.setPower((move+turn-strafe) * multip);
+            frontRight.setPower((move+turn+strafe) * multip);
+            backRight.setPower((move-turn+strafe) * multip);
         }
 
         slowModeToggle = toggleSlowMode;
@@ -130,4 +133,4 @@ public class Actuation {
         slidesLeft.setTargetPosition(pos);
         slidesRight.setTargetPosition(pos);
     }
-}
+}// screw omkar, he needs a barber

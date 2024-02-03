@@ -19,24 +19,27 @@ public class ActuationConstants {
     public static class Drivetrain {
         public static final double ticksPerRev = 2000;
 
-        public static double centerMultiplier = 0.3863728657; // responsible for move (test robot: 1.08
-        public static double lateral_multiplier = 2.514924912; // responsible for turn (test robot: 1.033174886)
-        public static double perpendicularMultiplier = 0.3902688729; // responsible for strafe (test robot: 1.06)
+        public static double centerMultiplier = 0.3863728657; // responsible for move (test robot: 1.08)
+        public static double lateral_multiplier = 2.34638397; // responsible for turn (test robot: 1.033174886)
+        public static double perpendicularMultiplier = 0.39372002180; // responsible for strafe (test robot: 1.06)
 
         public static double wheel_circ = 15.07; // cm
         public static double track_width = 12.25 * lateral_multiplier; // inches distance between drive wheels (test robot: 11.024)
-        public static double forward_offset = 2.5; // inches distance from center of robot to perp wheel (test robot: -5.906)
+        public static double forward_offset = 4; // inches distance from center of robot to perp wheel (test robot: -5.906)
 
         public static double scale = wheel_circ / ticksPerRev;
     }
 
     @Config
     public static class Extension {
-        public static int[] tiltPositions = {
-                0, // intake
-                0,
-                0,
-                0 // highest
+        public static int maxExtend = 2600;
+
+        public static double[] tiltPositions = {
+                0.56, // intake
+                0.48,
+                0.40,
+                0.32, // highest
+                0.30  // hang
         };
 
         public static int[] slidePositions = {

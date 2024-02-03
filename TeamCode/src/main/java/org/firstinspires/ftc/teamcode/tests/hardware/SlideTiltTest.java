@@ -19,8 +19,8 @@ public class SlideTiltTest extends OpMode {
     public static int slidePos = 0;
     @Override
     public void init() {
-        tiltL = hardwareMap.servo.get("tiltL");
-        tiltR = hardwareMap.servo.get("tiltR");
+        tiltL = hardwareMap.servo.get("tiltLeft");
+        tiltR = hardwareMap.servo.get("tiltRight");
 
         tiltL.setDirection(Servo.Direction.REVERSE);
 
