@@ -40,9 +40,9 @@ public class RightBlue extends LinearOpMode {
 //        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
 //        Actuation.setTilt(ActuationConstants.Extension.tiltStacks);
 
-        left = 0.4;
-        right = 0.1;
-        middle = 0.1;
+        left = 0;
+        right = 0;
+        middle = 10;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -78,15 +78,30 @@ public class RightBlue extends LinearOpMode {
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Right.centerSpike)
-                    .lineTo(new Pose(-38.5, 38, Math.toRadians(0)));
+                    .lineTo(new Pose(-38.5, 38, Math.toRadians(-90)))
+                    .lineTo(new Pose(-38.5, 38, Math.toRadians(-180)))
+                    .lineTo(new Pose(-58, 38, Math.toRadians(-180)))
+                    .lineTo(new Pose(-54, 38, Math.toRadians(-180)))
+                    .lineTo(new Pose(-54, 38, Math.toRadians(0)))
+                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Right.leftSpike)
-                    .lineTo(new Pose(-38.5, 38, Math.toRadians(0)));
+                    .lineTo(new Pose(-34, 36, Math.toRadians(-45)))
+                    .lineTo(new Pose(-38, 36, Math.toRadians(-180)))
+                    .lineTo(new Pose(-58, 36, Math.toRadians(-180)))
+                    .lineTo(new Pose(-54, 36, Math.toRadians(-180)))
+                    .lineTo(new Pose(-54, 36, Math.toRadians(0)))
+                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Blue.Right.rightSpike)
-                    .lineTo(new Pose(-55, 36, Math.toRadians(0)));
+                    .lineTo(new Pose(-38, 38, Math.toRadians(-135)))
+                    .lineTo(new Pose(-38, 36, Math.toRadians(-180)))
+                    .lineTo(new Pose(-58, 36, Math.toRadians(-180)))
+                    .lineTo(new Pose(-54,36,Math.toRadians(-180)))
+                    .lineTo(new Pose(-54, 36, Math.toRadians(0)))
+                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
         }
 
         start_spike.run();
