@@ -36,13 +36,10 @@ public class RightBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
-//        Actuation.setClaw(ActuationConstants.Claw.closed);
-//        Actuation.setWrist(ActuationConstants.Claw.wristAutoInit);
-//        Actuation.setTilt(ActuationConstants.Extension.tiltStacks);
 
         left = 0;
-        right = 0;
-        middle = 10;
+        right = 10;
+        middle = 0;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -71,40 +68,33 @@ public class RightBlue extends LinearOpMode {
             telemetry.update();
         }
 
-//        commented because testing vision code
         waitForStart();
         Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start)
                 .lineTo(FieldConstants.Blue.Right.transition);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Right.centerSpike)
-                    .lineTo(new Pose(-38.5, 38, Math.toRadians(-90)))
-                    .lineTo(new Pose(-38.5, 38, Math.toRadians(-180)))
-                    .lineTo(new Pose(-58, 38, Math.toRadians(-180)))
-                    .lineTo(new Pose(-54, 38, Math.toRadians(-180)))
-                    .lineTo(new Pose(-54, 38, Math.toRadians(0)))
-                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
+                    .lineTo(FieldConstants.Blue.Right.transition);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Right.leftSpike)
-                    .lineTo(new Pose(-34, 36, Math.toRadians(-45)))
-                    .lineTo(new Pose(-38, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(-58, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(-54, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(-54, 36, Math.toRadians(0)))
-                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
+                    .lineTo(new Pose(-35, 36, Math.toRadians(-45)));
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Blue.Right.rightSpike)
-                    .lineTo(new Pose(-38, 38, Math.toRadians(-135)))
-                    .lineTo(new Pose(-38, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(-58, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(-54,36,Math.toRadians(-180)))
-                    .lineTo(new Pose(-54, 36, Math.toRadians(0)))
-                    .lineTo(new Pose(44, 38, Math.toRadians(0)));
+                    .lineTo(new Pose(-48.5, 44, Math.toRadians(-90)));
         }
+        Trajectory spikeToStacks = new Trajectory()
+                .lineTo(new Pose(-58, 38, Math.toRadians(0)));
+
+        Trajectory stacksToBoardViaSide = new Trajectory()
+                .lineTo(new Pose(-58, 60, Math.toRadians(0)))
+                .lineTo(new Pose(30, 60, Math.toRadians(0)), 0.8, 0.8)
+                .lineTo(FieldConstants.Blue.Canvas.center);
 
         start_spike.run();
+        spikeToStacks.run();
+        stacksToBoardViaSide.run();
 
 //        canvas_farStack.run();
 //        farStack_Canvas.run();
