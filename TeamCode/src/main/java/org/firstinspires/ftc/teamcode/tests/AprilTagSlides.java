@@ -40,11 +40,15 @@ public class AprilTagSlides extends OpMode {
     public static double servoPos = 0.5;
     public static int slidePos = 0;
 
+    double lastDist = 0;
+
     FtcDashboard dashboard;
 
     @Override
     public void init() {
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "dist");
+
+        if (!(Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())) lastDist = rangeSensor.getDistance(DistanceUnit.INCH);
 
         tiltL = hardwareMap.servo.get("tiltLeft");
         tiltR = hardwareMap.servo.get("tiltRight");
@@ -67,18 +71,29 @@ public class AprilTagSlides extends OpMode {
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         dashboard = FtcDashboard.getInstance();
+
+        TelemetryPacket packet = new TelemetryPacket();
+
+        packet.put("dist", lastDist);
+        packet.put("length", slidePos);
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     @Override
     public void loop() { // for i in range(i+1),
-        double dist = rangeSensor.getDistance(DistanceUnit.INCH);
+        double dist = lastDist;
+        if(Math.abs(lastDist - rangeSensor.getDistance(DistanceUnit.INCH)) < 5 && !Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())
+            dist = rangeSensor.getDistance(DistanceUnit.INCH);
 
         tiltL.setPosition(servoPos);
         tiltR.setPosition(servoPos);
 
-        if((int)(dist / 0.012589) <= 2600) {
-            slideL.setTargetPosition((int) (dist / 0.012589));
-            slideR.setTargetPosition((int) (dist / 0.012589));
+        slidePos = (int)(dist * 133.869 + 734.94) - 300;
+
+        if(slidePos <= 2600) {
+            slideL.setTargetPosition(slidePos);
+            slideR.setTargetPosition(slidePos);
         }
         else {
             slideL.setTargetPosition(2600);
@@ -87,9 +102,12 @@ public class AprilTagSlides extends OpMode {
 
         telemetry.addData("Distance", rangeSensor.getDistance(DistanceUnit.INCH));
 
+        lastDist = dist;
+
         TelemetryPacket packet = new TelemetryPacket();
 
-        packet.put("dist", (int)(dist / 0.012589));
+        packet.put("dist", dist);
+        packet.put("slidePos", slidePos);
 
         dashboard.sendTelemetryPacket(packet);
     }

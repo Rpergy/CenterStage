@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.tests.hardware;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,6 +19,9 @@ public class SlideTiltTest extends OpMode {
 
     public static double servoPos = 0.5;
     public static int slidePos = 0;
+
+    FtcDashboard dashboard;
+
     @Override
     public void init() {
         tiltL = hardwareMap.servo.get("tiltLeft");
@@ -38,6 +43,8 @@ public class SlideTiltTest extends OpMode {
         slideR.setPower(1.0);
         slideR.setTargetPosition(slidePos);
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        dashboard = FtcDashboard.getInstance();
     }
 
     @Override
@@ -48,6 +55,11 @@ public class SlideTiltTest extends OpMode {
 
         slideL.setTargetPosition(slidePos);
         slideR.setTargetPosition(slidePos);
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("degrees", servoPos * 330.847 - 10.7458);
+
+        dashboard.sendTelemetryPacket(packet);
     }
 }
 //E
