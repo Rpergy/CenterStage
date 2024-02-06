@@ -25,6 +25,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 @Autonomous(name="right blue", group = "blue auto")
@@ -38,8 +39,8 @@ public class RightBlue extends LinearOpMode {
         Actuation.setup(hardwareMap, telemetry);
 
         left = 0;
-        right = 10;
-        middle = 0;
+        right = 0;
+        middle = 1;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -85,8 +86,12 @@ public class RightBlue extends LinearOpMode {
         Trajectory canvas_stack_mid = new Trajectory();
         Trajectory canvas_stack_side = new Trajectory()
                 .lineTo(new Pose(30, 60, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(-58, 60, Math.toRadians(0))) // move close to stack
+                .lineTo(new Pose(-58, 60, Math.toRadians(0)), 0.8, 0.8) // move close to stack
                 .lineTo(FieldConstants.Blue.Stacks.right); // into stack
+
+        Trajectory park_left = new Trajectory()
+                .lineTo(new Pose(45, 61, Math.toRadians(0)))
+                .lineTo(FieldConstants.Blue.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Right.centerSpike) // deposit purple
@@ -106,7 +111,7 @@ public class RightBlue extends LinearOpMode {
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Blue.Right.rightSpike) // deposit purple
-                    .lineTo(new Pose(-48.5, 44, Math.toRadians(-90))); // move back
+                    .lineTo(new Pose(-48.5, 46, Math.toRadians(-90))); // move back
 
             // move into canvas pos
             stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.right);
@@ -123,6 +128,7 @@ public class RightBlue extends LinearOpMode {
         stack_canvas_side.run();
 
         //park
+        park_left.run();
     }
     class Pipeline extends OpenCvPipeline
     {

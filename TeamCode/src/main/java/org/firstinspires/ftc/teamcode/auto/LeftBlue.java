@@ -27,7 +27,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.ArrayList;
 
-@Autonomous(name="left blue", group = "auto")
+@Autonomous(name="left blue", group = "blue auto")
 public class LeftBlue extends LinearOpMode {
     OpenCvWebcam webcam;
     double left = 0;

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.tests;
 
-import android.graphics.Canvas;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -12,35 +10,25 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.opencv.core.Mat;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-@TeleOp(name="april tag slides", group = "tests")
+@TeleOp(name="distance slides", group = "tests")
 @Config
-public class AprilTagSlides extends OpMode {
+public class DistanceSlides extends OpMode {
     ModernRoboticsI2cRangeSensor rangeSensor;
-
     Servo tiltL, tiltR;
-
     DcMotor slideL, slideR;
 
     public static double servoPos = 0.5;
     public static int slidePos = 0;
 
     double lastDist = 0;
+
+    int period = 20;
+
+    double[] data;
 
     FtcDashboard dashboard;
 
@@ -49,6 +37,9 @@ public class AprilTagSlides extends OpMode {
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "dist");
 
         if (!(Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())) lastDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        data = new double[period];
+        Arrays.fill(data, lastDist);
 
         tiltL = hardwareMap.servo.get("tiltLeft");
         tiltR = hardwareMap.servo.get("tiltRight");
@@ -75,21 +66,34 @@ public class AprilTagSlides extends OpMode {
         TelemetryPacket packet = new TelemetryPacket();
 
         packet.put("dist", lastDist);
+        packet.put("smoothDist", lastDist);
         packet.put("length", slidePos);
 
         dashboard.sendTelemetryPacket(packet);
     }
 
     @Override
-    public void loop() { // for i in range(i+1),
+    public void loop() {
         double dist = lastDist;
-        if(Math.abs(lastDist - rangeSensor.getDistance(DistanceUnit.INCH)) < 5 && !Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())
-            dist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        double newDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 3)
+            dist = newDist;
+
+        for(int i = data.length-1; i > 0; i--) {
+            data[i] = data[i-1];
+        }
+        data[0] = dist;
+
+        double smoothDist = 0;
+        for(double val : data) smoothDist += val;
+        smoothDist /= period;
+
+        slidePos = (int)(smoothDist * 133.869 + 434.94);
 
         tiltL.setPosition(servoPos);
         tiltR.setPosition(servoPos);
-
-        slidePos = (int)(dist * 133.869 + 734.94) - 300;
 
         if(slidePos <= 2600) {
             slideL.setTargetPosition(slidePos);
@@ -100,13 +104,12 @@ public class AprilTagSlides extends OpMode {
             slideR.setTargetPosition(2600);
         }
 
-        telemetry.addData("Distance", rangeSensor.getDistance(DistanceUnit.INCH));
-
         lastDist = dist;
 
         TelemetryPacket packet = new TelemetryPacket();
 
         packet.put("dist", dist);
+        packet.put("smoothDist", smoothDist);
         packet.put("slidePos", slidePos);
 
         dashboard.sendTelemetryPacket(packet);
