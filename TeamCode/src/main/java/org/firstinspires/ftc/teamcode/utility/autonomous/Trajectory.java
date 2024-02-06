@@ -96,7 +96,7 @@ public class Trajectory {
         while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(3)) {
             AutoMovement.updatePosition();
 
-//            AutoMovement.displayPosition(ActuationConstants.Autonomous.followDistance);//omkarisgay and fat obese large
+            AutoMovement.displayPosition();//omkarisgay and fat obese large
 
             AutoMovement.moveTowards(targetPose, moveSpeed, turnSpeed);
 
@@ -120,6 +120,7 @@ public class Trajectory {
 
         while(dist > 0.6 || Math.abs(MathFunctions.AngleWrap(rotDist)) > Math.toRadians(2)) {
             AutoMovement.updatePosition();
+            AutoMovement.displayPosition();
             AutoMovement.moveTowards(targetPose, mSpeed, tSpeed);
 
             dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
