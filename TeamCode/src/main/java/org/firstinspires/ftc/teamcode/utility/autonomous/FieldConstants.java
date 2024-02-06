@@ -37,6 +37,17 @@ public class FieldConstants {
             public static Pose left = new Pose(45, 42, Math.toRadians(0));
             public static Pose right = new Pose(45, 26.5, Math.toRadians(0));
         }
+
+        public static class Stacks {
+            public static Pose center = new Pose(0, 0, Math.toRadians(0));
+            public static Pose left = new Pose(0, 0, Math.toRadians(0));
+            public static Pose right = new Pose(-58, 38, Math.toRadians(0));
+        }
+
+        public static class Park {
+            public static Pose left = new Pose(0, 0, Math.toRadians(0));
+            public static Pose right = new Pose(0, 0, Math.toRadians(0));
+        }
     }
 
     public static class Red {
@@ -62,6 +73,17 @@ public class FieldConstants {
             public static Pose center = new Pose(50, 34.5, Math.toRadians(180));
             public static Pose left = new Pose(50, 42, Math.toRadians(180));
             public static Pose right = new Pose(50, 26.5, Math.toRadians(180));
+        }
+
+        public static class Stacks {
+            public static Pose center = new Pose(0, 0, Math.toRadians(0));
+            public static Pose left = new Pose(0, 0, Math.toRadians(0));
+            public static Pose right = new Pose(0, 0, Math.toRadians(0));
+        }
+
+        public static class Park {
+            public static Pose left = new Pose(0, 0, Math.toRadians(0));
+            public static Pose right = new Pose(0, 0, Math.toRadians(0));
         }
     }
 }

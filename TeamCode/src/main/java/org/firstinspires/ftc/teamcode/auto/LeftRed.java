@@ -27,7 +27,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.ArrayList;
 
-@Autonomous(name="left red", group = "auto")
+@Autonomous(name="left red", group = "red auto")
 public class LeftRed extends LinearOpMode {
     OpenCvWebcam webcam;
     double left = 1.0;
@@ -68,47 +68,42 @@ public class LeftRed extends LinearOpMode {
             telemetry.update();
         }
 
-//        commented because testing vision code
         waitForStart();
 
         Trajectory start_spike = new Trajectory(FieldConstants.Red.Left.start)
                 .lineTo(FieldConstants.Red.Left.transition);
 
+        Trajectory spike_stack = new Trajectory();
+
+        Trajectory stack_canvas_side = new Trajectory();
+        Trajectory stack_canvas_mid = new Trajectory();
+
+        Trajectory canvas_stack_mid = new Trajectory();
+        Trajectory canvas_stack_side = new Trajectory();
+
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Red.Left.centerSpike)
-                    .lineTo(new Pose(-36.5, -40, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.centerSpike) // deposit purple
+                    .lineTo(new Pose(-36.5, -40, Math.toRadians(0))); // move back
+
+            stack_canvas_side.lineTo(FieldConstants.Red.Canvas.center);
+            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Red.Left.leftSpike)
-                    .lineTo(new Pose(-46.5, -44, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.leftSpike) // deposit purple
+                    .lineTo(new Pose(-46.5, -44, Math.toRadians(0))); // move back
+
+            stack_canvas_side.lineTo(FieldConstants.Red.Canvas.left);
+            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Red.Left.rightSpike)
-                    .lineTo(new Pose(-34, -42, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Red.Left.rightSpike) // deposit purple
+                    .lineTo(new Pose(-34, -42, Math.toRadians(0))); // move back
+
+            stack_canvas_side.lineTo(FieldConstants.Red.Canvas.right);
+            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.right);
         }
-//
-//        Trajectory farStack_Canvas = new Trajectory()
-//                .lineTo(new Pose(-40, 14, Math.toRadians(180)))
-//                .lineTo(new Pose(30, 14, Math.toRadians(180)), 0.5, ActuationConstants.Autonomous.turnSpeed)
-//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[0]))
-//                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristDeposit))
-//                .lineTo(new Pose(43, 34.5, Math.toRadians(180)))
-//                .lineTo(FieldConstants.Blue.Canvas.center)
-//                .action(() -> sleep(1500))
-//                .action(() -> Actuation.setClaw(ActuationConstants.Claw.open))
-//                .action(() -> sleep(400));
-//
-//        Trajectory canvas_park = new Trajectory()
-//                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPresets[3]))
-//                .action(() -> Actuation.setWrist(ActuationConstants.Claw.wristIntake))
-//                .lineTo(new Pose(47, 10, Math.toRadians(180)))
-//                .lineTo(new Pose(54, 10, Math.toRadians(180)));
 
         start_spike.run();
-
-//        canvas_farStack.run();
-//        farStack_Canvas.run();
-//        canvas_park.run();
     }
     class Pipeline extends OpenCvPipeline
     {

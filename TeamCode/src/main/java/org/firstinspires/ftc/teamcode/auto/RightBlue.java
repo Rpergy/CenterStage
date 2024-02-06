@@ -27,7 +27,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.ArrayList;
 
-@Autonomous(name="right blue", group = "auto")
+@Autonomous(name="right blue", group = "blue auto")
 public class RightBlue extends LinearOpMode {
     OpenCvWebcam webcam;
     double left = 0;
@@ -69,36 +69,60 @@ public class RightBlue extends LinearOpMode {
         }
 
         waitForStart();
+
         Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start)
                 .lineTo(FieldConstants.Blue.Right.transition);
 
+        Trajectory spike_stack = new Trajectory()
+                .lineTo(FieldConstants.Blue.Stacks.right); // to pixel stack
+
+        Trajectory stack_canvas_side = new Trajectory()
+                .lineTo(new Pose(-58, 60, Math.toRadians(0))) // line up with truss
+                .lineTo(new Pose(30, 60, Math.toRadians(0)), 0.8, 0.8); // move to blue left
+
+        Trajectory stack_canvas_mid = new Trajectory();
+
+        Trajectory canvas_stack_mid = new Trajectory();
+        Trajectory canvas_stack_side = new Trajectory()
+                .lineTo(new Pose(30, 60, Math.toRadians(0))) // line up with truss
+                .lineTo(new Pose(-58, 60, Math.toRadians(0))) // move close to stack
+                .lineTo(FieldConstants.Blue.Stacks.right); // into stack
+
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Right.centerSpike)
-                    .lineTo(FieldConstants.Blue.Right.transition);
+            start_spike.lineTo(FieldConstants.Blue.Right.centerSpike) // deposit purple
+                    .lineTo(FieldConstants.Blue.Right.transition); // move back
+
+            // move into canvas pos
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.center);
+            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Blue.Right.leftSpike)
-                    .lineTo(new Pose(-35, 36, Math.toRadians(-45)));
+            start_spike.lineTo(FieldConstants.Blue.Right.leftSpike) // deposit purple
+                    .lineTo(new Pose(-35, 36, Math.toRadians(-45))); // move back
+
+            // move into canvas pos
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left);
+            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Blue.Right.rightSpike)
-                    .lineTo(new Pose(-48.5, 44, Math.toRadians(-90)));
+            start_spike.lineTo(FieldConstants.Blue.Right.rightSpike) // deposit purple
+                    .lineTo(new Pose(-48.5, 44, Math.toRadians(-90))); // move back
+
+            // move into canvas pos
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.right);
+            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
         }
-        Trajectory spikeToStacks = new Trajectory()
-                .lineTo(new Pose(-58, 38, Math.toRadians(0)));
 
-        Trajectory stacksToBoardViaSide = new Trajectory()
-                .lineTo(new Pose(-58, 60, Math.toRadians(0)))
-                .lineTo(new Pose(30, 60, Math.toRadians(0)), 0.8, 0.8)
-                .lineTo(FieldConstants.Blue.Canvas.center);
-
+        // purple preload
         start_spike.run();
-        spikeToStacks.run();
-        stacksToBoardViaSide.run();
+        spike_stack.run();
 
-//        canvas_farStack.run();
-//        farStack_Canvas.run();
-//        canvas_park.run();
+        // yellow preload and cycle
+        stack_canvas_side.run();
+        canvas_stack_side.run();
+        stack_canvas_side.run();
+
+        //park
     }
     class Pipeline extends OpenCvPipeline
     {
