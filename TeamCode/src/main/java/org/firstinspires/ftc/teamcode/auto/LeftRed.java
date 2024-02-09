@@ -38,8 +38,8 @@ public class LeftRed extends LinearOpMode {
         Actuation.setup(hardwareMap, telemetry);
 
         left = 0.0;
-        right = 1.0;
-        middle = 0.0;
+        right = 0;
+        middle = 10.0;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -73,13 +73,23 @@ public class LeftRed extends LinearOpMode {
         Trajectory start_spike = new Trajectory(FieldConstants.Red.Left.start)
                 .lineTo(FieldConstants.Red.Left.transition);
 
-        Trajectory spike_stack = new Trajectory();
+        Trajectory spike_stack = new Trajectory()
+                .lineTo(FieldConstants.Red.Stacks.left);
 
-        Trajectory stack_canvas_side = new Trajectory();
+        Trajectory stack_canvas_side = new Trajectory()
+                .lineTo(new Pose(-59, -59, Math.toRadians(0)))
+                .lineTo(new Pose(36, -59, Math.toRadians(0)), 0.8, 0.8);
         Trajectory stack_canvas_mid = new Trajectory();
 
         Trajectory canvas_stack_mid = new Trajectory();
-        Trajectory canvas_stack_side = new Trajectory();
+        Trajectory canvas_stack_side = new Trajectory()
+                .lineTo(new Pose(36, -59, Math.toRadians(0)))
+                .lineTo(new Pose(-59, -59, Math.toRadians(0)), 0.8, 0.8)
+                .lineTo(FieldConstants.Red.Stacks.left);
+
+        Trajectory park = new Trajectory()
+                .lineTo(new Pose(36, -59, Math.toRadians(0)))
+                .lineTo(FieldConstants.Red.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Red.Left.centerSpike) // deposit purple
@@ -104,6 +114,14 @@ public class LeftRed extends LinearOpMode {
         }
 
         start_spike.run();
+        spike_stack.run();
+
+        stack_canvas_side.run();
+        canvas_stack_side.run();
+        stack_canvas_side.run();
+
+        park.run();
+
     }
     class Pipeline extends OpenCvPipeline
     {
