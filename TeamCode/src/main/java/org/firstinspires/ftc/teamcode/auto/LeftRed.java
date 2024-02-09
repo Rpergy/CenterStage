@@ -30,16 +30,16 @@ import java.util.ArrayList;
 @Autonomous(name="left red", group = "red auto")
 public class LeftRed extends LinearOpMode {
     OpenCvWebcam webcam;
-    double left = 1.0;
-    double middle = 0;
+    double left = 0.0;
+    double middle = 10;
     double right = 0;
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
 
-        left = 0.0;
+        left = 10.0;
         right = 0;
-        middle = 10.0;
+        middle = 0.0;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -77,14 +77,15 @@ public class LeftRed extends LinearOpMode {
                 .lineTo(FieldConstants.Red.Stacks.left);
 
         Trajectory stack_canvas_side = new Trajectory()
-                .lineTo(new Pose(-59, -59, Math.toRadians(0)))
-                .lineTo(new Pose(36, -59, Math.toRadians(0)), 0.8, 0.8);
+                .lineTo(new Pose(-53, -59.5, Math.toRadians(0)))
+                .lineTo(new Pose(36, -59.5, Math.toRadians(0)), 0.7, 0.7);
+
         Trajectory stack_canvas_mid = new Trajectory();
 
         Trajectory canvas_stack_mid = new Trajectory();
         Trajectory canvas_stack_side = new Trajectory()
-                .lineTo(new Pose(36, -59, Math.toRadians(0)))
-                .lineTo(new Pose(-59, -59, Math.toRadians(0)), 0.8, 0.8)
+                .lineTo(new Pose(36, -59.5, Math.toRadians(0)))
+                .lineTo(new Pose(-53, -59.5, Math.toRadians(0)), 0.7, 0.7)
                 .lineTo(FieldConstants.Red.Stacks.left);
 
         Trajectory park = new Trajectory()
@@ -93,7 +94,7 @@ public class LeftRed extends LinearOpMode {
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Red.Left.centerSpike) // deposit purple
-                    .lineTo(new Pose(-36.5, -40, Math.toRadians(0))); // move back
+                    .lineTo(new Pose(-36.5, -36, Math.toRadians(0))); // move back
 
             stack_canvas_side.lineTo(FieldConstants.Red.Canvas.center);
             stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.center);
