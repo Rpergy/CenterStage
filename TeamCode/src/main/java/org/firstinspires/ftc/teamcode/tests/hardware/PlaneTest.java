@@ -8,14 +8,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.utility.ActuationConstants;
 
 @TeleOp(name="Plane Test", group="tests")
-@Disabled
 public class PlaneTest extends OpMode {
     Servo tilt, release;
 
     @Override
     public void init() {
-        tilt = hardwareMap.servo.get("planeTilt");
-        release = hardwareMap.servo.get("planeRelease");
+        tilt = hardwareMap.servo.get("airplaneTilt");
+        release = hardwareMap.servo.get("airplaneLaunch");
 
         tilt.setPosition(0.0);
         release.setPosition(ActuationConstants.Plane.releaseDown);

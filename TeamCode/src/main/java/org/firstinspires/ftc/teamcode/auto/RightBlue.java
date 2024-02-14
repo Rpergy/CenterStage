@@ -38,22 +38,18 @@ public class RightBlue extends LinearOpMode {
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
 
-        left = 0;
-        right = 0;
-        middle = 1;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam.setPipeline(new Pipeline());
+        webcam.setMillisecondsPermissionTimeout(5000);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
 
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        webcam.setPipeline(new Pipeline());
-//        webcam.setMillisecondsPermissionTimeout(5000);
-//        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-//            @Override
-//            public void onOpened() {
-//                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-//            }
-//
-//            public void onError(int errorCode) {}
-//        });
+            public void onError(int errorCode) {}
+        });
 
         while(opModeInInit()) {
 
