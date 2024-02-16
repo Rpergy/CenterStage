@@ -29,7 +29,18 @@ public class DragonOp extends OpMode {
         double turn = gamepad1.left_stick_x;
         double strafe = gamepad1.right_stick_x;
 
-        Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, strafe, turn);
+        Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
+
+        Actuation.toggleSlides(gamepad2.square);
+
+        if (gamepad1.left_trigger > 0.5)
+            Actuation.setIntake(1.0);
+        else if (gamepad1.right_trigger > 0.5){
+            Actuation.setIntake(-1.0);
+        }
+        else {
+            Actuation.setIntake(0.0);
+        }
 
         telemetry.addData("Slow mode", Actuation.slowMode);
         telemetry.addData("Field centric", Actuation.fieldCentric);

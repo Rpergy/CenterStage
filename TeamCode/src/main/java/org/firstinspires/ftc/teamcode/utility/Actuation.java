@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.utility;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,18 +16,23 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.PixelColors;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
+
+import java.util.Arrays;
 
 
 public class Actuation {
 
     public static boolean slowMode = false;
     public static boolean fieldCentric = false;
+    public static boolean slides = false;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
+    private static boolean slidesToggle = false;
 
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
@@ -32,7 +41,14 @@ public class Actuation {
     public static Servo tiltLeft, tiltRight;
     public static Servo depositTilt, deposit;
 
+    public static ModernRoboticsI2cRangeSensor rangeSensor;
+
     private static RevBlinkinLedDriver leds;
+
+    private static double lastDist;
+    private static double[] data;
+
+    private static FtcDashboard dashboard;
 
     public static void setup(HardwareMap map, Telemetry telemetry) {
         AutoMovement.setup(map, telemetry);
@@ -75,6 +91,13 @@ public class Actuation {
             deposit = map.servo.get("deposit");
         }
 
+        rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
+
+        if (!(Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())) lastDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        data = new double[ActuationConstants.Extension.period];
+        Arrays.fill(data, lastDist);
+
 //        leds = map.get(RevBlinkinLedDriver.class, "lights");
 //        leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 
@@ -95,6 +118,8 @@ public class Actuation {
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        dashboard = FtcDashboard.getInstance();
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -127,6 +152,67 @@ public class Actuation {
 
         slowModeToggle = toggleSlowMode;
         fieldCentricToggle = toggleFieldCentric;
+    }
+
+    public static void toggleSlides(boolean toggle) {
+        double newDist = 0;
+        double dist = 0;
+
+        if (toggle && !slidesToggle) {
+            slides = !slides;
+
+            if (!slides) {
+                tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+                tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+
+                slidesLeft.setTargetPosition(0);
+                slidesRight.setTargetPosition(0);
+            }
+            else {
+                newDist = rangeSensor.getDistance(DistanceUnit.INCH);
+                if(!Double.isNaN(newDist))
+                    dist = newDist;
+            }
+        }
+
+        if(slides) {
+            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+
+            dist = lastDist;
+
+            TelemetryPacket packet = new TelemetryPacket();
+
+            newDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+            if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 3)
+                dist = newDist;
+
+            if (data.length - 1 >= 0) System.arraycopy(data, 0, data, 1, data.length - 1);
+            data[0] = dist;
+
+            double smoothDist = 0;
+            for(double val : data) smoothDist += val;
+            smoothDist /= ActuationConstants.Extension.period;
+
+            int slidePos = (int)(smoothDist * 133.869 + 434.94);
+
+            if(slidePos <= ActuationConstants.Extension.maxExtend) {
+                slidesLeft.setTargetPosition(slidePos);
+                slidesRight.setTargetPosition(slidePos);
+            }
+            else {
+                slidesLeft.setTargetPosition(ActuationConstants.Extension.maxExtend);
+                slidesRight.setTargetPosition(ActuationConstants.Extension.maxExtend);
+            }
+
+            packet.put("dist", smoothDist);
+            dashboard.sendTelemetryPacket(packet);
+
+            lastDist = smoothDist;
+        }
+
+        slidesToggle = toggle;
     }
 
     public static void setIntake(double power) {

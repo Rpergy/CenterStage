@@ -33,12 +33,11 @@ public class ActuationConstants {
     @Config
     public static class Extension {
         public static int maxExtend = 2600;
+        public static int period = 10;
 
         public static double[] tiltPositions = {
                 0.56, // intake
-                0.48,
-                0.40,
-                0.32, // highest
+                0.5,
                 0.30  // hang
         };
 
