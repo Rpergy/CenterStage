@@ -39,8 +39,8 @@ public class RightRed extends LinearOpMode {
         Actuation.setup(hardwareMap, telemetry);
 
         left = 0.0;
-        right = 1.0;
-        middle = 0.0;
+        right = 0.0;
+        middle = 5.0;
 
 //        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
