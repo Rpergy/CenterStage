@@ -37,22 +37,18 @@ public class LeftBlue extends LinearOpMode {
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
 
-        left = 1;
-        right = 0;
-        middle = 0;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam.setPipeline(new Pipeline());
+        webcam.setMillisecondsPermissionTimeout(5000);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
 
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        webcam.setPipeline(new Pipeline());
-//        webcam.setMillisecondsPermissionTimeout(5000);
-//        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-//            @Override
-//            public void onOpened() {
-//                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-//            }
-//
-//            public void onError(int errorCode) {}
-//        });
+            public void onError(int errorCode) {}
+        });
 
         while(opModeInInit()) {
 
@@ -82,25 +78,42 @@ public class LeftBlue extends LinearOpMode {
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Left.leftSpike)
-                    .lineTo(new Pose(23, 48, Math.toRadians(0)));
+                    .lineTo(new Pose(21, 48, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Blue.Left.rightSpike)
-                    .lineTo(new Pose(12, 36, Math.toRadians(-180)))
-                    .lineTo(new Pose(24, 36, Math.toRadians(0)));
+                    .lineTo(new Pose(18, 40, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
-        Trajectory canvas_stack_mid = new Trajectory();
+        Trajectory canvas_stack_mid = new Trajectory()
+            .lineTo(new Pose(37, 10, 0))
+            .lineTo(FieldConstants.Blue.Stacks.left, 0.9, 0.5);
         Trajectory canvas_stack_side = new Trajectory();
-        Trajectory stack_canvas_mid = new Trajectory();
+
+        Trajectory stack_canvas_mid = new Trajectory()
+                .lineTo(new Pose(37, 10, 0), 0.9, 0.5)
+                .lineTo(FieldConstants.Blue.Canvas.center);
         Trajectory stack_canvas_side = new Trajectory();
+
+        Trajectory park_left = new Trajectory()
+                .lineTo(new Pose(45, 61, Math.toRadians(0)))
+                .lineTo(FieldConstants.Blue.Park.left);
+
+        Trajectory park_right = new Trajectory()
+                .lineTo(new Pose(45, 11, 0))
+                .lineTo(FieldConstants.Blue.Park.right);
 
         start_spike.run();
         spike_canvas.run();
+        canvas_stack_mid.run();
+        stack_canvas_mid.run();
+        canvas_stack_mid.run();
+        stack_canvas_mid.run();
+        park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {

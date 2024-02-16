@@ -28,6 +28,7 @@ public class Actuation {
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public static DcMotor slidesLeft, slidesRight;
+    public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
     public static Servo depositTilt, deposit;
 
@@ -60,6 +61,10 @@ public class Actuation {
 
             tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
             tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+        }
+
+        if (map.dcMotor.contains("intake")) {
+            intake = map.dcMotor.get("intake");
         }
 
         if (map.servo.contains("depositTilt")) {
@@ -122,6 +127,10 @@ public class Actuation {
 
         slowModeToggle = toggleSlowMode;
         fieldCentricToggle = toggleFieldCentric;
+    }
+
+    public static void setIntake(double power) {
+        intake.setPower(power);
     }
 
     public static void setTilt(double pos) {

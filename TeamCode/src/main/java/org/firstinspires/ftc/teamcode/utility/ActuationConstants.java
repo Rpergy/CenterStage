@@ -5,14 +5,14 @@ import com.acmerobotics.dashboard.config.Config;
 public class ActuationConstants {
     @Config
     public static class Autonomous {
-        public static double moveSpeed = 0.6;
-        public static double turnSpeed = 0.6;
+        public static double moveSpeed = 0.8;
+        public static double turnSpeed = 0.8;
         public static double followDistance = 10;
         //omkar is gay
         public static double minTurnSpeed = 0.06;
         public static double turnAccelMult = 2.5;
-        public static double moveAccelMult = 1.0;
-        public static double strafeAccelMult = 0.5;
+        public static double moveAccelMult = 0.75;
+        public static double strafeAccelMult = 0.75;
     }
 
     @Config
