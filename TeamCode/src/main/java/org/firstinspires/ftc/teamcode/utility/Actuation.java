@@ -40,6 +40,7 @@ public class Actuation {
     public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
     public static Servo depositTilt, deposit;
+    public static Servo lifter;
 
     public static ModernRoboticsI2cRangeSensor rangeSensor;
 
@@ -89,6 +90,10 @@ public class Actuation {
 
         if (map.servo.contains("deposit")) {
             deposit = map.servo.get("deposit");
+        }
+
+        if (map.servo.contains("lifter")) {
+            lifter  = map.servo.get("lifter");
         }
 
         rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
@@ -155,8 +160,26 @@ public class Actuation {
     }
 
     public static void toggleSlides(boolean toggle) {
-        double newDist = 0;
-        double dist = 0;
+        double dist = lastDist;
+
+        TelemetryPacket packet = new TelemetryPacket();
+
+        double newDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 30)
+            dist = newDist;
+
+        if (data.length - 1 >= 0) System.arraycopy(data, 0, data, 1, data.length - 1);
+        data[0] = dist;
+
+        double smoothDist = 0;
+        for(double val : data) smoothDist += val;
+        smoothDist /= ActuationConstants.Extension.period;
+
+        packet.put("dist", smoothDist);
+        dashboard.sendTelemetryPacket(packet);
+
+        lastDist = smoothDist;
 
         if (toggle && !slidesToggle) {
             slides = !slides;
@@ -168,32 +191,11 @@ public class Actuation {
                 slidesLeft.setTargetPosition(0);
                 slidesRight.setTargetPosition(0);
             }
-            else {
-                newDist = rangeSensor.getDistance(DistanceUnit.INCH);
-                if(!Double.isNaN(newDist))
-                    dist = newDist;
-            }
         }
 
         if(slides) {
             tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
             tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-
-            dist = lastDist;
-
-            TelemetryPacket packet = new TelemetryPacket();
-
-            newDist = rangeSensor.getDistance(DistanceUnit.INCH);
-
-            if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 3)
-                dist = newDist;
-
-            if (data.length - 1 >= 0) System.arraycopy(data, 0, data, 1, data.length - 1);
-            data[0] = dist;
-
-            double smoothDist = 0;
-            for(double val : data) smoothDist += val;
-            smoothDist /= ActuationConstants.Extension.period;
 
             int slidePos = (int)(smoothDist * 133.869 + 434.94);
 
@@ -205,19 +207,47 @@ public class Actuation {
                 slidesLeft.setTargetPosition(ActuationConstants.Extension.maxExtend);
                 slidesRight.setTargetPosition(ActuationConstants.Extension.maxExtend);
             }
-
-            packet.put("dist", smoothDist);
-            dashboard.sendTelemetryPacket(packet);
-
-            lastDist = smoothDist;
         }
 
         slidesToggle = toggle;
     }
 
+    public static void slidesOut() {
+        double dist = lastDist;
+
+        double newDist = rangeSensor.getDistance(DistanceUnit.INCH);
+
+        if(!Double.isNaN(newDist))
+            dist = newDist;
+
+        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+
+        int slidePos = (int)(dist * 133.869 + 434.94);
+
+        if(slidePos <= ActuationConstants.Extension.maxExtend) {
+            slidesLeft.setTargetPosition(slidePos);
+            slidesRight.setTargetPosition(slidePos);
+        }
+        else {
+            slidesLeft.setTargetPosition(ActuationConstants.Extension.maxExtend);
+            slidesRight.setTargetPosition(ActuationConstants.Extension.maxExtend);
+        }
+    }
+
+    public static void slidesIn() {
+        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+
+        slidesLeft.setTargetPosition(0);
+        slidesRight.setTargetPosition(0);
+    }
+
     public static void setIntake(double power) {
         intake.setPower(power);
     }
+
+    public static void setIntakeArm(double pos) {  }
 
     public static void setTilt(double pos) {
         tiltLeft.setPosition(pos);

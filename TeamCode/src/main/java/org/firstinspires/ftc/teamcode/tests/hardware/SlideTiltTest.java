@@ -13,12 +13,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="Slide Tilt Test", group="tests")
 @Config
 public class SlideTiltTest extends OpMode {
-    Servo tiltL, tiltR;
+    Servo tiltL, tiltR, depositTilt, deposit;
 
     DcMotor slideL, slideR;
 
     public static double servoPos = 0.5;
     public static int slidePos = 0;
+    public static double tiltPos = 0.0;
+    public static double depositTiltPos = 0.0;
 
     FtcDashboard dashboard;
 
@@ -44,6 +46,9 @@ public class SlideTiltTest extends OpMode {
         slideR.setTargetPosition(slidePos);
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        depositTilt = hardwareMap.servo.get("depositTilt");
+        deposit = hardwareMap.servo.get("depositer");
+
         dashboard = FtcDashboard.getInstance();
     }
 
@@ -55,6 +60,9 @@ public class SlideTiltTest extends OpMode {
 
         slideL.setTargetPosition(slidePos);
         slideR.setTargetPosition(slidePos);
+
+        depositTilt.setPosition(tiltPos);
+        deposit.setPosition(depositTiltPos);
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("degrees", servoPos * 330.847 - 10.7458);

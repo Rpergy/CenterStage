@@ -33,7 +33,7 @@ public class ActuationConstants {
     @Config
     public static class Extension {
         public static int maxExtend = 2600;
-        public static int period = 10;
+        public static int period = 20;
 
         public static double[] tiltPositions = {
                 0.56, // intake
@@ -47,6 +47,20 @@ public class ActuationConstants {
                 0,
                 0 // highest
         };
+    }
+
+    @Config
+    public static class Intake {
+        public static double power = 0.0;
+        public static double[] stackPos = {
+                0.15, // 5 pixels
+                0.29, // 4 pixels
+                0.45, // 3 pixels
+                0.75, // 2 pixels
+                1.0, // 1 pixel
+        };
+
+        public static double testStackPos = 0.0;
     }
 
     @Config

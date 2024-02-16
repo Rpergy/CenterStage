@@ -38,22 +38,18 @@ public class RightBlue extends LinearOpMode {
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
 
-        left = 0;
-        right = 0;
-        middle = 10;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam.setPipeline(new Pipeline());
+        webcam.setMillisecondsPermissionTimeout(5000);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
 
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        webcam.setPipeline(new Pipeline());
-//        webcam.setMillisecondsPermissionTimeout(5000);
-//        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-//            @Override
-//            public void onOpened() {
-//                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-//            }
-//
-//            public void onError(int errorCode) {}
-//        });
+            public void onError(int errorCode) {}
+        });
 
         while(opModeInInit()) {
 
@@ -78,15 +74,21 @@ public class RightBlue extends LinearOpMode {
                 .lineTo(FieldConstants.Blue.Stacks.right); // to pixel stack
 
         Trajectory stack_canvas_side = new Trajectory()
-                .lineTo(new Pose(-58, 60, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(30, 60, Math.toRadians(0)), 0.8, 0.8); // move to blue left
+                .lineTo(new Pose(-58, 58.75, Math.toRadians(0))) // line up with truss
+                .lineTo(new Pose(30, 58.75, Math.toRadians(0)), 0.8, 0.8); // move to blue left
 
-        Trajectory stack_canvas_mid = new Trajectory();
+        Trajectory stack_canvas_mid = new Trajectory() // DOES NOT WORK
+                .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
+                .lineTo(new Pose(37, 10, 0), 0.9, 0.5);
 
-        Trajectory canvas_stack_mid = new Trajectory();
+        Trajectory canvas_stack_mid = new Trajectory() // DOES NOT WORK
+                .lineTo(new Pose(37, 10, 0), 0.9, 0.5)
+                .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
+                .lineTo(FieldConstants.Blue.Stacks.right);
+
         Trajectory canvas_stack_side = new Trajectory()
-                .lineTo(new Pose(30, 60, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(-58, 60, Math.toRadians(0)), 0.8, 0.8) // move close to stack
+                .lineTo(new Pose(30, 58.75, Math.toRadians(0))) // line up with truss
+                .lineTo(new Pose(-58, 58.75, Math.toRadians(0)), 0.8, 0.8) // move close to stack
                 .lineTo(FieldConstants.Blue.Stacks.right); // into stack
 
         Trajectory park_left = new Trajectory()
@@ -103,7 +105,7 @@ public class RightBlue extends LinearOpMode {
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Right.leftSpike) // deposit purple
-                    .lineTo(new Pose(-35, 36, Math.toRadians(-45))); // move back
+                    .lineTo(new Pose(-38, 36, Math.toRadians(0))); // move back
 
             // move into canvas pos
             stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left);
@@ -117,6 +119,10 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.right);
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
         }
+
+        stack_canvas_side.action(Actuation::slidesOut)
+                .action(() -> sleep(1000))
+                .action(Actuation::slidesIn);
 
         // purple preload
         start_spike.run();

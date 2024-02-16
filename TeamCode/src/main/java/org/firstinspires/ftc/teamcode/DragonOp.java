@@ -31,12 +31,12 @@ public class DragonOp extends OpMode {
 
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
 
-        Actuation.toggleSlides(gamepad2.square);
+        Actuation.toggleSlides(gamepad1.square);
 
         if (gamepad1.left_trigger > 0.5)
-            Actuation.setIntake(1.0);
-        else if (gamepad1.right_trigger > 0.5){
             Actuation.setIntake(-1.0);
+        else if (gamepad1.right_trigger > 0.5){
+            Actuation.setIntake(1.0);
         }
         else {
             Actuation.setIntake(0.0);
