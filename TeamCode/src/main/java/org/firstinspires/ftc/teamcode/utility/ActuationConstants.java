@@ -36,7 +36,7 @@ public class ActuationConstants {
         public static int period = 20;
 
         public static double[] tiltPositions = {
-                0.56, // intake
+                0.561, // intake
                 0.5,
                 0.30  // hang
         };
@@ -66,7 +66,7 @@ public class ActuationConstants {
     @Config
     public static class Deposit {
         public static double intakeTilt = 0.0;
-        public static double depositTilt = 0.0;
+        public static double depositTilt = 0.44;
 
         public static double loaded = 0.0;
         public static double halfDrop = 0.0;

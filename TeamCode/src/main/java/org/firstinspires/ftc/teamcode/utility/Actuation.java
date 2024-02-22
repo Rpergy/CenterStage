@@ -2,25 +2,16 @@ package org.firstinspires.ftc.teamcode.utility;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.PixelColors;
-import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.Arrays;
 
@@ -39,7 +30,7 @@ public class Actuation {
     public static DcMotor slidesLeft, slidesRight;
     public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
-    public static Servo depositTilt, deposit;
+    public static Servo depositTilter, deposit;
     public static Servo lifter;
 
     public static ModernRoboticsI2cRangeSensor rangeSensor;
@@ -59,6 +50,9 @@ public class Actuation {
         if (map.dcMotor.contains("slidesLeft") && map.dcMotor.contains("slidesRight")) {
             slidesLeft = map.dcMotor.get("slidesLeft");
             slidesRight = map.dcMotor.get("slidesRight");
+
+            slidesLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             slidesLeft.setPower(1.0);
             slidesLeft.setTargetPosition(ActuationConstants.Extension.slidePositions[0]);
@@ -84,8 +78,8 @@ public class Actuation {
             intake = map.dcMotor.get("intake");
         }
 
-        if (map.servo.contains("depositTilt")) {
-            depositTilt = map.servo.get("depositTilt");
+        if (map.servo.contains("depositTilter")) {
+            depositTilter = map.servo.get("depositTilter");
         }
 
         if (map.servo.contains("deposit")) {
@@ -258,4 +252,10 @@ public class Actuation {
         slidesLeft.setTargetPosition(pos);
         slidesRight.setTargetPosition(pos);
     }
-}// screw omkar, he needs a barber
+
+    public static void initDepositTilter(boolean toggle){
+        if(toggle){
+            depositTilter.setPosition(ActuationConstants.Deposit.depositTilt);
+        }
+    }
+}

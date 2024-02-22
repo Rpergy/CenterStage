@@ -30,7 +30,7 @@ import java.util.ArrayList;
 @Autonomous(name="left blue", group = "blue auto")
 public class LeftBlue extends LinearOpMode {
     OpenCvWebcam webcam;
-    double left = 0;
+    double left = 1;
     double middle = 0;
     double right = 0;
     @Override
@@ -71,8 +71,8 @@ public class LeftBlue extends LinearOpMode {
         Trajectory spike_canvas = new Trajectory();
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike)
-                    .lineTo(new Pose(11.5, 45, Math.toRadians(0)));
+            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike);
+
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.center);
         }

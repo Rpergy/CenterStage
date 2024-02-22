@@ -70,9 +70,9 @@ public class FieldConstants {
         }
 
         public static class Canvas {
-            public static Pose center = new Pose(50, -36, Math.toRadians(0));
-            public static Pose left = new Pose(50, -30, Math.toRadians(0));
-            public static Pose right = new Pose(50, -42, Math.toRadians(0));
+            public static Pose center = new Pose(43, -36, Math.toRadians(0));
+            public static Pose left = new Pose(43, -30, Math.toRadians(0));
+            public static Pose right = new Pose(43, -42, Math.toRadians(0));
         }
 
         public static class Stacks {
@@ -83,7 +83,7 @@ public class FieldConstants {
 
         public static class Park {
             public static Pose left = new Pose(60, -60, Math.toRadians(0));
-            public static Pose right = new Pose(0, 0, Math.toRadians(0));
+            public static Pose right = new Pose(53, -11, Math.toRadians(0));
         }
     }
 }

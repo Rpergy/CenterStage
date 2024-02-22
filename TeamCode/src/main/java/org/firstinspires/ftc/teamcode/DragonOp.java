@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.database.AbstractCursor;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -32,6 +34,8 @@ public class DragonOp extends OpMode {
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
 
         Actuation.toggleSlides(gamepad1.square);
+
+        Actuation.initDepositTilter(gamepad1.triangle);
 
         if (gamepad1.left_trigger > 0.5)
             Actuation.setIntake(-1.0);

@@ -46,7 +46,7 @@ public class SlideTiltTest extends OpMode {
         slideR.setTargetPosition(slidePos);
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        depositTilt = hardwareMap.servo.get("depositTilt");
+        depositTilt = hardwareMap.servo.get("depositTilter");
         deposit = hardwareMap.servo.get("depositer");
 
         dashboard = FtcDashboard.getInstance();
