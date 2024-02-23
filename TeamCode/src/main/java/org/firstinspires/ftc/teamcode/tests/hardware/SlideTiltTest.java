@@ -46,8 +46,8 @@ public class SlideTiltTest extends OpMode {
         slideR.setTargetPosition(slidePos);
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        depositTilt = hardwareMap.servo.get("depositTilter");
-        deposit = hardwareMap.servo.get("depositer");
+        depositTilt = hardwareMap.servo.get("depositTilt");
+//        deposit = hardwareMap.servo.get("deposit");
 
         dashboard = FtcDashboard.getInstance();
     }
@@ -62,7 +62,7 @@ public class SlideTiltTest extends OpMode {
         slideR.setTargetPosition(slidePos);
 
         depositTilt.setPosition(tiltPos);
-        deposit.setPosition(depositTiltPos);
+//        deposit.setPosition(depositTiltPos);
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("degrees", servoPos * 330.847 - 10.7458);

@@ -70,8 +70,14 @@ public class RightBlue extends LinearOpMode {
         Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start)
                 .lineTo(FieldConstants.Blue.Right.transition);
 
-        Trajectory spike_stack = new Trajectory()
-                .lineTo(FieldConstants.Blue.Stacks.right); // to pixel stack
+        Trajectory spike_stack = new Trajectory() // to pixel stack
+                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]))
+                .lineTo(FieldConstants.Blue.Stacks.right, 0.7, 0.7)
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]))
+                .action(() -> Actuation.setIntake(1))
+                .lineTo(new Pose(-57, 37, Math.toRadians(0)))
+                .action(() -> sleep(1000));
 
         Trajectory stack_canvas_side = new Trajectory()
                 .lineTo(new Pose(-58, 58.75, Math.toRadians(0))) // line up with truss
@@ -120,21 +126,17 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
-        stack_canvas_side.action(Actuation::slidesOut)
-                .action(() -> sleep(1000))
-                .action(Actuation::slidesIn);
-
         // purple preload
         start_spike.run();
         spike_stack.run();
 
         // yellow preload and cycle
-        stack_canvas_side.run();
-        canvas_stack_side.run();
-        stack_canvas_side.run();
+//        stack_canvas_side.run();
+//        canvas_stack_side.run();
+//        stack_canvas_side.run();
 
         //park
-        park_left.run();
+//        park_left.run();
     }
     class Pipeline extends OpenCvPipeline
     {

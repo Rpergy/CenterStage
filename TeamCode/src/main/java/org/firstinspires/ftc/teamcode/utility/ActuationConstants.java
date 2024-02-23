@@ -53,11 +53,12 @@ public class ActuationConstants {
     public static class Intake {
         public static double power = 0.0;
         public static double[] stackPos = {
-                0.15, // 5 pixels
-                0.29, // 4 pixels
-                0.45, // 3 pixels
-                0.75, // 2 pixels
-                1.0, // 1 pixel
+                0.9,  // 1 pixel (ground)
+                0.44, // 2 pixels
+                0.32, // 3 pixels
+                0.22, // 4 pixels
+                0.1,  // 5 pixels
+                0.0 // highest
         };
 
         public static double testStackPos = 0.0;
@@ -65,7 +66,7 @@ public class ActuationConstants {
 
     @Config
     public static class Deposit {
-        public static double intakeTilt = 0.0;
+        public static double intakeTilt = 1.0;
         public static double depositTilt = 0.44;
 
         public static double loaded = 0.0;

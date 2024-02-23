@@ -30,7 +30,7 @@ public class Actuation {
     public static DcMotor slidesLeft, slidesRight;
     public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
-    public static Servo depositTilter, deposit;
+    public static Servo depositTilt, deposit;
     public static Servo lifter;
 
     public static ModernRoboticsI2cRangeSensor rangeSensor;
@@ -78,8 +78,9 @@ public class Actuation {
             intake = map.dcMotor.get("intake");
         }
 
-        if (map.servo.contains("depositTilter")) {
-            depositTilter = map.servo.get("depositTilter");
+        if (map.servo.contains("depositTilt")) {
+            depositTilt = map.servo.get("depositTilt");
+            depositTilt.setPosition(ActuationConstants.Deposit.depositTilt);
         }
 
         if (map.servo.contains("deposit")) {
@@ -88,6 +89,7 @@ public class Actuation {
 
         if (map.servo.contains("lifter")) {
             lifter  = map.servo.get("lifter");
+            lifter.setPosition(ActuationConstants.Intake.stackPos[0]);
         }
 
         rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
@@ -241,7 +243,7 @@ public class Actuation {
         intake.setPower(power);
     }
 
-    public static void setIntakeArm(double pos) {  }
+    public static void setIntakeArm(double pos) { lifter.setPosition(pos); }
 
     public static void setTilt(double pos) {
         tiltLeft.setPosition(pos);
@@ -253,9 +255,14 @@ public class Actuation {
         slidesRight.setTargetPosition(pos);
     }
 
-    public static void initDepositTilter(boolean toggle){
-        if(toggle){
-            depositTilter.setPosition(ActuationConstants.Deposit.depositTilt);
+    public static void setDeposit() {
+        int slideAvg = (slidesLeft.getCurrentPosition() + slidesRight.getCurrentPosition()) / 2;
+
+        if (slideAvg > 700) {
+            depositTilt.setPosition(ActuationConstants.Deposit.depositTilt);
+        }
+        else {
+            depositTilt.setPosition(ActuationConstants.Deposit.intakeTilt);
         }
     }
 }

@@ -41,7 +41,7 @@ public class FieldConstants {
         public static class Stacks {
             public static Pose center = new Pose(0, 0, Math.toRadians(0));
             public static Pose left = new Pose(-57, 10, Math.toRadians(0));
-            public static Pose right = new Pose(-57, 38, Math.toRadians(0));
+            public static Pose right = new Pose(-59.5, 37, Math.toRadians(0));
         }
 
         public static class Park {

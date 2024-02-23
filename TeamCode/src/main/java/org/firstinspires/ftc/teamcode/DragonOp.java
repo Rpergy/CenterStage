@@ -35,7 +35,7 @@ public class DragonOp extends OpMode {
 
         Actuation.toggleSlides(gamepad1.square);
 
-        Actuation.initDepositTilter(gamepad1.triangle);
+        Actuation.setDeposit();
 
         if (gamepad1.left_trigger > 0.5)
             Actuation.setIntake(-1.0);
