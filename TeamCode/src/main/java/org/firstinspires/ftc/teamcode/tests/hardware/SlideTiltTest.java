@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.tests.hardware;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,10 +16,10 @@ public class SlideTiltTest extends OpMode {
 
     DcMotor slideL, slideR;
 
-    public static double servoPos = 0.5;
+    public static double slidesTilt = 0.5;
     public static int slidePos = 0;
-    public static double tiltPos = 0.0;
     public static double depositTiltPos = 0.0;
+    public static double depositPos = 0.0;
 
     FtcDashboard dashboard;
 
@@ -31,8 +30,8 @@ public class SlideTiltTest extends OpMode {
 
         tiltL.setDirection(Servo.Direction.REVERSE);
 
-        tiltL.setPosition(servoPos);
-        tiltR.setPosition(servoPos);
+        tiltL.setPosition(slidesTilt);
+        tiltR.setPosition(slidesTilt);
 
         slideL = hardwareMap.dcMotor.get("slidesLeft");
         slideR = hardwareMap.dcMotor.get("slidesRight");
@@ -47,7 +46,10 @@ public class SlideTiltTest extends OpMode {
         slideR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         depositTilt = hardwareMap.servo.get("depositTilt");
-//        deposit = hardwareMap.servo.get("deposit");
+        deposit = hardwareMap.servo.get("depositor");
+
+        deposit.setPosition(depositPos);
+        depositTilt.setPosition(depositTiltPos);
 
         dashboard = FtcDashboard.getInstance();
     }
@@ -55,17 +57,17 @@ public class SlideTiltTest extends OpMode {
     @Override
     public void loop() {
         double move = gamepad1.left_stick_y / 400;
-        tiltL.setPosition(servoPos);
-        tiltR.setPosition(servoPos);
+        tiltL.setPosition(slidesTilt);
+        tiltR.setPosition(slidesTilt);
 
         slideL.setTargetPosition(slidePos);
         slideR.setTargetPosition(slidePos);
 
-        depositTilt.setPosition(tiltPos);
-//        deposit.setPosition(depositTiltPos);
+        depositTilt.setPosition(depositTiltPos);
+        deposit.setPosition(depositPos);
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("degrees", servoPos * 330.847 - 10.7458);
+        packet.put("degrees", slidesTilt * 330.847 - 10.7458);
 
         dashboard.sendTelemetryPacket(packet);
     }

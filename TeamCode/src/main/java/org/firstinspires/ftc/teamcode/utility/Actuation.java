@@ -21,17 +21,22 @@ public class Actuation {
     public static boolean slowMode = false;
     public static boolean fieldCentric = false;
     public static boolean slides = false;
+    public static boolean tilt = false;
+    public static boolean deposit = false;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
     private static boolean slidesToggle = false;
+    private static boolean tiltToggle = false;
+    private static boolean depositToggle = false;
 
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public static DcMotor slidesLeft, slidesRight;
     public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
-    public static Servo depositTilt, deposit;
+    public static Servo depositTilt, depositor;
     public static Servo lifter;
+    public static Servo airplaneTilt, airplaneLaunch;
 
     public static ModernRoboticsI2cRangeSensor rangeSensor;
 
@@ -42,8 +47,12 @@ public class Actuation {
 
     private static FtcDashboard dashboard;
 
-    public static void setup(HardwareMap map, Telemetry telemetry) {
+    private static Telemetry telemetry;
+
+    public static void setup(HardwareMap map, Telemetry tel) {
         AutoMovement.setup(map, telemetry);
+
+        telemetry = tel;
 
         // nigerian prince scam
 
@@ -80,16 +89,26 @@ public class Actuation {
 
         if (map.servo.contains("depositTilt")) {
             depositTilt = map.servo.get("depositTilt");
-            depositTilt.setPosition(ActuationConstants.Deposit.depositTilt);
+            depositTilt.setPosition(ActuationConstants.Deposit.intakeTilt);
         }
 
-        if (map.servo.contains("deposit")) {
-            deposit = map.servo.get("deposit");
+        if (map.servo.contains("depositor")) {
+            depositor = map.servo.get("depositor");
         }
 
         if (map.servo.contains("lifter")) {
-            lifter  = map.servo.get("lifter");
+            lifter = map.servo.get("lifter");
             lifter.setPosition(ActuationConstants.Intake.stackPos[0]);
+        }
+
+        if (map.servo.contains("airplaneLaunch")) {
+            airplaneLaunch = map.servo.get("airplaneLaunch");
+            airplaneLaunch.setPosition(ActuationConstants.Plane.releaseDown);
+        }
+
+        if (map.servo.contains("airplaneTilt")) {
+            airplaneTilt = map.servo.get("airplaneTilt");
+            airplaneTilt.setPosition(ActuationConstants.Plane.tilt);
         }
 
         rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
@@ -177,23 +196,22 @@ public class Actuation {
 
         lastDist = smoothDist;
 
-        if (toggle && !slidesToggle) {
+        if (toggle && !slidesToggle && tilt) {
             slides = !slides;
 
             if (!slides) {
-                tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-                tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-
                 slidesLeft.setTargetPosition(0);
                 slidesRight.setTargetPosition(0);
+
+                deposit = false;
+            }
+            else {
+                deposit = true;
             }
         }
 
         if(slides) {
-            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-
-            int slidePos = (int)(smoothDist * 133.869 + 434.94);
+            int slidePos = (int)(smoothDist * 115.283 + 587);
 
             if(slidePos <= ActuationConstants.Extension.maxExtend) {
                 slidesLeft.setTargetPosition(slidePos);
@@ -208,6 +226,23 @@ public class Actuation {
         slidesToggle = toggle;
     }
 
+    public static void toggleTilt(boolean toggle) {
+        if (toggle && !tiltToggle && !slides) {
+            tilt = !tilt;
+        }
+
+        if (tilt) {
+            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+        }
+        else {
+            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
+        }
+
+        tiltToggle = toggle;
+    }
+
     public static void slidesOut() {
         double dist = lastDist;
 
@@ -216,10 +251,7 @@ public class Actuation {
         if(!Double.isNaN(newDist))
             dist = newDist;
 
-        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-
-        int slidePos = (int)(dist * 133.869 + 434.94);
+        int slidePos = (int)(dist * 115.283 + 587);
 
         if(slidePos <= ActuationConstants.Extension.maxExtend) {
             slidesLeft.setTargetPosition(slidePos);
@@ -232,9 +264,6 @@ public class Actuation {
     }
 
     public static void slidesIn() {
-        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-
         slidesLeft.setTargetPosition(0);
         slidesRight.setTargetPosition(0);
     }
@@ -255,14 +284,48 @@ public class Actuation {
         slidesRight.setTargetPosition(pos);
     }
 
-    public static void setDeposit() {
+    public static void autoDeposit() {
         int slideAvg = (slidesLeft.getCurrentPosition() + slidesRight.getCurrentPosition()) / 2;
 
-        if (slideAvg > 700) {
+        if (slideAvg > 800) {
             depositTilt.setPosition(ActuationConstants.Deposit.depositTilt);
         }
         else {
             depositTilt.setPosition(ActuationConstants.Deposit.intakeTilt);
         }
+    }
+
+    public static void setDepositTilt(double pos) {
+        depositTilt.setPosition(pos);
+    }
+
+    public static void setDeposit(double pos) { depositor.setPosition(pos); }
+
+    public static void toggleDeposit(boolean toggle) {
+        telemetry.addData("toggle", toggle);
+        telemetry.addData("lastToggle", depositToggle);
+        telemetry.addData("depositing", deposit);
+
+        if(toggle && !depositToggle) {
+            deposit = !deposit;
+        }
+
+        if (!deposit) {
+            depositor.setPosition(ActuationConstants.Deposit.open);
+        }
+        else {
+            depositor.setPosition(ActuationConstants.Deposit.closed);
+        }
+
+        depositToggle = toggle;
+    }
+
+    public static void hangSetup() {
+        setTilt(ActuationConstants.Extension.tiltPositions[2]);
+        setSlides(ActuationConstants.Extension.hang);
+    }
+
+    public static void hang() {
+        setSlides(0);
     }
 }

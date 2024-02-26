@@ -36,6 +36,7 @@ public class LeftBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
+        Actuation.setDeposit(ActuationConstants.Deposit.closed);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -71,8 +72,8 @@ public class LeftBlue extends LinearOpMode {
         Trajectory spike_canvas = new Trajectory();
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike);
-
+            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike)
+                    .lineTo(new Pose(11.5, 44, Math.toRadians(-90)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.center);
         }
@@ -88,6 +89,18 @@ public class LeftBlue extends LinearOpMode {
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);
         }
+
+        spike_canvas.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+                .action(Actuation::slidesOut) // send slides out
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilt)) // setup depositor
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> sleep(500))
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(Actuation::slidesIn) // send slides in
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         Trajectory canvas_stack_mid = new Trajectory()
             .lineTo(new Pose(37, 10, 0))
@@ -109,11 +122,11 @@ public class LeftBlue extends LinearOpMode {
 
         start_spike.run();
         spike_canvas.run();
-        canvas_stack_mid.run();
-        stack_canvas_mid.run();
-        canvas_stack_mid.run();
-        stack_canvas_mid.run();
-        park_right.run();
+//        canvas_stack_mid.run();
+//        stack_canvas_mid.run();
+//        canvas_stack_mid.run();
+//        stack_canvas_mid.run();
+        park_left.run();
     }
     class Pipeline extends OpenCvPipeline
     {

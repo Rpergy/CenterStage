@@ -103,9 +103,9 @@ public class Trajectory {
             dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
             rotDist = Math.abs(robotPose.heading - targetPose.heading);
 
-            AutoMovement.telemetry.addData("dist", dist);
-            AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
-            AutoMovement.telemetry.update();
+//            AutoMovement.telemetry.addData("dist", dist);
+//            AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
+//            AutoMovement.telemetry.update();
 
             moveSpeed = ActuationConstants.Autonomous.moveSpeed;
             turnSpeed = ActuationConstants.Autonomous.turnSpeed;
@@ -126,9 +126,9 @@ public class Trajectory {
             dist = MathFunctions.distance(robotPose.toPoint(), targetPose.toPoint());
             rotDist = robotPose.heading - targetPose.heading;
 
-            AutoMovement.telemetry.addData("dist", dist);
-            AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
-            AutoMovement.telemetry.update();
+//            AutoMovement.telemetry.addData("dist", dist);
+//            AutoMovement.telemetry.addData("rotDist", Math.toDegrees(MathFunctions.AngleWrap(rotDist)));
+//            AutoMovement.telemetry.update();
         }
 
         Actuation.drive(0, 0, 0);

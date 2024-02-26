@@ -37,23 +37,20 @@ public class RightRed extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
+        Actuation.setDeposit(ActuationConstants.Deposit.closed);
 
-        left = 0.0;
-        right = 0.0;
-        middle = 5.0;
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam.setPipeline(new Pipeline());
+        webcam.setMillisecondsPermissionTimeout(5000);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
 
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        webcam.setPipeline(new Pipeline());
-//        webcam.setMillisecondsPermissionTimeout(5000);
-//        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-//            @Override
-//            public void onOpened() {
-//                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-//            }
-//
-//            public void onError(int errorCode) {}
-//        });
+            public void onError(int errorCode) {}
+        });
 
         while(opModeInInit()) {
 
@@ -76,24 +73,45 @@ public class RightRed extends LinearOpMode {
 
         Trajectory spike_canvas = new Trajectory();
 
+        Trajectory left_park = new Trajectory()
+                .lineTo(new Pose(36, -59, Math.toRadians(0)))
+                .lineTo(FieldConstants.Red.Park.left);
+
+        Trajectory right_park = new Trajectory()
+                .lineTo(new Pose(36, -11, Math.toRadians(0)))
+                .lineTo(FieldConstants.Red.Park.right);
+
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Red.Right.centerSpike)
-                    .lineTo(new Pose(11.5, -40, Math.toRadians(0)));
+                    .lineTo(new Pose(12, -40, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Red.Right.leftSpike)
-                    .lineTo(new Pose(13.5, -42, Math.toRadians(0)));
+//            start_spike.lineTo(FieldConstants.Red.Right.leftSpike)
+//                    .lineTo(new Pose(13.5, -42, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Red.Right.rightSpike)
-                    .lineTo(new Pose(21.5, -46, Math.toRadians(0)));
+                    .lineTo(new Pose(24, -48, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.right);
         }
+
+        spike_canvas.action(() -> sleep(1000))
+                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+                .action(Actuation::slidesOut) // send slides out
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilt)) // setup depositor
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> sleep(500))
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(Actuation::slidesIn) // send slides in
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         Trajectory canvas_stack_mid = new Trajectory();
         Trajectory canvas_stack_side = new Trajectory();
@@ -102,7 +120,7 @@ public class RightRed extends LinearOpMode {
 
         start_spike.run();
         spike_canvas.run();
-
+        left_park.run();
     }
     class Pipeline extends OpenCvPipeline
     {

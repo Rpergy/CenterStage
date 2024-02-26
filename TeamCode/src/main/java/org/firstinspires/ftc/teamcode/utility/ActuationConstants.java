@@ -32,13 +32,15 @@ public class ActuationConstants {
 
     @Config
     public static class Extension {
-        public static int maxExtend = 2600;
+        public static int maxExtend = 2500;
         public static int period = 20;
 
+        public static int hang = 700;
+
         public static double[] tiltPositions = {
-                0.561, // intake
-                0.5,
-                0.30  // hang
+                0.45, // intake
+                0.52,
+                0.70  // hang
         };
 
         public static int[] slidePositions = {
@@ -66,19 +68,17 @@ public class ActuationConstants {
 
     @Config
     public static class Deposit {
-        public static double intakeTilt = 1.0;
-        public static double depositTilt = 0.44;
+        public static double intakeTilt = 0.44;
+        public static double depositTilt = 0.77;
 
-        public static double loaded = 0.0;
-        public static double halfDrop = 0.0;
-        public static double fullDrop = 0.0;
+        public static double open = 0.3;
+        public static double closed = 0.0;
     }
 
     @Config
     public static class Plane {
-        public static double releaseDown = 0.41;
+        public static double releaseDown = 0.7;
         public static double releaseUp = 0.0;
         public static double tilt = 0.629;
-        //
     }
 }
