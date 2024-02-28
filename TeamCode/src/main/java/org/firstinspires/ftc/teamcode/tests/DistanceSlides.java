@@ -82,12 +82,12 @@ public class DistanceSlides extends OpMode {
             Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt);
         }
 
-        if(slidePos <= 2500) {
-            Actuation.setSlides(slidePos);
-        }
-        else {
-            Actuation.setSlides(2500);
-        }
+//        if(slidePos <= 2500) {
+//            Actuation.setSlides(slidePos);
+//        }
+//        else {
+//            Actuation.setSlides(2500);
+//        }
 
         lastDist = dist;
 

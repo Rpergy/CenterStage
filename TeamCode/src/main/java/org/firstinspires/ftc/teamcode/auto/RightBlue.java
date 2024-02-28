@@ -67,15 +67,18 @@ public class RightBlue extends LinearOpMode {
 
         waitForStart();
 
-        Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start)
-                .lineTo(FieldConstants.Blue.Right.transition);
+        Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start);
 
         Trajectory spike_stack = new Trajectory() // to pixel stack
                 .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]))
-                .lineTo(FieldConstants.Blue.Stacks.right, 0.7, 0.7)
+                .lineTo(FieldConstants.Blue.Stacks.right, 0.6, 0.7)
                 .action(() -> sleep(500))
-                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]))
-                .action(() -> Actuation.setIntake(1))
+                .action(() -> Actuation.setIntake(-1))
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]))
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]))
+                .action(() -> sleep(500))
                 .lineTo(new Pose(-57, 37, Math.toRadians(0)))
                 .action(() -> sleep(1000));
 
@@ -102,7 +105,8 @@ public class RightBlue extends LinearOpMode {
                 .lineTo(FieldConstants.Blue.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Right.centerSpike) // deposit purple
+            start_spike.lineTo(FieldConstants.Blue.Right.transition)
+                    .lineTo(FieldConstants.Blue.Right.centerSpike) // deposit purple
                     .lineTo(FieldConstants.Blue.Right.transition); // move back
 
             // move into canvas pos
@@ -110,15 +114,16 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Blue.Right.leftSpike) // deposit purple
-                    .lineTo(new Pose(-38, 36, Math.toRadians(0))); // move back
+            start_spike.lineTo(new Pose(-40, 38, Math.toRadians(0)), 0.7, 0.8)
+                    .lineTo(FieldConstants.Blue.Right.leftSpike); // deposit purple
 
             // move into canvas pos
             stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left);
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Blue.Right.rightSpike) // deposit purple
+            start_spike.lineTo(FieldConstants.Blue.Right.transition)
+                    .lineTo(FieldConstants.Blue.Right.rightSpike) // deposit purple
                     .lineTo(new Pose(-48.5, 46, Math.toRadians(-90))); // move back
 
             // move into canvas pos

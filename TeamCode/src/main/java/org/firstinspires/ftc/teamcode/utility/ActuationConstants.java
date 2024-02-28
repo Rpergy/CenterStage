@@ -6,7 +6,7 @@ public class ActuationConstants {
     @Config
     public static class Autonomous {
         public static double moveSpeed = 0.8;
-        public static double turnSpeed = 0.8;
+        public static double turnSpeed = 0.85;
         public static double followDistance = 10;
         //omkar is gay
         public static double minTurnSpeed = 0.06;
@@ -56,10 +56,10 @@ public class ActuationConstants {
         public static double power = 0.0;
         public static double[] stackPos = {
                 0.9,  // 1 pixel (ground)
-                0.44, // 2 pixels
-                0.32, // 3 pixels
-                0.22, // 4 pixels
-                0.1,  // 5 pixels
+                0.45, // 2 pixels
+                0.300, // 3 pixels
+                0.180, // 4 pixels
+                0.075,  // 5 pixels
                 0.0 // highest
         };
 
