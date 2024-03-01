@@ -22,6 +22,7 @@ public class Actuation {
     public static boolean fieldCentric = false;
     public static boolean slides = false;
     public static boolean tilt = false;
+    public static int tiltPos = 0;
     public static boolean deposit = false;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
@@ -196,7 +197,7 @@ public class Actuation {
 
         lastDist = smoothDist;
 
-        if (toggle && !slidesToggle && tilt) {
+        if (toggle && !slidesToggle && tiltPos != 0) {
             slides = !slides;
 
             if (!slides) {
@@ -211,7 +212,11 @@ public class Actuation {
         }
 
         if(slides) {
-            int slidePos = (int)(smoothDist * 115.283 + 587);
+            int slidePos = 0;
+            if (tiltPos == 1)
+                slidePos = (int)(smoothDist * 115.283 + 587);
+            else if (tiltPos == 2)
+                slidePos = (int)(smoothDist * 246.956 + 308);
 
             if(slidePos <= ActuationConstants.Extension.maxExtend) {
                 slidesLeft.setTargetPosition(slidePos);
@@ -223,24 +228,38 @@ public class Actuation {
             }
         }
 
+        telemetry.addData("tiltPos", tiltPos);
+        telemetry.addData("slides", slides);
+
         slidesToggle = toggle;
     }
 
     public static void toggleTilt(boolean toggle) {
         if (toggle && !tiltToggle && !slides) {
-            tilt = !tilt;
-        }
+            if(tiltPos == 0 || tiltPos == 1) tiltPos += 1;
+            else tiltPos = 0;
 
-        if (tilt) {
-            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[1]);
-            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[1]);
+            deposit = (tiltPos == 1 || tiltPos == 2);
         }
-        else {
-            tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-            tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[0]);
-        }
+        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
+        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
 
         tiltToggle = toggle;
+    }
+
+    public static void setTiltPreset(int num) {
+        if(!slides)
+            tiltPos = num;
+
+        tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
+        tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
+
+        if(num != 0) {
+            deposit = true;
+        }
+        else {
+            deposit = false;
+        }
     }
 
     public static void slidesOut() {
@@ -251,7 +270,7 @@ public class Actuation {
         if(!Double.isNaN(newDist))
             dist = newDist;
 
-        int slidePos = (int)(dist * 115.283 + 587);
+        int slidePos = (int)(dist * 115.283 + 500);
 
         if(slidePos <= ActuationConstants.Extension.maxExtend) {
             slidesLeft.setTargetPosition(slidePos);
@@ -287,8 +306,8 @@ public class Actuation {
     public static void autoDeposit() {
         int slideAvg = (slidesLeft.getCurrentPosition() + slidesRight.getCurrentPosition()) / 2;
 
-        if (slideAvg > 800) {
-            depositTilt.setPosition(ActuationConstants.Deposit.depositTilt);
+        if (slideAvg > 1300 && tiltPos > 0) {
+            depositTilt.setPosition(ActuationConstants.Deposit.depositTilts[tiltPos-1]);
         }
         else {
             depositTilt.setPosition(ActuationConstants.Deposit.intakeTilt);

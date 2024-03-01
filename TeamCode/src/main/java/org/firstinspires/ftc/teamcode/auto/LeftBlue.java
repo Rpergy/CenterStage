@@ -66,37 +66,39 @@ public class LeftBlue extends LinearOpMode {
         }
 
         waitForStart();
-        Trajectory start_spike = new Trajectory(FieldConstants.Blue.Left.start)
-                .lineTo(FieldConstants.Blue.Left.transition);
+        Trajectory start_spike = new Trajectory(FieldConstants.Blue.Left.start);
 
         Trajectory spike_canvas = new Trajectory();
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Blue.Left.centerSpike)
+            start_spike.lineTo(FieldConstants.Blue.Left.transition)
+                    .lineTo(FieldConstants.Blue.Left.centerSpike)
                     .lineTo(new Pose(11.5, 44, Math.toRadians(-90)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            start_spike.lineTo(FieldConstants.Blue.Left.leftSpike)
+            start_spike.lineTo(FieldConstants.Blue.Left.transition)
+                    .lineTo(FieldConstants.Blue.Left.leftSpike)
                     .lineTo(new Pose(21, 48, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Blue.Left.rightSpike)
-                    .lineTo(new Pose(18, 40, Math.toRadians(0)));
+            start_spike.lineTo(new Pose(14, 36, Math.toRadians(-180)))
+                    .lineTo(FieldConstants.Blue.Left.rightSpike)
+                    .lineTo(new Pose(16, 38, Math.toRadians(-180)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
         spike_canvas.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
-                .action(() -> sleep(1000))
-                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilt)) // setup depositor
                 .action(() -> sleep(500))
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
+                .action(() -> sleep(1250))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
-                .action(() -> sleep(500))
+                .action(() -> sleep(1000))
                 .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
@@ -126,7 +128,7 @@ public class LeftBlue extends LinearOpMode {
 //        stack_canvas_mid.run();
 //        canvas_stack_mid.run();
 //        stack_canvas_mid.run();
-        park_left.run();
+        park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {

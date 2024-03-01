@@ -58,6 +58,9 @@ public class AutoMovement {
         packet.put("turnPower", 0);
         packet.put("movePower", 0);
         packet.put("strafePower", 0);
+        packet.put("ticks left", 0);
+        packet.put("ticks right", 0);
+        packet.put("ticks back", 0);
         dashboard.sendTelemetryPacket(packet);
     }
 
@@ -82,6 +85,13 @@ public class AutoMovement {
         dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.centerMultiplier;
         dx_perpendicular = -1 * (delta_ticks_back - (ActuationConstants.Drivetrain.forward_offset * ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width))) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.perpendicularMultiplier;
 
+
+        packet.put("ticks left", ticks_left);
+        packet.put("ticks right", ticks_right);
+        packet.put("ticks back", ticks_back);
+        packet.put("dx center", dx_center);
+        packet.put("dx perpendicular", dx_perpendicular);
+
 //        pose exponential terribleness
 //        a = robotPose.heading
 //        b = dtheta
@@ -102,6 +112,11 @@ public class AutoMovement {
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
         prev_ticks_right = ticks_right;
+
+        packet.put("dx", dx);
+        packet.put("dy", dy);
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -149,7 +164,7 @@ public class AutoMovement {
         packet.put("movePower", movePower);
         packet.put("turnPower", turnPower);
         packet.put("strafePower", strafePower);
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     public static void turnTowards(double targetHeading, double turnSpeed) {
@@ -177,7 +192,7 @@ public class AutoMovement {
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("turnPower", turnPower);
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -292,7 +307,7 @@ public class AutoMovement {
         packet.fieldOverlay().setStroke("white");
         packet.fieldOverlay().strokeLine(robotPose.x, robotPose.y, xs[4], ys[4]);
 
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**

@@ -104,7 +104,7 @@ public class RightRed extends LinearOpMode {
                  .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(1000))
-                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilt)) // setup depositor
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
                 .action(() -> sleep(500))

@@ -32,7 +32,7 @@ public class ActuationConstants {
 
     @Config
     public static class Extension {
-        public static int maxExtend = 2500;
+        public static int maxExtend = 2300;
         public static int period = 20;
 
         public static int hang = 700;
@@ -40,6 +40,7 @@ public class ActuationConstants {
         public static double[] tiltPositions = {
                 0.45, // intake
                 0.52,
+                0.56,
                 0.70  // hang
         };
 
@@ -69,10 +70,13 @@ public class ActuationConstants {
     @Config
     public static class Deposit {
         public static double intakeTilt = 0.44;
-        public static double depositTilt = 0.77;
+        public static double[] depositTilts = {
+                0.77,
+                0.67
+        };
 
-        public static double open = 0.3;
-        public static double closed = 0.0;
+        public static double open = 0.8;
+        public static double closed = 0.4;
     }
 
     @Config

@@ -69,22 +69,20 @@ public class RightBlue extends LinearOpMode {
 
         Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start);
 
-        Trajectory spike_stack = new Trajectory() // to pixel stack
-                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]))
-                .lineTo(FieldConstants.Blue.Stacks.right, 0.6, 0.7)
-                .action(() -> sleep(500))
-                .action(() -> Actuation.setIntake(-1))
-                .action(() -> sleep(500))
-                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]))
-                .action(() -> sleep(500))
-                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]))
-                .action(() -> sleep(500))
-                .lineTo(new Pose(-57, 37, Math.toRadians(0)))
-                .action(() -> sleep(1000));
+        Trajectory spike_stack = new Trajectory(); // to pixel stack
+//                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]))
+//                .lineTo(FieldConstants.Blue.Stacks.right, 0.6, 0.7)
+//                .action(() -> sleep(500))
+//                .action(() -> Actuation.setIntake(-1))
+//                .action(() -> sleep(500))
+//                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]))
+//                .action(() -> sleep(500))
+//                .lineTo(new Pose(-57, 37, Math.toRadians(0)))
+//                .action(() -> sleep(1000));
 
         Trajectory stack_canvas_side = new Trajectory()
                 .lineTo(new Pose(-58, 58.75, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(30, 58.75, Math.toRadians(0)), 0.8, 0.8); // move to blue left
+                .lineTo(new Pose(28, 58.75, Math.toRadians(0)), 0.8, 0.8); // move to blue left
 
         Trajectory stack_canvas_mid = new Trajectory() // DOES NOT WORK
                 .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
@@ -101,8 +99,12 @@ public class RightBlue extends LinearOpMode {
                 .lineTo(FieldConstants.Blue.Stacks.right); // into stack
 
         Trajectory park_left = new Trajectory()
-                .lineTo(new Pose(45, 61, Math.toRadians(0)))
+                .lineTo(new Pose(43, 59, Math.toRadians(0)))
                 .lineTo(FieldConstants.Blue.Park.left);
+
+        Trajectory park_right = new Trajectory()
+                .lineTo(new Pose(43, 13, 0))
+                .lineTo(FieldConstants.Blue.Park.right);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Right.transition)
@@ -115,7 +117,8 @@ public class RightBlue extends LinearOpMode {
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(new Pose(-40, 38, Math.toRadians(0)), 0.7, 0.8)
-                    .lineTo(FieldConstants.Blue.Right.leftSpike); // deposit purple
+                    .lineTo(FieldConstants.Blue.Right.leftSpike)
+                    .lineTo(new Pose(-40, 37, 0)); // deposit purple
 
             // move into canvas pos
             stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left);
@@ -131,17 +134,29 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
+        stack_canvas_side.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+                .action(Actuation::slidesOut) // send slides out
+                .action(() -> sleep(1500))
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> sleep(1000))
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(Actuation::slidesIn) // send slides in
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
+
         // purple preload
         start_spike.run();
         spike_stack.run();
 
         // yellow preload and cycle
-//        stack_canvas_side.run();
+        stack_canvas_side.run();
 //        canvas_stack_side.run();
 //        stack_canvas_side.run();
 
         //park
-//        park_left.run();
+        park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {

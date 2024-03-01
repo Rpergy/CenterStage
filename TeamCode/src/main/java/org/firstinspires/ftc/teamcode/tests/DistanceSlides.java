@@ -71,23 +71,23 @@ public class DistanceSlides extends OpMode {
         for(double val : data) smoothDist += val;
         smoothDist /= period;
 
-        slidePos = (int)(smoothDist * 115.283 + 407);
+        slidePos = (int)(smoothDist * 246.956 + 308);
 
         Actuation.setTilt(servoPos);
 
         if(slidePos > 700) {
-            Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilt);
+            Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[1]);
         }
         else {
             Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt);
         }
 
-//        if(slidePos <= 2500) {
-//            Actuation.setSlides(slidePos);
-//        }
-//        else {
-//            Actuation.setSlides(2500);
-//        }
+        if(slidePos <= 2500) {
+            Actuation.setSlides(slidePos);
+        }
+        else {
+            Actuation.setSlides(2500);
+        }
 
         lastDist = dist;
 

@@ -31,7 +31,7 @@ public class DepositTest extends OpMode {
 
     @Override
     public void loop() {
-        depositTilter.setPosition(ActuationConstants.Deposit.depositTilt);
+        depositTilter.setPosition(ActuationConstants.Deposit.depositTilts[0]);
 
         if(gamepad1.left_trigger > 0.5)
             roller.setPower(1.0);

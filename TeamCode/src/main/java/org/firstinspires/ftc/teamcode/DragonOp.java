@@ -32,7 +32,10 @@ public class DragonOp extends OpMode {
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
 
         Actuation.toggleSlides(gamepad2.square);
-        Actuation.toggleTilt(gamepad2.cross);
+
+        if(gamepad2.left_bumper) Actuation.setTiltPreset(1);
+        if(gamepad2.right_bumper) Actuation.setTiltPreset(2);
+        if(gamepad2.cross) Actuation.setTiltPreset(0);
 
         Actuation.toggleDeposit(gamepad2.circle || gamepad1.circle);
 
