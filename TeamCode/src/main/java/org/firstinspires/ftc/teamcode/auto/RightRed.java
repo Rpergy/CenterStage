@@ -68,33 +68,35 @@ public class RightRed extends LinearOpMode {
 
         waitForStart();
 
-        Trajectory start_spike = new Trajectory(FieldConstants.Red.Right.start)
-                .lineTo(FieldConstants.Red.Right.transition);
+        Trajectory start_spike = new Trajectory(FieldConstants.Red.Right.start);
 
         Trajectory spike_canvas = new Trajectory();
 
-        Trajectory left_park = new Trajectory()
-                .lineTo(new Pose(36, -59, Math.toRadians(0)))
-                .lineTo(FieldConstants.Red.Park.left);
-
-        Trajectory right_park = new Trajectory()
-                .lineTo(new Pose(36, -11, Math.toRadians(0)))
+        Trajectory park_right = new Trajectory()
+                .lineTo(new Pose(36, -60, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.right);
 
+        Trajectory park_left = new Trajectory()
+                .lineTo(new Pose(36, -12, Math.toRadians(0)))
+                .lineTo(FieldConstants.Red.Park.left);
+
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            start_spike.lineTo(FieldConstants.Red.Right.centerSpike)
+            start_spike.lineTo(FieldConstants.Red.Right.transition)
+                    .lineTo(FieldConstants.Red.Right.centerSpike)
                     .lineTo(new Pose(12, -40, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-//            start_spike.lineTo(FieldConstants.Red.Right.leftSpike)
-//                    .lineTo(new Pose(13.5, -42, Math.toRadians(0)));
+            start_spike.lineTo(new Pose(13.5, -36, Math.toRadians(-180)))
+                    .lineTo(FieldConstants.Red.Right.leftSpike)
+                    .lineTo(new Pose(13.5, -42, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            start_spike.lineTo(FieldConstants.Red.Right.rightSpike)
+            start_spike.lineTo(FieldConstants.Red.Right.transition)
+                    .lineTo(FieldConstants.Red.Right.rightSpike)
                     .lineTo(new Pose(24, -48, Math.toRadians(0)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.right);
@@ -120,7 +122,7 @@ public class RightRed extends LinearOpMode {
 
         start_spike.run();
         spike_canvas.run();
-        left_park.run();
+        park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {

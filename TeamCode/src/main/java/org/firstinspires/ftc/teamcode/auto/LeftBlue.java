@@ -86,7 +86,7 @@ public class LeftBlue extends LinearOpMode {
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(new Pose(14, 36, Math.toRadians(-180)))
-                    .lineTo(FieldConstants.Blue.Left.rightSpike)
+                    .lineTo(FieldConstants.Blue.Left.rightSpike, 0.6, 0.2)
                     .lineTo(new Pose(16, 38, Math.toRadians(-180)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);

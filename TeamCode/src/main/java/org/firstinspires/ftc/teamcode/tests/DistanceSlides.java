@@ -21,9 +21,12 @@ public class DistanceSlides extends OpMode {
     public static double servoPos = 0.5;
     public static int slidePos = 0;
 
+    public static double m = 246.956;
+    public static double b = 308;
+
     double lastDist = 0;
 
-    int period = 20;
+    int period = 10;
 
     double[] data;
 
@@ -34,6 +37,7 @@ public class DistanceSlides extends OpMode {
         Actuation.setup(hardwareMap, telemetry);
 
         Actuation.setSlides(slidePos);
+        Actuation.setTilt(servoPos);
 
         rangeSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "dist");
 
@@ -71,7 +75,7 @@ public class DistanceSlides extends OpMode {
         for(double val : data) smoothDist += val;
         smoothDist /= period;
 
-        slidePos = (int)(smoothDist * 246.956 + 308);
+        slidePos = (int)(smoothDist * m + b);
 
         Actuation.setTilt(servoPos);
 

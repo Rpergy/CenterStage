@@ -33,7 +33,7 @@ public class ActuationConstants {
     @Config
     public static class Extension {
         public static int maxExtend = 2300;
-        public static int period = 20;
+        public static int period = 10;
 
         public static int hang = 700;
 
@@ -71,8 +71,8 @@ public class ActuationConstants {
     public static class Deposit {
         public static double intakeTilt = 0.44;
         public static double[] depositTilts = {
-                0.77,
-                0.67
+                0.74,
+                0.66
         };
 
         public static double open = 0.8;

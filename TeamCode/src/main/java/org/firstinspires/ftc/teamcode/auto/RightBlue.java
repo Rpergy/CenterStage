@@ -81,8 +81,8 @@ public class RightBlue extends LinearOpMode {
 //                .action(() -> sleep(1000));
 
         Trajectory stack_canvas_side = new Trajectory()
-                .lineTo(new Pose(-58, 58.75, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(28, 58.75, Math.toRadians(0)), 0.8, 0.8); // move to blue left
+                .lineTo(new Pose(-58, 59, Math.toRadians(0))) // line up with truss
+                .lineTo(new Pose(28, 59, Math.toRadians(0)), 0.8, 0.8); // move to blue left
 
         Trajectory stack_canvas_mid = new Trajectory() // DOES NOT WORK
                 .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
@@ -140,8 +140,19 @@ public class RightBlue extends LinearOpMode {
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
-                .action(() -> sleep(1000))
-                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(() -> sleep(1000));
+
+        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+            stack_canvas_side.lineTo(new Pose(38, 37.25, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+            stack_canvas_side.lineTo(new Pose(38, 44, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
+            stack_canvas_side.lineTo(new Pose(38, 32.5, Math.toRadians(0)));
+        }
+
+        stack_canvas_side.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides

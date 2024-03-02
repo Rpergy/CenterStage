@@ -214,9 +214,9 @@ public class Actuation {
         if(slides) {
             int slidePos = 0;
             if (tiltPos == 1)
-                slidePos = (int)(smoothDist * 115.283 + 587);
+                slidePos = (int)(smoothDist * 125 + 650);
             else if (tiltPos == 2)
-                slidePos = (int)(smoothDist * 246.956 + 308);
+                slidePos = (int)(smoothDist * 197 + 1246);
 
             if(slidePos <= ActuationConstants.Extension.maxExtend) {
                 slidesLeft.setTargetPosition(slidePos);
@@ -270,7 +270,7 @@ public class Actuation {
         if(!Double.isNaN(newDist))
             dist = newDist;
 
-        int slidePos = (int)(dist * 115.283 + 500);
+        int slidePos = (int)(dist * 125 + 650);
 
         if(slidePos <= ActuationConstants.Extension.maxExtend) {
             slidesLeft.setTargetPosition(slidePos);

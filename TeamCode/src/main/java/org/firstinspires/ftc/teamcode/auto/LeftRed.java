@@ -31,8 +31,8 @@ import java.util.ArrayList;
 public class LeftRed extends LinearOpMode {
     OpenCvWebcam webcam;
     double left = 0.0;
-    double middle = 10;
-    double right = 0;
+    double middle = 0.0;
+    double right = 0.0;
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
@@ -73,7 +73,7 @@ public class LeftRed extends LinearOpMode {
 
         Trajectory stack_canvas_side = new Trajectory()
                 .lineTo(new Pose(-53, -59.5, Math.toRadians(0)))
-                .lineTo(new Pose(36, -59.5, Math.toRadians(0)), 0.7, 0.7);
+                .lineTo(new Pose(29, -59.5, Math.toRadians(0)), 0.8, 0.2);
 
         Trajectory stack_canvas_mid = new Trajectory();
 
@@ -83,8 +83,12 @@ public class LeftRed extends LinearOpMode {
                 .lineTo(new Pose(-53, -59.5, Math.toRadians(0)), 0.7, 0.7)
                 .lineTo(FieldConstants.Red.Stacks.left);
 
-        Trajectory park = new Trajectory()
-                .lineTo(new Pose(36, -59, Math.toRadians(0)))
+        Trajectory park_right = new Trajectory()
+                .lineTo(new Pose(36, -60, Math.toRadians(0)))
+                .lineTo(FieldConstants.Red.Park.right);
+
+        Trajectory park_left = new Trajectory()
+                .lineTo(new Pose(36, -12, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
@@ -111,14 +115,26 @@ public class LeftRed extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.right);
         }
 
+        stack_canvas_side.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+                .action(Actuation::slidesOut) // send slides out
+                .action(() -> sleep(500))
+                .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
+                .action(() -> sleep(1250))
+                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> sleep(1000))
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(Actuation::slidesIn) // send slides in
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
+
         start_spike.run();
 //        spike_stack.run();
 //
-//        stack_canvas_side.run();
+        stack_canvas_side.run();
 //        canvas_stack_side.run();
 //        stack_canvas_side.run();
 
-//        park.run();
+        park_left.run();
 
     }
     class Pipeline extends OpenCvPipeline
