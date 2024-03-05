@@ -58,6 +58,9 @@ public class PositionTest extends OpMode {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
+        x = 48;
+        y = 38;
+
         wheel_circ = ActuationConstants.Drivetrain.wheel_circ; // inches
         track_width = ActuationConstants.Drivetrain.track_width; // in distance between drive wheels
         forward_offset = ActuationConstants.Drivetrain.forward_offset; // in distance from center of robot to perp wheel

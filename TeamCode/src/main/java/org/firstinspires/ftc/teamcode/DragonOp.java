@@ -32,14 +32,20 @@ public class DragonOp extends OpMode {
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
 
         Actuation.toggleSlides(gamepad2.square);
-
-        if(gamepad2.left_bumper) Actuation.setTiltPreset(1);
-        if(gamepad2.right_bumper) Actuation.setTiltPreset(2);
-        if(gamepad2.cross) Actuation.setTiltPreset(0);
-
         Actuation.toggleDeposit(gamepad2.circle || gamepad1.circle);
 
-        if(gamepad2.dpad_up) Actuation.setTilt(ActuationConstants.Extension.tiltPositions[2]);
+        // pixel stack
+        if(gamepad1.right_bumper) Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]);
+        else Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
+
+        // tilts
+        if(gamepad2.left_bumper) Actuation.setTiltPreset(1);
+        if(gamepad2.right_bumper) Actuation.setTiltPreset(2);
+        if(gamepad2.right_trigger > 0.5) Actuation.setTiltPreset(3);
+        if(gamepad2.cross) Actuation.setTiltPreset(0);
+
+        // hang controls
+        if(gamepad2.dpad_up) Actuation.setTilt(ActuationConstants.Extension.tiltPositions[3]);
         if(gamepad2.share) Actuation.hangSetup();
         if(gamepad2.options) Actuation.hang();
 

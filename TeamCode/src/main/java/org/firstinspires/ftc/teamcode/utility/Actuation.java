@@ -9,9 +9,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
+import org.firstinspires.ftc.teamcode.utility.autonomous.Trajectory;
+import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.Arrays;
 
@@ -119,8 +122,8 @@ public class Actuation {
         data = new double[ActuationConstants.Extension.period];
         Arrays.fill(data, lastDist);
 
-//        leds = map.get(RevBlinkinLedDriver.class, "lights");
-//        leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        leds = map.get(RevBlinkinLedDriver.class, "leds");
+        leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 
         frontLeft  = map.get(DcMotor.class, "frontLeft");
         frontRight = map.get(DcMotor.class, "frontRight");
@@ -175,14 +178,14 @@ public class Actuation {
         fieldCentricToggle = toggleFieldCentric;
     }
 
-    public static void toggleSlides(boolean toggle) {
+    public static double getDist() {
         double dist = lastDist;
 
         TelemetryPacket packet = new TelemetryPacket();
 
         double newDist = rangeSensor.getDistance(DistanceUnit.INCH);
 
-        if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 30)
+        if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 30 && newDist != Double.POSITIVE_INFINITY && newDist != Double.NEGATIVE_INFINITY)
             dist = newDist;
 
         if (data.length - 1 >= 0) System.arraycopy(data, 0, data, 1, data.length - 1);
@@ -196,6 +199,29 @@ public class Actuation {
         dashboard.sendTelemetryPacket(packet);
 
         lastDist = smoothDist;
+
+        return smoothDist;
+    }
+
+    public static void canvasAlign() {
+        double travelDist = getDist() - 10.0;
+
+        TelemetryPacket packet = new TelemetryPacket();
+
+        while(Math.abs(travelDist) > 1.0) {
+            drive(-Math.tanh(travelDist/5) * 0.3, 0.0, 0.0);
+            travelDist = getDist() - 10.0;
+
+            packet.put("travel dist", travelDist);
+            packet.put("motor power", -Math.tanh(travelDist/5) * 0.3);
+            dashboard.sendTelemetryPacket(packet);
+        }
+        drive(0, 0, 0);
+        AutoMovement.robotPose = new Pose(48, AutoMovement.robotPose.y, AutoMovement.robotPose.heading);
+    }
+
+    public static void toggleSlides(boolean toggle) {
+        double dist = getDist();
 
         if (toggle && !slidesToggle && tiltPos != 0) {
             slides = !slides;
@@ -214,9 +240,11 @@ public class Actuation {
         if(slides) {
             int slidePos = 0;
             if (tiltPos == 1)
-                slidePos = (int)(smoothDist * 125 + 650);
+                slidePos = (int)(dist * 125 + 650);
             else if (tiltPos == 2)
-                slidePos = (int)(smoothDist * 197 + 1246);
+                slidePos = (int)(dist * 197 + 1246);
+            else if (tiltPos == 3)
+                slidePos = 2400;
 
             if(slidePos <= ActuationConstants.Extension.maxExtend) {
                 slidesLeft.setTargetPosition(slidePos);

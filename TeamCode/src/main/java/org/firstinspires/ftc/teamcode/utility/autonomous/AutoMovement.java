@@ -53,22 +53,12 @@ public class AutoMovement {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         dashboard = FtcDashboard.getInstance();
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("turnPower", 0);
-        packet.put("movePower", 0);
-        packet.put("strafePower", 0);
-        packet.put("ticks left", 0);
-        packet.put("ticks right", 0);
-        packet.put("ticks back", 0);
-        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
      * Updates the robot's pose based off of encoder values from odometry
      */
     public static void updatePosition() {
-        TelemetryPacket packet = new TelemetryPacket();
         for (LynxModule module : allHubs) {
             module.clearBulkCache();
         }
@@ -84,13 +74,6 @@ public class AutoMovement {
         dtheta = ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width) * ActuationConstants.Drivetrain.scale;
         dx_center = ((delta_ticks_left + delta_ticks_right) / 2) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.centerMultiplier;
         dx_perpendicular = -1 * (delta_ticks_back - (ActuationConstants.Drivetrain.forward_offset * ((delta_ticks_left - delta_ticks_right) / ActuationConstants.Drivetrain.track_width))) * ActuationConstants.Drivetrain.scale * ActuationConstants.Drivetrain.perpendicularMultiplier;
-
-
-        packet.put("ticks left", ticks_left);
-        packet.put("ticks right", ticks_right);
-        packet.put("ticks back", ticks_back);
-        packet.put("dx center", dx_center);
-        packet.put("dx perpendicular", dx_perpendicular);
 
 //        pose exponential terribleness
 //        a = robotPose.heading
@@ -112,11 +95,6 @@ public class AutoMovement {
         prev_ticks_back = ticks_back;
         prev_ticks_left = ticks_left;
         prev_ticks_right = ticks_right;
-
-        packet.put("dx", dx);
-        packet.put("dy", dy);
-
-        dashboard.sendTelemetryPacket(packet);
     }
 
     /**

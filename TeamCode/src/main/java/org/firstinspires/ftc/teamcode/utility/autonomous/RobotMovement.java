@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class RobotMovement {
     VoltageSensor voltageSensor;
     DcMotor frontLeft, frontRight, backLeft, backRight;

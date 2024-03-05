@@ -41,6 +41,7 @@ public class ActuationConstants {
                 0.45, // intake
                 0.52,
                 0.56,
+                0.6,
                 0.70  // hang
         };
 
@@ -72,6 +73,7 @@ public class ActuationConstants {
         public static double intakeTilt = 0.44;
         public static double[] depositTilts = {
                 0.74,
+                0.66,
                 0.66
         };
 

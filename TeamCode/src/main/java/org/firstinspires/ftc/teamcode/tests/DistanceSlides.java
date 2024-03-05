@@ -75,7 +75,7 @@ public class DistanceSlides extends OpMode {
         for(double val : data) smoothDist += val;
         smoothDist /= period;
 
-        slidePos = (int)(smoothDist * m + b);
+//        slidePos = (int)(smoothDist * m + b);
 
         Actuation.setTilt(servoPos);
 

@@ -33,7 +33,7 @@ public class FieldConstants {
         }
 
         public static class Canvas {
-            public static Pose center = new Pose(42, 37.25, Math.toRadians(0));
+            public static Pose center = new Pose(42, 38.5, Math.toRadians(0));
             public static Pose left = new Pose(42, 44.5, Math.toRadians(0));
             public static Pose right = new Pose(42, 32.5, Math.toRadians(0));
         }
@@ -45,8 +45,8 @@ public class FieldConstants {
         }
 
         public static class Park {
-            public static Pose left = new Pose(50, 60.5, Math.toRadians(0));
-            public static Pose right = new Pose(51, 13, Math.toRadians(0));
+            public static Pose left = new Pose(56, 60.5, Math.toRadians(0));
+            public static Pose right = new Pose(56, 13, Math.toRadians(0));
         }
     }
 

@@ -134,13 +134,16 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
-        stack_canvas_side.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+        stack_canvas_side.action(() -> sleep(250))
+                .action(Actuation::canvasAlign)
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(1500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
-                .action(() -> sleep(1000));
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
             stack_canvas_side.lineTo(new Pose(38, 37.25, Math.toRadians(0)));

@@ -92,14 +92,28 @@ public class LeftBlue extends LinearOpMode {
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);
         }
 
-        spike_canvas.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+        spike_canvas.action(() -> sleep(250))
+                .action(Actuation::canvasAlign)
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(1250))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
                 .action(() -> sleep(1000))
-                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
+
+        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+            spike_canvas.lineTo(new Pose(45, 37.25, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+            spike_canvas.lineTo(new Pose(45, 44, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
+            spike_canvas.lineTo(new Pose(45, 32.5, Math.toRadians(0)));
+        }
+
+        spike_canvas.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
