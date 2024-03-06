@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -45,11 +46,24 @@ public class DragonOp extends OpMode {
         if(gamepad2.cross) Actuation.setTiltPreset(0);
 
         // hang controls
-        if(gamepad2.dpad_up) Actuation.setTilt(ActuationConstants.Extension.tiltPositions[3]);
+        if(gamepad2.dpad_up) {
+            Actuation.setLeds(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE);
+            Actuation.setTilt(ActuationConstants.Extension.tiltPositions[4]);
+        }
         if(gamepad2.share) Actuation.hangSetup();
         if(gamepad2.options) Actuation.hang();
 
         Actuation.autoDeposit();
+        Actuation.stuckFix(gamepad2.ps);
+
+        if(Actuation.deposit) {
+            gamepad1.setLedColor(0, 255, 0, 1500);
+            gamepad2.setLedColor(0, 255, 0, 1500);
+        }
+        else {
+            gamepad1.setLedColor(255, 0, 0, 1500);
+            gamepad2.setLedColor(255, 0, 0, 1500);
+        }
 
         if (gamepad1.left_trigger > 0.5)
             Actuation.setIntake(-1.0);

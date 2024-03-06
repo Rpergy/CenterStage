@@ -75,21 +75,21 @@ public class LeftBlue extends LinearOpMode {
                     .lineTo(FieldConstants.Blue.Left.centerSpike)
                     .lineTo(new Pose(11.5, 44, Math.toRadians(-90)));
 
-            spike_canvas.lineTo(FieldConstants.Blue.Canvas.center);
+            spike_canvas.lineTo(FieldConstants.Blue.Canvas.center, 0.6, 0.6);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Left.transition)
                     .lineTo(FieldConstants.Blue.Left.leftSpike)
                     .lineTo(new Pose(21, 48, Math.toRadians(0)));
 
-            spike_canvas.lineTo(FieldConstants.Blue.Canvas.left);
+            spike_canvas.lineTo(FieldConstants.Blue.Canvas.left, 0.6, 0.6);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(new Pose(14, 36, Math.toRadians(-180)))
                     .lineTo(FieldConstants.Blue.Left.rightSpike, 0.6, 0.2)
                     .lineTo(new Pose(16, 38, Math.toRadians(-180)));
 
-            spike_canvas.lineTo(FieldConstants.Blue.Canvas.right);
+            spike_canvas.lineTo(FieldConstants.Blue.Canvas.right, 0.6, 0.6);
         }
 
         spike_canvas.action(() -> sleep(250))

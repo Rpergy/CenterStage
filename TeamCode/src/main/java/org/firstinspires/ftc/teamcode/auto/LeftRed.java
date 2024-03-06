@@ -115,14 +115,27 @@ public class LeftRed extends LinearOpMode {
             stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.right);
         }
 
-        stack_canvas_side.action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+        stack_canvas_side.action(() -> sleep(250))
+                .action(Actuation::canvasAlign)
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(1250))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
-                .action(() -> sleep(1000))
-                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(() -> sleep(1000));
+
+        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+            stack_canvas_side.lineTo(new Pose(38, -39, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+            stack_canvas_side.lineTo(new Pose(38, -31, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
+            stack_canvas_side.lineTo(new Pose(38, -42.5, Math.toRadians(0)));
+        }
+
+        stack_canvas_side.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides

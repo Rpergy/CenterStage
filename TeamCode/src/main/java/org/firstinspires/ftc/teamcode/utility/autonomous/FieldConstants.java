@@ -33,9 +33,9 @@ public class FieldConstants {
         }
 
         public static class Canvas {
-            public static Pose center = new Pose(42, 38.5, Math.toRadians(0));
-            public static Pose left = new Pose(42, 44.5, Math.toRadians(0));
-            public static Pose right = new Pose(42, 32.5, Math.toRadians(0));
+            public static Pose center = new Pose(36, 38.5, Math.toRadians(0));
+            public static Pose left = new Pose(36, 44.5, Math.toRadians(0));
+            public static Pose right = new Pose(36, 32.5, Math.toRadians(0));
         }
 
         public static class Stacks {
@@ -66,13 +66,13 @@ public class FieldConstants {
 
             public static Pose leftSpike = new Pose(10, -36, Math.toRadians(180));
             public static Pose centerSpike = new Pose(11.5, -35.5, Math.toRadians(90));
-            public static Pose rightSpike = new Pose(25, -42, Math.toRadians(90));
+            public static Pose rightSpike = new Pose(23, -42, Math.toRadians(90));
         }
 
         public static class Canvas {
-            public static Pose center = new Pose(39, -39, Math.toRadians(0));
-            public static Pose left = new Pose(37, -31, Math.toRadians(0));
-            public static Pose right = new Pose(37, -42.5, Math.toRadians(0));
+            public static Pose center = new Pose(36, -39, Math.toRadians(0));
+            public static Pose left = new Pose(36, -31, Math.toRadians(0));
+            public static Pose right = new Pose(36, -42.5, Math.toRadians(0));
         }
 
         public static class Stacks {
@@ -82,8 +82,8 @@ public class FieldConstants {
         }
 
         public static class Park {
-            public static Pose right = new Pose(50, -60, Math.toRadians(0));
-            public static Pose left = new Pose(50, -12, Math.toRadians(0));
+            public static Pose right = new Pose(62, -60, Math.toRadians(0));
+            public static Pose left = new Pose(62, -12, Math.toRadians(0));
         }
     }
 }

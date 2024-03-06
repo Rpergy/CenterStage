@@ -26,12 +26,14 @@ public class Actuation {
     public static boolean slides = false;
     public static boolean tilt = false;
     public static int tiltPos = 0;
+    public static int stuckStatus = 0;
     public static boolean deposit = false;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
     private static boolean slidesToggle = false;
     private static boolean tiltToggle = false;
     private static boolean depositToggle = false;
+    private static boolean stuckToggle = false;
 
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
 
@@ -46,7 +48,7 @@ public class Actuation {
 
     private static RevBlinkinLedDriver leds;
 
-    private static double lastDist;
+    private static double lastDist = 0;
     private static double[] data;
 
     private static FtcDashboard dashboard;
@@ -117,10 +119,8 @@ public class Actuation {
 
         rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
 
-        if (!(Double.valueOf(rangeSensor.getDistance(DistanceUnit.INCH)).isNaN())) lastDist = rangeSensor.getDistance(DistanceUnit.INCH);
-
         data = new double[ActuationConstants.Extension.period];
-        Arrays.fill(data, lastDist);
+        Arrays.fill(data, -1);
 
         leds = map.get(RevBlinkinLedDriver.class, "leds");
         leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
@@ -144,6 +144,13 @@ public class Actuation {
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         dashboard = FtcDashboard.getInstance();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("dist", 0);
+        packet.put("smoothDist", 0);
+        packet.put("travel dist", 0);
+        packet.put("motor power", 0);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -192,10 +199,16 @@ public class Actuation {
         data[0] = dist;
 
         double smoothDist = 0;
-        for(double val : data) smoothDist += val;
-        smoothDist /= ActuationConstants.Extension.period;
+        double validPoints = 0;
+        for(double val : data)
+            if(val != -1) {
+                smoothDist += val;
+                validPoints += 1;
+            }
+        smoothDist /= validPoints;
 
-        packet.put("dist", smoothDist);
+        packet.put("dist", dist);
+        packet.put("smoothDist", smoothDist);
         dashboard.sendTelemetryPacket(packet);
 
         lastDist = smoothDist;
@@ -204,13 +217,13 @@ public class Actuation {
     }
 
     public static void canvasAlign() {
-        double travelDist = getDist() - 10.0;
+        double travelDist = getDist() - 6;
 
         TelemetryPacket packet = new TelemetryPacket();
 
         while(Math.abs(travelDist) > 1.0) {
             drive(-Math.tanh(travelDist/5) * 0.3, 0.0, 0.0);
-            travelDist = getDist() - 10.0;
+            travelDist = getDist() - 6;
 
             packet.put("travel dist", travelDist);
             packet.put("motor power", -Math.tanh(travelDist/5) * 0.3);
@@ -229,20 +242,15 @@ public class Actuation {
             if (!slides) {
                 slidesLeft.setTargetPosition(0);
                 slidesRight.setTargetPosition(0);
-
-                deposit = false;
-            }
-            else {
-                deposit = true;
             }
         }
 
         if(slides) {
             int slidePos = 0;
             if (tiltPos == 1)
-                slidePos = (int)(dist * 125 + 650);
+                slidePos = (int)(dist * 125 + 400);
             else if (tiltPos == 2)
-                slidePos = (int)(dist * 197 + 1246);
+                slidePos = (int)(dist * 197 + 775);
             else if (tiltPos == 3)
                 slidePos = 2400;
 
@@ -267,7 +275,7 @@ public class Actuation {
             if(tiltPos == 0 || tiltPos == 1) tiltPos += 1;
             else tiltPos = 0;
 
-            deposit = (tiltPos == 1 || tiltPos == 2);
+            deposit = (tiltPos >= 1);
         }
         tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
         tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
@@ -298,7 +306,7 @@ public class Actuation {
         if(!Double.isNaN(newDist))
             dist = newDist;
 
-        int slidePos = (int)(dist * 125 + 650);
+        int slidePos = (int)(dist * 125 + 400);
 
         if(slidePos <= ActuationConstants.Extension.maxExtend) {
             slidesLeft.setTargetPosition(slidePos);
@@ -334,7 +342,7 @@ public class Actuation {
     public static void autoDeposit() {
         int slideAvg = (slidesLeft.getCurrentPosition() + slidesRight.getCurrentPosition()) / 2;
 
-        if (slideAvg > 1300 && tiltPos > 0) {
+        if (slideAvg > 900 && tiltPos > 0) {
             depositTilt.setPosition(ActuationConstants.Deposit.depositTilts[tiltPos-1]);
         }
         else {
@@ -367,6 +375,23 @@ public class Actuation {
         depositToggle = toggle;
     }
 
+    public static void stuckFix(boolean toggle) {
+        if(toggle && !stuckToggle) {
+            if(stuckStatus != 3)
+                stuckStatus += 1;
+            else
+                stuckStatus = 0;
+
+            if(stuckStatus == 0) setSlides(0);
+            else if(stuckStatus == 1) setTiltPreset(1);
+            else if(stuckStatus == 2) setSlides(500);
+            else if(stuckStatus == 3) setTiltPreset(0);
+        }
+        telemetry.addData("stuck status", stuckStatus);
+
+        stuckToggle = toggle;
+    }
+
     public static void hangSetup() {
         setTilt(ActuationConstants.Extension.tiltPositions[2]);
         setSlides(ActuationConstants.Extension.hang);
@@ -374,5 +399,9 @@ public class Actuation {
 
     public static void hang() {
         setSlides(0);
+    }
+
+    public static void setLeds(RevBlinkinLedDriver.BlinkinPattern pattern) {
+        leds.setPattern(pattern);
     }
 }

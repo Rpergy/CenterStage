@@ -21,8 +21,8 @@ public class DistanceSlides extends OpMode {
     public static double servoPos = 0.5;
     public static int slidePos = 0;
 
-    public static double m = 246.956;
-    public static double b = 308;
+    public static double m = 197;
+    public static double b = 1246;
 
     double lastDist = 0;
 
@@ -75,7 +75,7 @@ public class DistanceSlides extends OpMode {
         for(double val : data) smoothDist += val;
         smoothDist /= period;
 
-//        slidePos = (int)(smoothDist * m + b);
+        slidePos = (int)(smoothDist * m + b);
 
         Actuation.setTilt(servoPos);
 

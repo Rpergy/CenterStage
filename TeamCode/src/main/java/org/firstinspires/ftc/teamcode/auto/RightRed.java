@@ -73,11 +73,11 @@ public class RightRed extends LinearOpMode {
         Trajectory spike_canvas = new Trajectory();
 
         Trajectory park_right = new Trajectory()
-                .lineTo(new Pose(36, -60, Math.toRadians(0)))
+                .lineTo(new Pose(42, -60, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.right);
 
         Trajectory park_left = new Trajectory()
-                .lineTo(new Pose(36, -12, Math.toRadians(0)))
+                .lineTo(new Pose(42, -12, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
@@ -97,20 +97,33 @@ public class RightRed extends LinearOpMode {
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Red.Right.transition)
                     .lineTo(FieldConstants.Red.Right.rightSpike)
-                    .lineTo(new Pose(24, -48, Math.toRadians(0)));
+                    .lineTo(new Pose(23, -50, Math.toRadians(90)));
 
             spike_canvas.lineTo(FieldConstants.Red.Canvas.right);
         }
 
-        spike_canvas.action(() -> sleep(1000))
-                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
+        spike_canvas.action(() -> sleep(500))
+                .action(Actuation::canvasAlign)
+                .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
                 .action(() -> sleep(500))
-                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
+
+        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+            spike_canvas.lineTo(new Pose(47.5, -39, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+            spike_canvas.lineTo(new Pose(47.5, -31, Math.toRadians(0)));
+        }
+        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
+            spike_canvas.lineTo(new Pose(47.5, -42.5, Math.toRadians(0)));
+        }
+
+        spike_canvas.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides

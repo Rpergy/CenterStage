@@ -72,9 +72,9 @@ public class ActuationConstants {
     public static class Deposit {
         public static double intakeTilt = 0.44;
         public static double[] depositTilts = {
-                0.74,
-                0.66,
-                0.66
+                0.74, // first layer
+                0.66, // second layer
+                0.66 // third layer
         };
 
         public static double open = 0.8;
