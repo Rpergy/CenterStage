@@ -141,7 +141,9 @@ public class RightBlue extends LinearOpMode {
                 .action(() -> sleep(1500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
-                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> Actuation.setDeposit(1.0)) // start depositor
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setDeposit(0.0)) // stop depositor
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
 

@@ -4,16 +4,17 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utility.autonomous.AutoMovement;
-import org.firstinspires.ftc.teamcode.utility.autonomous.Trajectory;
 import org.firstinspires.ftc.teamcode.utility.dataTypes.Pose;
 
 import java.util.Arrays;
@@ -27,12 +28,11 @@ public class Actuation {
     public static boolean tilt = false;
     public static int tiltPos = 0;
     public static int stuckStatus = 0;
-    public static boolean deposit = false;
+    public static int deposit = 0;
     private static boolean fieldCentricToggle = false;
     private static boolean slowModeToggle = false;
     private static boolean slidesToggle = false;
     private static boolean tiltToggle = false;
-    private static boolean depositToggle = false;
     private static boolean stuckToggle = false;
 
     public static DcMotor frontLeft, frontRight, backLeft, backRight;
@@ -40,9 +40,12 @@ public class Actuation {
     public static DcMotor slidesLeft, slidesRight;
     public static DcMotor intake;
     public static Servo tiltLeft, tiltRight;
-    public static Servo depositTilt, depositor;
+    public static Servo depositTilt;
+    public static CRServo depositLeft, depositRight;
     public static Servo lifter;
     public static Servo airplaneTilt, airplaneLaunch;
+
+    public static ColorSensor colorTop, colorBottom;
 
     public static ModernRoboticsI2cRangeSensor rangeSensor;
 
@@ -98,8 +101,11 @@ public class Actuation {
             depositTilt.setPosition(ActuationConstants.Deposit.intakeTilt);
         }
 
-        if (map.servo.contains("depositor")) {
-            depositor = map.servo.get("depositor");
+        if (map.crservo.contains("depositLeft")) {
+            depositLeft = map.crservo.get("depositLeft");
+        }
+        if (map.crservo.contains("depositRight")) {
+            depositRight = map.crservo.get("depositRight");
         }
 
         if (map.servo.contains("lifter")) {
@@ -124,6 +130,9 @@ public class Actuation {
 
         leds = map.get(RevBlinkinLedDriver.class, "leds");
         leds.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+
+        colorTop = map.colorSensor.get("colorTop");
+        colorBottom = map.colorSensor.get("colorBottom");
 
         frontLeft  = map.get(DcMotor.class, "frontLeft");
         frontRight = map.get(DcMotor.class, "frontRight");
@@ -248,7 +257,7 @@ public class Actuation {
         if(slides) {
             int slidePos = 0;
             if (tiltPos == 1)
-                slidePos = (int)(dist * 125 + 400);
+                slidePos = (int)(dist * 125 + 450);
             else if (tiltPos == 2)
                 slidePos = (int)(dist * 197 + 775);
             else if (tiltPos == 3)
@@ -275,7 +284,7 @@ public class Actuation {
             if(tiltPos == 0 || tiltPos == 1) tiltPos += 1;
             else tiltPos = 0;
 
-            deposit = (tiltPos >= 1);
+//            deposit = (tiltPos >= 1);
         }
         tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
         tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
@@ -284,18 +293,20 @@ public class Actuation {
     }
 
     public static void setTiltPreset(int num) {
-        if(!slides)
+        if(!slides) {
+            if(tiltPos != num) {
+                if(tiltPos > 0) {
+                    setDepositTilt(ActuationConstants.Deposit.transitionTilt);
+                }
+                else {
+                    setDepositTilt(ActuationConstants.Deposit.intakeTilt);
+                }
+            }
             tiltPos = num;
+        }
 
         tiltLeft.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
         tiltRight.setPosition(ActuationConstants.Extension.tiltPositions[tiltPos]);
-
-        if(num != 0) {
-            deposit = true;
-        }
-        else {
-            deposit = false;
-        }
     }
 
     public static void slidesOut() {
@@ -306,7 +317,7 @@ public class Actuation {
         if(!Double.isNaN(newDist))
             dist = newDist;
 
-        int slidePos = (int)(dist * 125 + 400);
+        int slidePos = (int)(dist * 125 + 450);
 
         if(slidePos <= ActuationConstants.Extension.maxExtend) {
             slidesLeft.setTargetPosition(slidePos);
@@ -354,25 +365,18 @@ public class Actuation {
         depositTilt.setPosition(pos);
     }
 
-    public static void setDeposit(double pos) { depositor.setPosition(pos); }
+    public static void setDeposit(double power) {
+        depositLeft.setPower(power);
+        depositRight.setPower(power);
+    }
 
-    public static void toggleDeposit(boolean toggle) {
-        telemetry.addData("toggle", toggle);
-        telemetry.addData("lastToggle", depositToggle);
-        telemetry.addData("depositing", deposit);
-
-        if(toggle && !depositToggle) {
-            deposit = !deposit;
+    public static void toggleDeposit(int newState) {
+        if(newState != deposit) {
+            setDeposit(newState);
         }
+        deposit = newState;
 
-        if (!deposit) {
-            depositor.setPosition(ActuationConstants.Deposit.open);
-        }
-        else {
-            depositor.setPosition(ActuationConstants.Deposit.closed);
-        }
-
-        depositToggle = toggle;
+        telemetry.addData("deposit state", deposit);
     }
 
     public static void stuckFix(boolean toggle) {
@@ -403,5 +407,13 @@ public class Actuation {
 
     public static void setLeds(RevBlinkinLedDriver.BlinkinPattern pattern) {
         leds.setPattern(pattern);
+    }
+
+    public static void getColorTop() {
+
+    }
+
+    public static void getColorBottom() {
+
     }
 }

@@ -32,8 +32,14 @@ public class DragonOp extends OpMode {
 
         Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
 
-        Actuation.toggleSlides(gamepad2.square);
-        Actuation.toggleDeposit(gamepad2.circle || gamepad1.circle);
+        Actuation.toggleSlides(gamepad2.square); // slides
+
+        // depositor
+        if(gamepad2.left_trigger > 0.5 || gamepad1.left_trigger > 0.5 || gamepad1.right_trigger > 0.5) Actuation.toggleDeposit(1); // close
+        else if(gamepad2.right_trigger > 0.5) Actuation.toggleDeposit(-1); // open
+        else Actuation.toggleDeposit(0);
+
+        // Ryan sucks at programming
 
         // pixel stack
         if(gamepad1.right_bumper) Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]);
@@ -42,7 +48,7 @@ public class DragonOp extends OpMode {
         // tilts
         if(gamepad2.left_bumper) Actuation.setTiltPreset(1);
         if(gamepad2.right_bumper) Actuation.setTiltPreset(2);
-        if(gamepad2.right_trigger > 0.5) Actuation.setTiltPreset(3);
+        if(gamepad2.triangle) Actuation.setTiltPreset(3);
         if(gamepad2.cross) Actuation.setTiltPreset(0);
 
         // hang controls
@@ -56,17 +62,9 @@ public class DragonOp extends OpMode {
         Actuation.autoDeposit();
         Actuation.stuckFix(gamepad2.ps);
 
-        if(Actuation.deposit) {
-            gamepad1.setLedColor(0, 255, 0, 1500);
-            gamepad2.setLedColor(0, 255, 0, 1500);
-        }
-        else {
-            gamepad1.setLedColor(255, 0, 0, 1500);
-            gamepad2.setLedColor(255, 0, 0, 1500);
-        }
-
-        if (gamepad1.left_trigger > 0.5)
+        if (gamepad1.left_trigger > 0.5) {
             Actuation.setIntake(-1.0);
+        }
         else if (gamepad1.right_trigger > 0.5){
             Actuation.setIntake(1.0);
         }

@@ -122,7 +122,9 @@ public class LeftRed extends LinearOpMode {
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(1250))
-                .action(() -> Actuation.setDeposit(ActuationConstants.Deposit.open)) // open depositor
+                .action(() -> Actuation.setDeposit(1.0)) // start depositor
+                .action(() -> sleep(1000))
+                .action(() -> Actuation.setDeposit(0.0)) // stop depositor
                 .action(() -> sleep(1000));
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER

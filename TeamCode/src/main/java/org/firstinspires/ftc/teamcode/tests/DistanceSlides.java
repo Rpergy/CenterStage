@@ -21,8 +21,8 @@ public class DistanceSlides extends OpMode {
     public static double servoPos = 0.5;
     public static int slidePos = 0;
 
-    public static double m = 197;
-    public static double b = 1246;
+    public static double m = 125;
+    public static double b = 400;
 
     double lastDist = 0;
 
@@ -80,7 +80,7 @@ public class DistanceSlides extends OpMode {
         Actuation.setTilt(servoPos);
 
         if(slidePos > 700) {
-            Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[1]);
+            Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0]);
         }
         else {
             Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt);

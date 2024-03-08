@@ -71,6 +71,7 @@ public class ActuationConstants {
     @Config
     public static class Deposit {
         public static double intakeTilt = 0.44;
+        public static double transitionTilt = 0.5;
         public static double[] depositTilts = {
                 0.74, // first layer
                 0.66, // second layer
