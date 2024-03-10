@@ -120,7 +120,6 @@ public class Actuation {
 
         if (map.servo.contains("airplaneTilt")) {
             airplaneTilt = map.servo.get("airplaneTilt");
-            airplaneTilt.setPosition(ActuationConstants.Plane.tilt);
         }
 
         rangeSensor = map.get(ModernRoboticsI2cRangeSensor.class, "dist");
@@ -226,13 +225,13 @@ public class Actuation {
     }
 
     public static void canvasAlign() {
-        double travelDist = getDist() - 6;
+        double travelDist = getDist() - 7.9;
 
         TelemetryPacket packet = new TelemetryPacket();
 
         while(Math.abs(travelDist) > 1.0) {
             drive(-Math.tanh(travelDist/5) * 0.3, 0.0, 0.0);
-            travelDist = getDist() - 6;
+            travelDist = getDist() - 7.9;
 
             packet.put("travel dist", travelDist);
             packet.put("motor power", -Math.tanh(travelDist/5) * 0.3);
@@ -259,7 +258,7 @@ public class Actuation {
             if (tiltPos == 1)
                 slidePos = (int)(dist * 125 + 450);
             else if (tiltPos == 2)
-                slidePos = (int)(dist * 197 + 775);
+                slidePos = (int)(dist * 197 + 1000);
             else if (tiltPos == 3)
                 slidePos = 2400;
 
@@ -353,7 +352,7 @@ public class Actuation {
     public static void autoDeposit() {
         int slideAvg = (slidesLeft.getCurrentPosition() + slidesRight.getCurrentPosition()) / 2;
 
-        if (slideAvg > 900 && tiltPos > 0) {
+        if (slideAvg > 900 && tiltPos > 0 && tiltPos != 4) {
             depositTilt.setPosition(ActuationConstants.Deposit.depositTilts[tiltPos-1]);
         }
         else {
@@ -397,7 +396,6 @@ public class Actuation {
     }
 
     public static void hangSetup() {
-        setTilt(ActuationConstants.Extension.tiltPositions[2]);
         setSlides(ActuationConstants.Extension.hang);
     }
 
@@ -415,5 +413,13 @@ public class Actuation {
 
     public static void getColorBottom() {
 
+    }
+
+    public static void setPlaneTilt(double pos) {
+        airplaneTilt.setPosition(pos);
+    }
+
+    public static void setPlaneLaunch(double pos) {
+        airplaneLaunch.setPosition(pos);
     }
 }

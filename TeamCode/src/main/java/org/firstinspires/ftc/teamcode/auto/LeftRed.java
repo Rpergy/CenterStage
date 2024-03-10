@@ -33,6 +33,10 @@ public class LeftRed extends LinearOpMode {
     double left = 0.0;
     double middle = 0.0;
     double right = 0.0;
+
+    boolean parkLeft = true;
+    boolean center = false;
+
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
@@ -51,6 +55,11 @@ public class LeftRed extends LinearOpMode {
         });
 
         while(opModeInInit()) {
+            if(gamepad1.right_trigger > 0.5) parkLeft = false;
+            else if(gamepad1.left_trigger > 0.5) parkLeft = true;
+
+            if(gamepad1.left_bumper) center = false;
+            if(gamepad1.right_bumper) center = true;
 
             if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) {
                 telemetry.addData("prop", "middle");
@@ -61,6 +70,12 @@ public class LeftRed extends LinearOpMode {
             else if (Math.max(Math.max(left, right), middle) == right) {
                 telemetry.addData("prop", "right");
             }
+
+            if(parkLeft) telemetry.addData("park", "left");
+            else telemetry.addData("park", "right");
+
+            if(center) telemetry.addData("movement", "center");
+            else telemetry.addData("movement", "side");
             telemetry.update();
         }
 
@@ -68,27 +83,18 @@ public class LeftRed extends LinearOpMode {
 
         Trajectory start_spike = new Trajectory(FieldConstants.Red.Left.start);
 
-        Trajectory spike_stack = new Trajectory()
-                .lineTo(FieldConstants.Red.Stacks.left);
-
         Trajectory stack_canvas_side = new Trajectory()
-                .lineTo(new Pose(-53, -59.5, Math.toRadians(0)))
-                .lineTo(new Pose(29, -59.5, Math.toRadians(0)), 0.8, 0.2);
+                .lineTo(new Pose(-53, -59.75, Math.toRadians(0)))
+                .lineTo(new Pose(29, -59.75, Math.toRadians(0)), 0.8, 0.2);
 
         Trajectory stack_canvas_mid = new Trajectory();
 
-        Trajectory canvas_stack_mid = new Trajectory();
-        Trajectory canvas_stack_side = new Trajectory()
-                .lineTo(new Pose(36, -59.5, Math.toRadians(0)))
-                .lineTo(new Pose(-53, -59.5, Math.toRadians(0)), 0.7, 0.7)
-                .lineTo(FieldConstants.Red.Stacks.left);
-
         Trajectory park_right = new Trajectory()
-                .lineTo(new Pose(36, -60, Math.toRadians(0)))
+                .lineTo(new Pose(47, -60, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.right);
 
         Trajectory park_left = new Trajectory()
-                .lineTo(new Pose(36, -12, Math.toRadians(0)))
+                .lineTo(new Pose(47, -12, Math.toRadians(0)))
                 .lineTo(FieldConstants.Red.Park.left);
 
         if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
@@ -97,59 +103,69 @@ public class LeftRed extends LinearOpMode {
                     .lineTo(new Pose(-36.5, -40, Math.toRadians(0))); // move back
 
             stack_canvas_side.lineTo(FieldConstants.Red.Canvas.center);
-            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.center);
+            stack_canvas_mid
+                    .lineTo(new Pose(-55, -40, Math.toRadians(90)))
+                    .lineTo(new Pose(-55, -12, Math.toRadians(90)))
+                    .lineTo(new Pose(40, -12, Math.toRadians(0)))
+                    .lineTo(FieldConstants.Red.Canvas.center);
         }
         else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
             start_spike.lineTo(FieldConstants.Red.Left.transition)
                     .lineTo(FieldConstants.Red.Left.leftSpike) // deposit purple
-                    .lineTo(new Pose(-39, -44, Math.toRadians(0))); // move back
+                    .lineTo(new Pose(-39, -44, Math.toRadians(90))); // move back
 
             stack_canvas_side.lineTo(FieldConstants.Red.Canvas.left);
-            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.left);
+            stack_canvas_mid
+                    .lineTo(new Pose(-35, -44, Math.toRadians(90)))
+                    .lineTo(new Pose(-35, -12, Math.toRadians(90)))
+                    .lineTo(new Pose(40, -12, Math.toRadians(0)))
+                    .lineTo(FieldConstants.Red.Canvas.left);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(new Pose(-38, -43, Math.toRadians(0)))
                     .lineTo(FieldConstants.Red.Left.rightSpike); // deposit purple
 
             stack_canvas_side.lineTo(FieldConstants.Red.Canvas.right);
-            stack_canvas_mid.lineTo(FieldConstants.Red.Canvas.right);
+            stack_canvas_mid
+                    .lineTo(new Pose(-38, -12, Math.toRadians(0)))
+                    .lineTo(new Pose(40, -12, Math.toRadians(0)))
+                    .lineTo(FieldConstants.Red.Canvas.right);
         }
 
-        stack_canvas_side.action(() -> sleep(250))
+        Trajectory deposit_movement = new Trajectory().action(() -> sleep(250))
                 .action(Actuation::canvasAlign)
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(1250))
-                .action(() -> Actuation.setDeposit(1.0)) // start depositor
+                .action(() -> Actuation.setDeposit(-1.0)) // start depositor
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setDeposit(0.0)) // stop depositor
-                .action(() -> sleep(1000));
-
-        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            stack_canvas_side.lineTo(new Pose(38, -39, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            stack_canvas_side.lineTo(new Pose(38, -31, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            stack_canvas_side.lineTo(new Pose(38, -42.5, Math.toRadians(0)));
-        }
-
-        stack_canvas_side.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(() -> sleep(1000))
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         start_spike.run();
-//        spike_stack.run();
-//
-        stack_canvas_side.run();
-//        canvas_stack_side.run();
-//        stack_canvas_side.run();
 
-        park_left.run();
+        if(center)
+            stack_canvas_mid.run();
+        else
+            stack_canvas_side.run();
+
+        deposit_movement.run();
+
+        if(parkLeft)
+            park_left.run();
+        else
+            park_right.run();
+
+        Trajectory planeSetup = new Trajectory()
+                .action(() -> Actuation.setPlaneTilt(0.21));
+
+        planeSetup.run();
 
     }
     class Pipeline extends OpenCvPipeline

@@ -33,6 +33,7 @@ public class LeftBlue extends LinearOpMode {
     double left = 1;
     double middle = 0;
     double right = 0;
+    boolean parkLeft = true;
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
@@ -52,11 +53,13 @@ public class LeftBlue extends LinearOpMode {
         });
 
         while(opModeInInit()) {
+            if(gamepad1.right_trigger > 0.5) parkLeft = false;
+            else if(gamepad1.left_trigger > 0.5) parkLeft = true;
 
-            if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) {
+            if (Math.max(Math.max(left, right), middle) == middle) {
                 telemetry.addData("prop", "middle");
             }
-            else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) {
+            else if (Math.max(Math.max(left, right), middle) == left) {
                 telemetry.addData("prop", "left");
             }
             else if (Math.max(Math.max(left, right), middle) == right) {
@@ -70,14 +73,14 @@ public class LeftBlue extends LinearOpMode {
 
         Trajectory spike_canvas = new Trajectory();
 
-        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+        if (Math.max(Math.max(left, right), middle) == middle) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Left.transition)
                     .lineTo(FieldConstants.Blue.Left.centerSpike)
                     .lineTo(new Pose(11.5, 44, Math.toRadians(-90)));
 
             spike_canvas.lineTo(FieldConstants.Blue.Canvas.center, 0.6, 0.6);
         }
-        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+        else if (Math.max(Math.max(left, right), middle) == left) { // LEFT
             start_spike.lineTo(FieldConstants.Blue.Left.transition)
                     .lineTo(FieldConstants.Blue.Left.leftSpike)
                     .lineTo(new Pose(21, 48, Math.toRadians(0)));
@@ -105,10 +108,10 @@ public class LeftBlue extends LinearOpMode {
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
 
-        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+        if (Math.max(Math.max(left, right), middle) == middle) { // CENTER
             spike_canvas.lineTo(new Pose(45, 37.25, Math.toRadians(0)));
         }
-        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+        else if (Math.max(Math.max(left, right), middle) == left) { // LEFT
             spike_canvas.lineTo(new Pose(45, 44, Math.toRadians(0)));
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
@@ -140,11 +143,11 @@ public class LeftBlue extends LinearOpMode {
 
         start_spike.run();
         spike_canvas.run();
-//        canvas_stack_mid.run();
-//        stack_canvas_mid.run();
-//        canvas_stack_mid.run();
-//        stack_canvas_mid.run();
-        park_right.run();
+
+        if(parkLeft)
+            park_left.run();
+        else
+            park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {
@@ -153,18 +156,24 @@ public class LeftBlue extends LinearOpMode {
         @Override
         public Mat processFrame(Mat input)
         {
+            Mat hsv = input.clone();
+
+            Imgproc.cvtColor(hsv, hsv, Imgproc.COLOR_RGB2HSV);
+
+            Core.inRange(hsv, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv);
+
             // debug drawing for finding where block spaces are
-            Imgproc.rectangle(input, new Point(0, 80), new Point(50, 160), new Scalar(255, 255, 0));
-            Imgproc.rectangle(input, new Point(280, 80), new Point(320, 160), new Scalar(255, 255, 0));
-            Imgproc.rectangle(input, new Point(100, 80), new Point(250, 140), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(0, 110), new Point(50, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(280, 110), new Point(320, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(100, 110), new Point(250, 140), new Scalar(255, 255, 0));
 
             Mat hsv_left = new Mat();
             Mat hsv_right = new Mat();
             Mat hsv_mid = new Mat();
 
-            Mat left_sub = input.submat(new Range(80, 160), new Range(0, 50));
-            Mat right_sub = input.submat(new Range(80, 160), new Range(280, 320));
-            Mat mid_sub = input.submat(new Range(80, 140), new Range(100, 250));
+            Mat left_sub = input.submat(new Range(110, 160), new Range(0, 50));
+            Mat right_sub = input.submat(new Range(110, 160), new Range(280, 320));
+            Mat mid_sub = input.submat(new Range(110, 140), new Range(100, 250));
 
             Imgproc.cvtColor(right_sub, hsv_right, Imgproc.COLOR_RGB2HSV);
             Imgproc.cvtColor(left_sub, hsv_left, Imgproc.COLOR_RGB2HSV);
@@ -172,6 +181,11 @@ public class LeftBlue extends LinearOpMode {
             Core.inRange(hsv_left, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_left);
             Core.inRange(hsv_right, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_right);
             Core.inRange(hsv_mid, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_mid);
+
+            Imgproc.rectangle(input, new Point(0, 110), new Point(50, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(input, new Point(280, 110), new Point(320, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(input, new Point(100, 110), new Point(250, 140), new Scalar(255, 255, 0));
+
             left = Core.sumElems(hsv_left).val[0]/(80*50*255);
             right = Core.sumElems(hsv_right).val[0]/(80*40*255);
             middle = Core.sumElems(hsv_mid).val[0]/(60*150*255);

@@ -12,13 +12,16 @@ import org.firstinspires.ftc.teamcode.utility.autonomous.RobotMovement;
 
 @TeleOp(name="Dragon Op")
 public class DragonOp extends OpMode {
-
-    private RobotMovement robot;
     @Override
     public void init() {
         Actuation.setup(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
+    }
+
+    @Override
+    public void start() {
+        Actuation.setPlaneTilt(ActuationConstants.Plane.setupTilt);
     }
 
     @Override
@@ -53,8 +56,8 @@ public class DragonOp extends OpMode {
 
         // hang controls
         if(gamepad2.dpad_up) {
-            Actuation.setLeds(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE);
-            Actuation.setTilt(ActuationConstants.Extension.tiltPositions[4]);
+            Actuation.setLeds(RevBlinkinLedDriver.BlinkinPattern.SHOT_RED);
+            Actuation.setTiltPreset(4);
         }
         if(gamepad2.share) Actuation.hangSetup();
         if(gamepad2.options) Actuation.hang();
@@ -62,6 +65,7 @@ public class DragonOp extends OpMode {
         Actuation.autoDeposit();
         Actuation.stuckFix(gamepad2.ps);
 
+        // intake
         if (gamepad1.left_trigger > 0.5) {
             Actuation.setIntake(-1.0);
         }
@@ -71,6 +75,10 @@ public class DragonOp extends OpMode {
         else {
             Actuation.setIntake(0.0);
         }
+
+        // airplane
+        if(gamepad2.dpad_left) Actuation.setPlaneTilt(ActuationConstants.Plane.launchTilt);
+        if(gamepad2.dpad_right) Actuation.setPlaneLaunch(ActuationConstants.Plane.releaseUp);
 
         telemetry.addData("Slow mode", Actuation.slowMode);
         telemetry.addData("Field centric", Actuation.fieldCentric);

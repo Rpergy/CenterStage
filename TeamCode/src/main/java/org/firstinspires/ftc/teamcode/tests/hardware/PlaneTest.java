@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.tests.hardware;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,13 +15,18 @@ public class PlaneTest extends OpMode {
         tilt = hardwareMap.servo.get("airplaneTilt");
         release = hardwareMap.servo.get("airplaneLaunch");
 
-        tilt.setPosition(0.0);
         release.setPosition(ActuationConstants.Plane.releaseDown);
     }
+
+    @Override
+    public void start() {
+        tilt.setPosition(ActuationConstants.Plane.launchTilt);
+    }
+
 // The only motion in the ocean is going to be Shreyas' flailing arms as I drown him in the sea
     @Override
     public void loop() {
-        tilt.setPosition(ActuationConstants.Plane.tilt);
+        tilt.setPosition(ActuationConstants.Plane.launchTilt);
 
         if(gamepad1.ps) release.setPosition(ActuationConstants.Plane.releaseUp);
         else release.setPosition(ActuationConstants.Plane.releaseDown);

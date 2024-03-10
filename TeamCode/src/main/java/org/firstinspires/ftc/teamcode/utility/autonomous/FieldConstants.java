@@ -53,7 +53,7 @@ public class FieldConstants {
     public static class Red {
         public static class Left {
             public static Pose start = new Pose(-36.5, -63, Math.toRadians(90));
-            public static Pose transition = new Pose(-36.5, -47, Math.toRadians(90));
+            public static Pose transition = new Pose(-36.5, -51, Math.toRadians(90));
 
             public static Pose leftSpike = new Pose(-48, -42, Math.toRadians(90));
             public static Pose centerSpike = new Pose(-36.5, -37, Math.toRadians(90));
@@ -64,15 +64,15 @@ public class FieldConstants {
             public static Pose start = new Pose(11.5, -63, Math.toRadians(90));
             public static Pose transition = new Pose(11.5, -50, Math.toRadians(90));
 
-            public static Pose leftSpike = new Pose(10, -36, Math.toRadians(180));
+            public static Pose leftSpike = new Pose(10, -35, Math.toRadians(180));
             public static Pose centerSpike = new Pose(11.5, -35.5, Math.toRadians(90));
             public static Pose rightSpike = new Pose(23, -42, Math.toRadians(90));
         }
 
         public static class Canvas {
-            public static Pose center = new Pose(36, -39, Math.toRadians(0));
+            public static Pose center = new Pose(36, -38, Math.toRadians(0));
             public static Pose left = new Pose(36, -31, Math.toRadians(0));
-            public static Pose right = new Pose(36, -42.5, Math.toRadians(0));
+            public static Pose right = new Pose(36, -43, Math.toRadians(0));
         }
 
         public static class Stacks {

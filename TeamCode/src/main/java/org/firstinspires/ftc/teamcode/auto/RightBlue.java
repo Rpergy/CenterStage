@@ -34,6 +34,9 @@ public class RightBlue extends LinearOpMode {
     double left = 0;
     double middle = 0;
     double right = 0;
+
+    boolean parkLeft = true;
+    boolean center = false;
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
@@ -52,15 +55,27 @@ public class RightBlue extends LinearOpMode {
         });
 
         while(opModeInInit()) {
+            telemetry.addData("left", left);
+            telemetry.addData("right", right);
+            telemetry.addData("center", middle);
 
-            if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) {
+            if(gamepad1.right_trigger > 0.5) parkLeft = false;
+            else if(gamepad1.left_trigger > 0.5) parkLeft = true;
+
+            if(gamepad1.left_bumper) center = false;
+            if(gamepad1.right_bumper) center = true;
+
+            if (Math.max(Math.max(left, right), middle) == middle) {
                 telemetry.addData("prop", "middle");
             }
-            else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) {
+            else if (Math.max(Math.max(left, right), middle) == left) {
                 telemetry.addData("prop", "left");
             }
             else if (Math.max(Math.max(left, right), middle) == right) {
                 telemetry.addData("prop", "right");
+            }
+            else {
+                telemetry.addData("prop", "none");
             }
             telemetry.update();
         }
@@ -69,60 +84,44 @@ public class RightBlue extends LinearOpMode {
 
         Trajectory start_spike = new Trajectory(FieldConstants.Blue.Right.start);
 
-        Trajectory spike_stack = new Trajectory(); // to pixel stack
-//                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]))
-//                .lineTo(FieldConstants.Blue.Stacks.right, 0.6, 0.7)
-//                .action(() -> sleep(500))
-//                .action(() -> Actuation.setIntake(-1))
-//                .action(() -> sleep(500))
-//                .action(() -> Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[4]))
-//                .action(() -> sleep(500))
-//                .lineTo(new Pose(-57, 37, Math.toRadians(0)))
-//                .action(() -> sleep(1000));
+        Trajectory stack_canvas_mid = new Trajectory();
 
         Trajectory stack_canvas_side = new Trajectory()
                 .lineTo(new Pose(-58, 59, Math.toRadians(0))) // line up with truss
+                .action(() -> sleep(10000))
                 .lineTo(new Pose(28, 59, Math.toRadians(0)), 0.8, 0.8); // move to blue left
 
-        Trajectory stack_canvas_mid = new Trajectory() // DOES NOT WORK
-                .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
-                .lineTo(new Pose(37, 10, 0), 0.9, 0.5);
-
-        Trajectory canvas_stack_mid = new Trajectory() // DOES NOT WORK
-                .lineTo(new Pose(37, 10, 0), 0.9, 0.5)
-                .lineTo(new Pose(40, 42, 0), 0.9, 0.5)
-                .lineTo(FieldConstants.Blue.Stacks.right);
-
-        Trajectory canvas_stack_side = new Trajectory()
-                .lineTo(new Pose(30, 58.75, Math.toRadians(0))) // line up with truss
-                .lineTo(new Pose(-58, 58.75, Math.toRadians(0)), 0.8, 0.8) // move close to stack
-                .lineTo(FieldConstants.Blue.Stacks.right); // into stack
-
         Trajectory park_left = new Trajectory()
-                .lineTo(new Pose(43, 59, Math.toRadians(0)))
+                .lineTo(new Pose(47, 60.5, Math.toRadians(0)))
                 .lineTo(FieldConstants.Blue.Park.left);
 
         Trajectory park_right = new Trajectory()
-                .lineTo(new Pose(43, 13, 0))
+                .lineTo(new Pose(47, 13, 0))
                 .lineTo(FieldConstants.Blue.Park.right);
 
-        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
+        if (Math.max(Math.max(left, right), middle) == middle) { // CENTER
             start_spike.lineTo(FieldConstants.Blue.Right.transition)
                     .lineTo(FieldConstants.Blue.Right.centerSpike) // deposit purple
                     .lineTo(FieldConstants.Blue.Right.transition); // move back
 
             // move into canvas pos
-            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.center);
-            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.center);
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.center, 0.7, 0.4);
+            stack_canvas_mid.lineTo(new Pose(-55, 36, Math.toRadians(-90)))
+                    .lineTo(new Pose(-55, 12, 0))
+                    .lineTo(new Pose(40, 12, 0))
+                    .lineTo(new Pose(FieldConstants.Blue.Canvas.center.x, FieldConstants.Blue.Canvas.center.y - 1.5, FieldConstants.Blue.Canvas.center.heading), 0.7, 0.4);
         }
-        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
+        else if (Math.max(Math.max(left, right), middle) == left) { // LEFT
             start_spike.lineTo(new Pose(-40, 38, Math.toRadians(0)), 0.7, 0.8)
                     .lineTo(FieldConstants.Blue.Right.leftSpike)
                     .lineTo(new Pose(-40, 37, 0)); // deposit purple
 
             // move into canvas pos
-            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left);
-            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.left);
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.left, 0.7, 0.4);
+            stack_canvas_mid.lineTo(new Pose(-40, 37, 0))
+                    .lineTo(new Pose(-40, 12, 0))
+                    .lineTo(new Pose(40, 12, 0))
+                    .lineTo(FieldConstants.Blue.Canvas.left, 0.7, 0.4);
         }
         else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
             start_spike.lineTo(FieldConstants.Blue.Right.transition)
@@ -130,49 +129,45 @@ public class RightBlue extends LinearOpMode {
                     .lineTo(new Pose(-48.5, 46, Math.toRadians(-90))); // move back
 
             // move into canvas pos
-            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.right);
-            stack_canvas_mid.lineTo(FieldConstants.Blue.Canvas.right);
+            stack_canvas_side.lineTo(FieldConstants.Blue.Canvas.right, 0.7, 0.4);
+            stack_canvas_mid.lineTo(new Pose(-37.5, 46, Math.toRadians(-90)))
+                    .lineTo(new Pose(-37.5, 12, Math.toRadians(-90)))
+                    .lineTo(new Pose(40, 12, 0))
+                    .lineTo(FieldConstants.Blue.Canvas.right, 0.7, 0.4);
         }
 
-        stack_canvas_side.action(() -> sleep(250))
+        Trajectory deposit_sequence = new Trajectory().action(() -> sleep(250))
                 .action(Actuation::canvasAlign)
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[1])) // tilt slides
                 .action(Actuation::slidesOut) // send slides out
-                .action(() -> sleep(1500))
+                .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
-                .action(() -> Actuation.setDeposit(1.0)) // start depositor
+                .action(() -> Actuation.setDeposit(-1.0)) // start depositor
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setDeposit(0.0)) // stop depositor
                 .action(() -> sleep(1000))
-                .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
-
-        if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == middle-0.2) { // CENTER
-            stack_canvas_side.lineTo(new Pose(38, 37.25, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left-0.3, right-0.3), middle-0.2) == left-0.3) { // LEFT
-            stack_canvas_side.lineTo(new Pose(38, 44, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            stack_canvas_side.lineTo(new Pose(38, 32.5, Math.toRadians(0)));
-        }
-
-        stack_canvas_side.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
+                .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         // purple preload
         start_spike.run();
-        spike_stack.run();
 
         // yellow preload and cycle
-        stack_canvas_side.run();
-//        canvas_stack_side.run();
 //        stack_canvas_side.run();
+        if(center)
+            stack_canvas_mid.run();
+        else
+            stack_canvas_side.run();
+        deposit_sequence.run();
 
         //park
-        park_right.run();
+        if(parkLeft)
+            park_left.run();
+        else
+            park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {
@@ -181,18 +176,24 @@ public class RightBlue extends LinearOpMode {
         @Override
         public Mat processFrame(Mat input)
         {
+            Mat hsv = input.clone();
+
+            Imgproc.cvtColor(hsv, hsv, Imgproc.COLOR_RGB2HSV);
+
+            Core.inRange(hsv, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv);
+
             // debug drawing for finding where block spaces are
-            Imgproc.rectangle(input, new Point(0, 80), new Point(50, 160), new Scalar(255, 255, 0));
-            Imgproc.rectangle(input, new Point(280, 80), new Point(320, 160), new Scalar(255, 255, 0));
-            Imgproc.rectangle(input, new Point(100, 80), new Point(250, 140), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(0, 110), new Point(50, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(280, 110), new Point(320, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(hsv, new Point(100, 110), new Point(250, 140), new Scalar(255, 255, 0));
 
             Mat hsv_left = new Mat();
             Mat hsv_right = new Mat();
             Mat hsv_mid = new Mat();
 
-            Mat left_sub = input.submat(new Range(80, 160), new Range(0, 50));
-            Mat right_sub = input.submat(new Range(80, 160), new Range(280, 320));
-            Mat mid_sub = input.submat(new Range(80, 140), new Range(100, 250));
+            Mat left_sub = input.submat(new Range(110, 160), new Range(0, 50));
+            Mat right_sub = input.submat(new Range(110, 160), new Range(280, 320));
+            Mat mid_sub = input.submat(new Range(110, 140), new Range(100, 250));
 
             Imgproc.cvtColor(right_sub, hsv_right, Imgproc.COLOR_RGB2HSV);
             Imgproc.cvtColor(left_sub, hsv_left, Imgproc.COLOR_RGB2HSV);
@@ -200,6 +201,11 @@ public class RightBlue extends LinearOpMode {
             Core.inRange(hsv_left, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_left);
             Core.inRange(hsv_right, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_right);
             Core.inRange(hsv_mid, new Scalar(100, 0, 100), new Scalar(255, 255, 255), hsv_mid);
+
+            Imgproc.rectangle(input, new Point(0, 110), new Point(50, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(input, new Point(280, 110), new Point(320, 160), new Scalar(255, 255, 0));
+            Imgproc.rectangle(input, new Point(100, 110), new Point(250, 140), new Scalar(255, 255, 0));
+
             left = Core.sumElems(hsv_left).val[0]/(80*50*255);
             right = Core.sumElems(hsv_right).val[0]/(80*40*255);
             middle = Core.sumElems(hsv_mid).val[0]/(60*150*255);
