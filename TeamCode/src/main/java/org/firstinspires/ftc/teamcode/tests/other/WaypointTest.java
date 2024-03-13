@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.tests.other;
 
 import java.util.ArrayList;
 import com.acmerobotics.dashboard.FtcDashboard;
