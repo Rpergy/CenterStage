@@ -152,13 +152,6 @@ public class Actuation {
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         dashboard = FtcDashboard.getInstance();
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("dist", 0);
-        packet.put("smoothDist", 0);
-        packet.put("travel dist", 0);
-        packet.put("motor power", 0);
-        dashboard.sendTelemetryPacket(packet);
     }
 
     public static void drive(double move, double turn, double strafe) {
@@ -196,8 +189,6 @@ public class Actuation {
     public static double getDist() {
         double dist = lastDist;
 
-        TelemetryPacket packet = new TelemetryPacket();
-
         double newDist = rangeSensor.getDistance(DistanceUnit.INCH);
 
         if(!Double.isNaN(newDist) && Math.abs(lastDist - newDist) < 30 && newDist != Double.POSITIVE_INFINITY && newDist != Double.NEGATIVE_INFINITY)
@@ -215,11 +206,9 @@ public class Actuation {
             }
         smoothDist /= validPoints;
 
-        packet.put("dist", dist);
-        packet.put("smoothDist", smoothDist);
-        dashboard.sendTelemetryPacket(packet);
-
         lastDist = smoothDist;
+
+        telemetry.addData("distance", smoothDist);
 
         return smoothDist;
     }
@@ -227,15 +216,9 @@ public class Actuation {
     public static void canvasAlign() {
         double travelDist = getDist() - 7.9;
 
-        TelemetryPacket packet = new TelemetryPacket();
-
         while(Math.abs(travelDist) > 1.0) {
             drive(-Math.tanh(travelDist/5) * 0.3, 0.0, 0.0);
             travelDist = getDist() - 7.9;
-
-            packet.put("travel dist", travelDist);
-            packet.put("motor power", -Math.tanh(travelDist/5) * 0.3);
-            dashboard.sendTelemetryPacket(packet);
         }
         drive(0, 0, 0);
         AutoMovement.robotPose = new Pose(48, AutoMovement.robotPose.y, AutoMovement.robotPose.heading);

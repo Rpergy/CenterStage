@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.utility.Actuation;
 
 @TeleOp(name = "weighted drive", group = "tests")
 public class WeightedDrive extends OpMode {
-    double[] xPos;
-    double[] yPos;
+    double[] movePos;
+    double[] strafePos;
 
-    int period = 500;
+    int period = 100;
 
     FtcDashboard dashboard;
 
@@ -20,38 +20,41 @@ public class WeightedDrive extends OpMode {
     public void init() {
         Actuation.setup(hardwareMap, telemetry);
 
-        xPos = new double[period];
-        yPos = new double[period];
+        movePos = new double[period];
+        strafePos = new double[period];
 
         dashboard = FtcDashboard.getInstance();
     }
 
     @Override
     public void loop() {
-        double x = gamepad1.left_stick_x;
-        double y = gamepad1.left_stick_y;
+        double move = 0;
+        double strafe = gamepad1.right_stick_x;
 
-        if (xPos.length - 1 >= 0) System.arraycopy(xPos, 0, xPos, 1, xPos.length - 1);
-        xPos[0] = x;
+        if(gamepad1.left_trigger > 0.1) move = gamepad1.left_trigger;
+        else if (gamepad1.right_trigger > 0.1) move = -gamepad1.right_trigger;
 
-        if (yPos.length - 1 >= 0) System.arraycopy(yPos, 0, yPos, 1, yPos.length - 1);
-        yPos[0] = x;
+        if (movePos.length - 1 >= 0) System.arraycopy(movePos, 0, movePos, 1, movePos.length - 1);
+        movePos[0] = move;
 
-        double xAvg = 0;
-        for(double val : xPos) xAvg += val;
-        xAvg /= period;
+        if (strafePos.length - 1 >= 0) System.arraycopy(strafePos, 0, strafePos, 1, strafePos.length - 1);
+        strafePos[0] = strafe;
 
-        double yAvg = 0;
-        for(double val : yPos) yAvg += val;
-        yAvg /= period;
+        double moveAvg = 0;
+        for(double val : movePos) moveAvg += val;
+        moveAvg /= period;
 
-        Actuation.drive(xAvg, yAvg, 0);
+        double strafeAvg = 0;
+        for(double val : strafePos) strafeAvg += val;
+        strafeAvg /= period;
+
+        Actuation.drive(moveAvg, gamepad1.left_stick_x, strafeAvg);
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("x", x);
-        packet.put("y", y);
-        packet.put("xAvg", xAvg);
-        packet.put("yAvg", yAvg);
+        packet.put("move", move);
+        packet.put("strafe", strafe);
+        packet.put("moveAvg", moveAvg);
+        packet.put("strafeAvg", strafeAvg);
         dashboard.sendTelemetryPacket(packet);
     }
 }

@@ -33,7 +33,12 @@ public class DragonOp extends OpMode {
         double turn = gamepad1.left_stick_x;
         double strafe = gamepad1.right_stick_x;
 
-        Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
+        if(gamepad1.left_bumper) {
+            AutoMovement.turnTowards(0, 1.0);
+        }
+        else {
+            Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
+        }
 
         Actuation.toggleSlides(gamepad2.square); // slides
 
