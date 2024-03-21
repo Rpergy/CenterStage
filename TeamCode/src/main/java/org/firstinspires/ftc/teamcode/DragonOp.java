@@ -30,11 +30,12 @@ public class DragonOp extends OpMode {
         AutoMovement.displayPosition();
 
         double move = gamepad1.left_stick_y;
-        double turn = gamepad1.left_stick_x;
-        double strafe = gamepad1.right_stick_x;
+        double turn = gamepad1.right_stick_x;
+        double strafe = gamepad1.left_stick_x;
 
         if(gamepad1.left_bumper) {
-            AutoMovement.turnTowards(0, 1.0);
+//            AutoMovement.turnTowards(0, 0.5);
+            Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, -AutoMovement.calcTurnTowards(Math.toRadians(0), 0.8), strafe);
         }
         else {
             Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);

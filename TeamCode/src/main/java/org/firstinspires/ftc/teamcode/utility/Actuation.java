@@ -176,10 +176,10 @@ public class Actuation {
             backRight.setPower((newMove-turn+newStrafe) * multip);
         }
         else {
-            frontLeft.setPower((move-turn-strafe) * multip);
-            backLeft.setPower((move+turn-strafe) * multip);
-            frontRight.setPower((move+turn+strafe) * multip);
-            backRight.setPower((move-turn+strafe) * multip);
+            frontLeft.setPower((move-strafe-turn) * multip);
+            backLeft.setPower((move+strafe-turn) * multip);
+            frontRight.setPower((move+strafe+turn) * multip);
+            backRight.setPower((move-strafe+turn) * multip);
         }
 
         slowModeToggle = toggleSlowMode;

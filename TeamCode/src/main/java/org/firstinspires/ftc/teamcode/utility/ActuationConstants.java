@@ -86,7 +86,7 @@ public class ActuationConstants {
     public static class Plane {
         public static double releaseDown = 0.9;
         public static double releaseUp = 0.4;
-        public static double setupTilt = 0.74;
-        public static double launchTilt = 0.62;
+        public static double setupTilt = 0.68;
+        public static double launchTilt = 0.52;
     }
 }

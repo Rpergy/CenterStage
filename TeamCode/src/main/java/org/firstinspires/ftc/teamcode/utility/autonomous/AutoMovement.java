@@ -145,7 +145,7 @@ public class AutoMovement {
 //        dashboard.sendTelemetryPacket(packet);
     }
 
-    public static void turnTowards(double targetHeading, double turnSpeed) {
+    public static double calcTurnTowards(double targetHeading, double turnSpeed) {
         double deltaTheta = MathFunctions.AngleWrap(targetHeading - robotPose.heading);
         double turnPower = deltaTheta/Math.PI;
 
@@ -156,21 +156,20 @@ public class AutoMovement {
             turnPower = -Math.pow(-turnPower, 1.0/ActuationConstants.Autonomous.turnAccelMult) * turnSpeed;
         }
 
-//        if (deltaTheta > 0)
-//            turnPower = Math.max(turnPower, ActuationConstants.Autonomous.minTurnSpeed);
-//        else
-//            turnPower = Math.min(turnPower, -ActuationConstants.Autonomous.minTurnSpeed);
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("turnPower", turnPower);
+        dashboard.sendTelemetryPacket(packet);
 
+        return turnPower;
+    }
+
+    public static void turnTowards(double targetHeading, double turnSpeed) {
+        double turnPower = calcTurnTowards(targetHeading, turnSpeed);
         double voltageComp = 12 / voltageSensor.getVoltage();
-
         Actuation.frontLeft.setPower(turnPower * voltageComp);
         Actuation.frontRight.setPower(-turnPower * voltageComp);
         Actuation.backLeft.setPower(turnPower * voltageComp);
         Actuation.backRight.setPower(-turnPower * voltageComp);
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("turnPower", turnPower);
-//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
