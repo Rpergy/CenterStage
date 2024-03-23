@@ -25,7 +25,6 @@ public class Actuation {
     public static boolean slowMode = false;
     public static boolean fieldCentric = false;
     public static boolean slides = false;
-    public static boolean tilt = false;
     public static int tiltPos = 0;
     public static int stuckStatus = 0;
     public static int deposit = 0;

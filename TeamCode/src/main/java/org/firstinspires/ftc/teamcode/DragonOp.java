@@ -33,11 +33,11 @@ public class DragonOp extends OpMode {
         double turn = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
 
-        if(gamepad1.left_bumper) {
+        if(gamepad1.left_bumper && !gamepad1.dpad_left) {
 //            AutoMovement.turnTowards(0, 0.5);
-            Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, -AutoMovement.calcTurnTowards(Math.toRadians(0), 0.8), strafe);
+            Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, -AutoMovement.calcTurnTowards(Math.toRadians(0), 1.0), strafe);
         }
-        else {
+        else if (!gamepad1.dpad_left) {
             Actuation.teleDrive(gamepad1.right_stick_button, gamepad1.left_stick_button, move, turn, strafe);
         }
 
@@ -83,7 +83,10 @@ public class DragonOp extends OpMode {
         }
 
         // airplane
-        if(gamepad2.dpad_left) Actuation.setPlaneTilt(ActuationConstants.Plane.launchTilt);
+        if(gamepad2.dpad_left) {
+            Actuation.setPlaneTilt(ActuationConstants.Plane.launchTilt);
+            AutoMovement.turnTowards(Math.toRadians(20), 1.0);
+        }
         if(gamepad2.dpad_right) Actuation.setPlaneLaunch(ActuationConstants.Plane.releaseUp);
 
         telemetry.addData("Slow mode", Actuation.slowMode);
