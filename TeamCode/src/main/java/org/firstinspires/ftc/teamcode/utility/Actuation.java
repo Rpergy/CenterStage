@@ -389,12 +389,12 @@ public class Actuation {
         leds.setPattern(pattern);
     }
 
-    public static void getColorTop() {
-
+    public static int[] getColorTop() {
+        return new int[]{colorTop.red(), colorTop.green(), colorTop.blue()};
     }
 
-    public static void getColorBottom() {
-
+    public static int[] getColorBottom() {
+        return new int[]{colorBottom.red(), colorBottom.green(), colorBottom.blue()};
     }
 
     public static void setPlaneTilt(double pos) {

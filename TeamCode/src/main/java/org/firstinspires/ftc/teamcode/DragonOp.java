@@ -15,7 +15,6 @@ public class DragonOp extends OpMode {
     @Override
     public void init() {
         Actuation.setup(hardwareMap, telemetry);
-
         telemetry.addData("Status", "Initialized");
     }
 
