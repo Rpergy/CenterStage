@@ -25,10 +25,10 @@ public class PixelStacks extends LinearOpMode {
        Trajectory goOver = new Trajectory()
                .lineTo(new Pose(-37.51, 5.75, Math.toRadians(0)), 0.5, 0.5);
        goOver.run();
-       Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
+       Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[2]);
        Trajectory goBack = new Trajectory()
                .lineTo(new Pose(-22, 5.75, Math.toRadians(0)), 0.5, 0.5)
-               .lineTo(new Pose(-35.5, 5.75, Math.toRadians(0)), 0.5, 0.5);
+               .lineTo(new Pose(-35, 5.75, Math.toRadians(0)), 0.5, 0.5);
        goBack.run();
        double start = System.currentTimeMillis();
        while(System.currentTimeMillis()-start<5000) {
