@@ -87,6 +87,7 @@ public class DragonOp extends OpMode {
             AutoMovement.turnTowards(Math.toRadians(20), 1.0);
         }
         if(gamepad2.dpad_right) Actuation.setPlaneLaunch(ActuationConstants.Plane.releaseUp);
+        else Actuation.setPlaneLaunch(ActuationConstants.Plane.releaseDown);
 
         telemetry.addData("Slow mode", Actuation.slowMode);
         telemetry.addData("Field centric", Actuation.fieldCentric);
