@@ -88,7 +88,6 @@ public class RightBlue extends LinearOpMode {
 
         Trajectory stack_canvas_side = new Trajectory()
                 .lineTo(new Pose(-58, 59, Math.toRadians(0))) // line up with truss
-                .action(() -> sleep(10000))
                 .lineTo(new Pose(28, 59, Math.toRadians(0)), 0.8, 0.8); // move to blue left
 
         Trajectory park_left = new Trajectory()
@@ -163,11 +162,40 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_side.run();
         deposit_sequence.run();
 
+        Trajectory goOver = new Trajectory()
+                .lineTo(new Pose(40, 12, Math.toRadians(0)))
+                .lineTo(new Pose(-55, 12, Math.toRadians(0)), 0.5, 0.5);
+
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
+
+        goOver.run();
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
+        Trajectory goBack = new Trajectory()
+                .lineTo(new Pose(-22, 12, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(-50, 12, Math.toRadians(0)), 0.5, 0.5);
+        goBack.run();
+        double start = System.currentTimeMillis();
+        while(System.currentTimeMillis()-start<5000) {
+            Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[1]);
+            if (Actuation.getColorTop()[0] >= 1055 && Actuation.getColorTop()[0]<= 1155 && Actuation.getColorTop()[1]>= 2150 && Actuation.getColorTop()[1]<= 2250) {
+                Actuation.setIntake(-1); // Intake
+                Actuation.toggleDeposit(1);
+            }
+            else {
+                Actuation.setIntake(1); // Extake
+            }
+        }
+        //Actuation.setIntake(0);
+        Trajectory retreat = new Trajectory()
+                .lineTo(new Pose(-12, 12, Math.toRadians(0)), 0.5, 0.5);
+        retreat.run();
+
         //park
-        if(parkLeft)
+        /*if(parkLeft)
             park_left.run();
         else
-            park_right.run();
+            park_right.run();*/
     }
     class Pipeline extends OpenCvPipeline
     {

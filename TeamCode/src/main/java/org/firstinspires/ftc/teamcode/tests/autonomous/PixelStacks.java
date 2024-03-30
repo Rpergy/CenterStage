@@ -25,20 +25,20 @@ public class PixelStacks extends LinearOpMode {
        Trajectory goOver = new Trajectory()
                .lineTo(new Pose(-37.51, 5.75, Math.toRadians(0)), 0.5, 0.5);
        goOver.run();
-       Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[2]);
+       Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
        Trajectory goBack = new Trajectory()
                .lineTo(new Pose(-22, 5.75, Math.toRadians(0)), 0.5, 0.5)
-               .lineTo(new Pose(-35, 5.75, Math.toRadians(0)), 0.5, 0.5);
+               .lineTo(new Pose(-34.5, 5.75, Math.toRadians(0)), 0.5, 0.5);
        goBack.run();
        double start = System.currentTimeMillis();
        while(System.currentTimeMillis()-start<5000) {
            Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[1]);
-           if (Actuation.getColorTop()[0] <= 255 && Actuation.getColorBottom()[0]<=255) {
-               Actuation.setIntake(1);
+           if (Actuation.getColorTop()[0] >= 1055 && Actuation.getColorTop()[0]<= 1155 && Actuation.getColorTop()[1]>= 2150 && Actuation.getColorTop()[1]<= 2250) {
+               Actuation.setIntake(-1); // Intake
+               Actuation.toggleDeposit(1);
            }
            else {
-               Actuation.setIntake(-1);
-               Actuation.toggleDeposit(1);
+               Actuation.setIntake(1); // Extake
            }
        }
        //Actuation.setIntake(0);
