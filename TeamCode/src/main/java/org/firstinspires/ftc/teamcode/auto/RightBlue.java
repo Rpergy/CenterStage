@@ -162,9 +162,10 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_side.run();
         deposit_sequence.run();
 
-        Trajectory goOver = new Trajectory()
-                .lineTo(new Pose(40, 12, Math.toRadians(0)))
-                .lineTo(new Pose(-55, 12, Math.toRadians(0)), 0.5, 0.5);
+        /*Trajectory goOver = new Trajectory()
+                .lineTo(new Pose(40, 14, Math.toRadians(0)))
+                .lineTo(new Pose(-45, 14, Math.toRadians(0)))
+                .lineTo(new Pose(-50.5, 14, Math.toRadians(0)), 0.5, 0.5);
 
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
@@ -172,8 +173,8 @@ public class RightBlue extends LinearOpMode {
         goOver.run();
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
         Trajectory goBack = new Trajectory()
-                .lineTo(new Pose(-22, 12, Math.toRadians(0)), 0.5, 0.5)
-                .lineTo(new Pose(-50, 12, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(-45, 14, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(-49, 14, Math.toRadians(0)), 0.5, 0.5);
         goBack.run();
         double start = System.currentTimeMillis();
         while(System.currentTimeMillis()-start<5000) {
@@ -188,14 +189,16 @@ public class RightBlue extends LinearOpMode {
         }
         //Actuation.setIntake(0);
         Trajectory retreat = new Trajectory()
-                .lineTo(new Pose(-12, 12, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(40, 14, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(FieldConstants.Blue.Canvas.right);
         retreat.run();
+        deposit_sequence.run();*/
 
         //park
-        /*if(parkLeft)
+        if(parkLeft)
             park_left.run();
         else
-            park_right.run();*/
+            park_right.run();
     }
     class Pipeline extends OpenCvPipeline
     {

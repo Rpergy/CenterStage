@@ -37,7 +37,6 @@ public class LeftBlue extends LinearOpMode {
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
-        Actuation.setDeposit(ActuationConstants.Deposit.closed);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -102,21 +101,20 @@ public class LeftBlue extends LinearOpMode {
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(1250))
-                .action(() -> Actuation.setDeposit(1.0)) // start depositor
+                .action(() -> Actuation.setDeposit(-1.0)) // start depositor
                 .action(() -> sleep(1000))
                 .action(() -> Actuation.setDeposit(0.0)) // stop depositor
-                .action(() -> sleep(1000))
-                .action(() -> Actuation.setSlides((int)((Actuation.getDist()+0.5) * 125 + 650)));
+                .action(() -> sleep(1000));
 
-        if (Math.max(Math.max(left, right), middle) == middle) { // CENTER
-            spike_canvas.lineTo(new Pose(45, 37.25, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left, right), middle) == left) { // LEFT
-            spike_canvas.lineTo(new Pose(45, 44, Math.toRadians(0)));
-        }
-        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
-            spike_canvas.lineTo(new Pose(45, 32.5, Math.toRadians(0)));
-        }
+//        if (Math.max(Math.max(left, right), middle) == middle) { // CENTER
+//            spike_canvas.lineTo(new Pose(45, 37.25, Math.toRadians(0)));
+//        }
+//        else if (Math.max(Math.max(left, right), middle) == left) { // LEFT
+//            spike_canvas.lineTo(new Pose(45, 44, Math.toRadians(0)));
+//        }
+//        else if (Math.max(Math.max(left, right), middle) == right) { // RIGHT
+//            spike_canvas.lineTo(new Pose(45, 32.5, Math.toRadians(0)));
+//        }
 
         spike_canvas.action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
@@ -124,8 +122,8 @@ public class LeftBlue extends LinearOpMode {
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         Trajectory canvas_stack_mid = new Trajectory()
-            .lineTo(new Pose(37, 10, 0))
-            .lineTo(FieldConstants.Blue.Stacks.left, 0.9, 0.5);
+                .lineTo(new Pose(37, 10, 0))
+                .lineTo(FieldConstants.Blue.Stacks.left, 0.9, 0.5);
         Trajectory canvas_stack_side = new Trajectory();
 
         Trajectory stack_canvas_mid = new Trajectory()
@@ -143,6 +141,39 @@ public class LeftBlue extends LinearOpMode {
 
         start_spike.run();
         spike_canvas.run();
+
+        Trajectory goOver = new Trajectory()
+                .lineTo(new Pose(40, 14, Math.toRadians(0)))
+                .lineTo(new Pose(-45, 14, Math.toRadians(0)))
+                .lineTo(new Pose(-50.5, 14, Math.toRadians(0)), 0.5, 0.5);
+
+        //Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
+
+        goOver.run();
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
+        Trajectory goBack = new Trajectory()
+                .lineTo(new Pose(-45, 14, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(-49, 14, Math.toRadians(0)), 0.5, 0.5);
+        goBack.run();
+        double start = System.currentTimeMillis();
+        while(System.currentTimeMillis()-start<5000) {
+            Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[1]);
+            if (Actuation.getColorTop()[0] >= 1055 && Actuation.getColorTop()[0]<= 1155 && Actuation.getColorTop()[1]>= 2150 && Actuation.getColorTop()[1]<= 2250) {
+                Actuation.setIntake(-1); // Intake
+                Actuation.toggleDeposit(1);
+            }
+            else {
+                Actuation.setIntake(1); // Extake
+            }
+        }
+        //Actuation.setIntake(0);
+        Trajectory retreat = new Trajectory()
+                .lineTo(new Pose(40, 14, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(FieldConstants.Blue.Canvas.right);
+        retreat.run();
+        spike_canvas.run();
+
 
         if(parkLeft)
             park_left.run();

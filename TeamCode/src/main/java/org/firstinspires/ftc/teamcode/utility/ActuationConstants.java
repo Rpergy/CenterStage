@@ -87,6 +87,6 @@ public class ActuationConstants {
         public static double releaseDown = 0.9;
         public static double releaseUp = 0.4;
         public static double setupTilt = 0.68;
-        public static double launchTilt = 0.59;
+        public static double launchTilt = 0.64;
     }
 }
