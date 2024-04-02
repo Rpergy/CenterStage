@@ -28,7 +28,7 @@ public class FieldConstants {
             public static Pose transition = new Pose(-38.5, 46, Math.toRadians(-90));
 
             public static Pose leftSpike = new Pose(-37, 37, Math.toRadians(0));
-            public static Pose centerSpike = new Pose(-38.5, 36, Math.toRadians(-90));
+            public static Pose centerSpike = new Pose(-38.5, 37.5, Math.toRadians(-90));
             public static Pose rightSpike = new Pose(-48.5, 36.5, Math.toRadians(-90));
         }
 

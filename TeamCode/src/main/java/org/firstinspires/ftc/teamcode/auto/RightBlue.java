@@ -143,12 +143,12 @@ public class RightBlue extends LinearOpMode {
                 .action(() -> Actuation.setDepositTilt(ActuationConstants.Deposit.depositTilts[0])) // setup depositor
                 .action(() -> sleep(500))
                 .action(() -> Actuation.setDeposit(-1.0)) // start depositor
-                .action(() -> sleep(1000))
+                .action(() -> sleep(750))
                 .action(() -> Actuation.setDeposit(0.0)) // stop depositor
-                .action(() -> sleep(1000))
+                .action(() -> sleep(500))
                 .action(()-> Actuation.setDepositTilt(ActuationConstants.Deposit.intakeTilt)) // set depositor
                 .action(Actuation::slidesIn) // send slides in
-                .action(() -> sleep(1000))
+                .action(() -> sleep(500))
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         // purple preload
@@ -162,10 +162,10 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_side.run();
         deposit_sequence.run();
 
-        /*Trajectory goOver = new Trajectory()
-                .lineTo(new Pose(40, 14, Math.toRadians(0)))
-                .lineTo(new Pose(-45, 14, Math.toRadians(0)))
-                .lineTo(new Pose(-50.5, 14, Math.toRadians(0)), 0.5, 0.5);
+        Trajectory goOver = new Trajectory()
+                .lineTo(new Pose(40, 14.5, Math.toRadians(0)))
+                .lineTo(new Pose(-45, 14.5, Math.toRadians(0)))
+                .lineTo(new Pose(-50.5, 14.5, Math.toRadians(0)), 0.5, 0.5);
 
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
@@ -173,11 +173,11 @@ public class RightBlue extends LinearOpMode {
         goOver.run();
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]);
         Trajectory goBack = new Trajectory()
-                .lineTo(new Pose(-45, 14, Math.toRadians(0)), 0.5, 0.5)
-                .lineTo(new Pose(-49, 14, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(-45, 14.75, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(-49, 14.75, Math.toRadians(0)), 0.5, 0.5);
         goBack.run();
         double start = System.currentTimeMillis();
-        while(System.currentTimeMillis()-start<5000) {
+        while(System.currentTimeMillis()-start<1750) {
             Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[1]);
             if (Actuation.getColorTop()[0] >= 1055 && Actuation.getColorTop()[0]<= 1155 && Actuation.getColorTop()[1]>= 2150 && Actuation.getColorTop()[1]<= 2250) {
                 Actuation.setIntake(-1); // Intake
@@ -189,16 +189,16 @@ public class RightBlue extends LinearOpMode {
         }
         //Actuation.setIntake(0);
         Trajectory retreat = new Trajectory()
-                .lineTo(new Pose(40, 14, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(35, 14.5, Math.toRadians(0)), 1, 1)
                 .lineTo(FieldConstants.Blue.Canvas.right);
         retreat.run();
-        deposit_sequence.run();*/
+        deposit_sequence.run();
 
         //park
-        if(parkLeft)
+        /*if(parkLeft)
             park_left.run();
         else
-            park_right.run();
+            park_right.run();*/
     }
     class Pipeline extends OpenCvPipeline
     {
