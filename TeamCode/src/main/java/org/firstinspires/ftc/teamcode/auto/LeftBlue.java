@@ -147,7 +147,7 @@ public class LeftBlue extends LinearOpMode {
                 .lineTo(new Pose(-45, 14, Math.toRadians(0)))
                 .lineTo(new Pose(-50.5, 14, Math.toRadians(0)), 0.5, 0.5);
 
-        //Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
+        Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
 
         goOver.run();
