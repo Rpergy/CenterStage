@@ -142,7 +142,7 @@ public class LeftBlue extends LinearOpMode {
         start_spike.run();
         spike_canvas.run();
 
-        Trajectory goOver = new Trajectory()
+        /*Trajectory goOver = new Trajectory()
                 .lineTo(new Pose(40, 14, Math.toRadians(0)))
                 .lineTo(new Pose(-45, 14, Math.toRadians(0)))
                 .lineTo(new Pose(-50.5, 14, Math.toRadians(0)), 0.5, 0.5);
@@ -172,7 +172,7 @@ public class LeftBlue extends LinearOpMode {
                 .lineTo(new Pose(40, 14, Math.toRadians(0)), 0.5, 0.5)
                 .lineTo(FieldConstants.Blue.Canvas.right);
         retreat.run();
-        spike_canvas.run();
+        spike_canvas.run();*/
 
 
         if(parkLeft)

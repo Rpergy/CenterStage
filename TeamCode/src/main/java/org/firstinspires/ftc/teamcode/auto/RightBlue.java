@@ -173,8 +173,8 @@ public class RightBlue extends LinearOpMode {
         goOver.run();
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]+0.2);
         Trajectory goBack = new Trajectory()
-                .lineTo(new Pose(-44, 14.5, Math.toRadians(0)), 0.5, 0.5)
-                .lineTo(new Pose(-48.85, 14.5, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(-44, 14.5, Math.toRadians(0)), 0.4, 0.5)
+                .lineTo(new Pose(-48.5, 14.5, Math.toRadians(0)), 0.5, 0.5);
         goBack.run();
         double start = System.currentTimeMillis();
         while(System.currentTimeMillis()-start<2000) {
