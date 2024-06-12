@@ -149,8 +149,8 @@ public class LeftRed extends LinearOpMode {
                 .action(() -> Actuation.setTilt(ActuationConstants.Extension.tiltPositions[0])); // tilt slides
 
         start_spike.run();
-
-        if(center)
+        //sleep(10000);
+        /*if(center)
             stack_canvas_mid.run();
         else
             stack_canvas_side.run();
@@ -165,7 +165,7 @@ public class LeftRed extends LinearOpMode {
         Trajectory planeSetup = new Trajectory()
                 .action(() -> Actuation.setPlaneTilt(0.21));
 
-        planeSetup.run();
+        planeSetup.run();*/
 
     }
     class Pipeline extends OpenCvPipeline

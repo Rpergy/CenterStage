@@ -39,7 +39,7 @@ public class ActuationConstants {
 
         public static double[] tiltPositions = {
                 0.45, // intake
-                0.52,
+                0.54,
                 0.56,
                 0.6,
                 0.70  // hang

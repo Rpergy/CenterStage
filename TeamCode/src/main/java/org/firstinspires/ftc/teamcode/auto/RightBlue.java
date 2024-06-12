@@ -36,7 +36,7 @@ public class RightBlue extends LinearOpMode {
     double right = 0;
 
     boolean parkLeft = false;
-    boolean center = false;
+    boolean center = true;
     @Override
     public void runOpMode() {
         Actuation.setup(hardwareMap, telemetry);
@@ -153,6 +153,7 @@ public class RightBlue extends LinearOpMode {
 
         // purple preload
         start_spike.run();
+        sleep(7000);
 
         // yellow preload and cycle
 //        stack_canvas_side.run();
@@ -162,10 +163,10 @@ public class RightBlue extends LinearOpMode {
             stack_canvas_side.run();
         deposit_sequence.run();
 
-        Trajectory goOver = new Trajectory()
+        /*Trajectory goOver = new Trajectory()
                 .lineTo(new Pose(40, 14.5, Math.toRadians(0)))
                 .lineTo(new Pose(-45, 14.5, Math.toRadians(0)))
-                .lineTo(new Pose(-50.5, 14.5, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(-48.5, 14.5, Math.toRadians(0)), 0.4, 0.5);
 
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[0]);
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[5]);
@@ -173,8 +174,8 @@ public class RightBlue extends LinearOpMode {
         goOver.run();
         Actuation.setIntakeArm(ActuationConstants.Intake.stackPos[3]+0.2);
         Trajectory goBack = new Trajectory()
-                .lineTo(new Pose(-44, 14.5, Math.toRadians(0)), 0.4, 0.5)
-                .lineTo(new Pose(-48.5, 14.5, Math.toRadians(0)), 0.5, 0.5);
+                .lineTo(new Pose(-42, 14.5, Math.toRadians(0)), 0.5, 0.5)
+                .lineTo(new Pose(-48, 14.5, Math.toRadians(0)), 0.5, 0.5);
         goBack.run();
         double start = System.currentTimeMillis();
         while(System.currentTimeMillis()-start<2000) {
@@ -192,13 +193,13 @@ public class RightBlue extends LinearOpMode {
                 .lineTo(new Pose(35, 14.5, Math.toRadians(0)), 1, 1)
                 .lineTo(FieldConstants.Blue.Canvas.right);
         retreat.run();
-        //deposit_sequence.run();
+        //deposit_sequence.run();*/
 
         //park
-        if(parkLeft)
+        /*if(parkLeft)
             park_left.run();
         else
-            park_right.run();
+            park_right.run();*/
     }
     class Pipeline extends OpenCvPipeline
     {

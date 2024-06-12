@@ -70,7 +70,8 @@ public class FieldTest extends OpMode {
             imu.resetYaw();
             if (orientation.getYaw(AngleUnit.RADIANS) != original)
                 startTime=System.nanoTime();
-        } else {
+        } else {        telemetry.addData("Status", "Initialized");
+
             telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
         }
         endTime = System.nanoTime();
